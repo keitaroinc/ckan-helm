@@ -1,0 +1,37 @@
+{{- if .Values.ckan.psql.initialize -}}
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: psql-init
+spec:
+  template:
+    spec:
+      volumes:
+        - name: psql-init-configmap
+          configMap:
+            name: psql-init-configmap
+      containers:
+      - name: psql-init
+        image: "{{ .Values.image.repository }}:{{ .Chart.AppVersion }}"
+        imagePullPolicy: {{ .Values.image.pullPolicy }}
+        env:
+        - name: PSQL_MASTER
+          value: {{ .Values.ckan.psql.masterUser }}
+        - name: PSQL_PASSWD
+          value: {{ .Values.ckan.psql.masterPassword }}
+        - name: PSQL_DB
+          value: {{ .Values.ckan.psql.masterDatabase }}
+        - name: CKAN_SQLALCHEMY_URL
+          value: "postgresql://{{ .Values.ckan.db.ckanDbUser }}:{{ .Values.ckan.db.ckanDbPassword }}@{{ .Values.ckan.db.ckanDbUrl }}/{{ .Values.ckan.db.ckanDbName }}"
+        - name: CKAN__DATASTORE__WRITE_URL
+          value: "postgresql://{{ .Values.ckan.datastore.RwDbUser }}:{{ .Values.ckan.datastore.RwDbPassword }}@{{ .Values.ckan.datastore.RwDbUrl }}/{{ .Values.ckan.datastore.RwDbName }}"
+        - name: CKAN__DATASTORE__READ_URL
+          value: "postgresql://{{ .Values.ckan.datastore.RoDbUser }}:{{ .Values.ckan.datastore.RoDbPassword }}@{{ .Values.ckan.datastore.RoDbUrl }}/{{ .Values.ckan.datastore.RoDbName }}"
+        command: ["python"]
+        args: ["/srv/psql-init/psql-init.py"]
+        volumeMounts:
+        - name: psql-init-configmap
+          mountPath: /srv/psql-init
+      restartPolicy: Never
+  backoffLimit: 1
+{{- end }}

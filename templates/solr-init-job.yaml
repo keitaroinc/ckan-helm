@@ -1,0 +1,40 @@
+{{- if .Values.solr.initialize.enabled -}}
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: solr-init
+spec:
+  template:
+    spec:
+      volumes:
+        - name: solr-init-configmap
+          configMap:
+            name: solr-init-configmap
+        - name: solr-configset-configmap
+          configMap:
+            name: solr-configset-configmap
+      containers:
+      - name: solr-init
+        image: "{{ .Values.image.repository }}:{{ .Chart.AppVersion }}"
+        imagePullPolicy: {{ .Values.image.pullPolicy }}
+        env:
+        - name: CKAN_SOLR_URL
+          value: {{ .Values.ckan.solr }}
+        - name: CKAN_SOLR_INIT_NUMSHARDS
+          value: "{{ .Values.solr.initialize.numShards }}"
+        - name: CKAN_SOLR_INIT_REPLICATIONFACTOR
+          value: "{{ .Values.solr.initialize.replicationFactor }}"
+        - name: CKAN_SOLR_INIT_MAXSHARDSPERNODE
+          value: "{{ .Values.solr.initialize.maxShardsPerNode }}"
+        - name: CKAN_SOLR_INIT_CONFIGSETNAME
+          value: "{{ .Values.solr.initialize.configsetName }}"
+        command: ["python"]
+        args: ["/srv/solr-init/solr-init.py"]
+        volumeMounts:
+        - name: solr-init-configmap
+          mountPath: /srv/solr-init
+        - name: solr-configset-configmap
+          mountPath: /srv/solr-configset
+      restartPolicy: Never
+  backoffLimit: 3
+{{- end }}

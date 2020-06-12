@@ -1,0 +1,8 @@
+{{- if .Values.solr.initialize.enabled -}}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: solr-configset-configmap
+data:
+{{ (.Files.Glob "solr-init/solr-configset/*").AsConfig | indent 2 }}
+{{- end }}

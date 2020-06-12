@@ -1,0 +1,10 @@
+{{- if .Values.ckan.psql.initialize -}}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: psql-init-configmap
+data:
+  psql-init.py: |
+{{ .Files.Get "psql-init/psql-init.py" | indent 4 }}
+
+{{- end }}

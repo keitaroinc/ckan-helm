@@ -1,0 +1,180 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "ckan-chart.fullname" . }}
+  labels:
+    {{- include "ckan-chart.labels" . | nindent 4 }}
+spec:
+  replicas: {{ .Values.replicaCount }}
+  selector:
+    matchLabels:
+      {{- include "ckan-chart.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      labels:
+        {{- include "ckan-chart.selectorLabels" . | nindent 8 }}
+    spec:
+    {{- with .Values.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+    {{- end }}
+      serviceAccountName: {{ include "ckan-chart.serviceAccountName" . }}
+      securityContext:
+        {{- toYaml .Values.podSecurityContext | nindent 8 }}
+      volumes:
+        - name: "ckan"
+          persistentVolumeClaim:
+            claimName: "ckan"
+      initContainers:
+      - name: set-volume-ownsership
+        image: busybox
+        command: ["sh", "-c", "chown -R 92:92 /var/lib/ckan"] # 92 is the uid and gid of ckan user/group
+        volumeMounts:
+        - name: ckan
+          mountPath: {{ .Values.ckan.storagePath }}
+          readOnly: false
+      containers:
+        - name: {{ .Chart.Name }}
+          securityContext:
+            {{- toYaml .Values.securityContext | nindent 12 }}
+          image: "{{ .Values.image.repository }}:{{ .Chart.AppVersion }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          ports:
+            - name: http
+              containerPort: 5000
+              protocol: TCP
+          env:
+            - name: DEBUG
+              value: {{ .Values.ckan.debug | quote }}
+            - name: CKAN___DEBUG
+              value: {{ .Values.ckan.debug | quote }}
+{{- if .Values.ckan.extraEnv }}
+{{ toYaml .Values.ckan.extraEnv | indent 12 }}
+{{- end }}
+            - name: CKAN_SYSADMIN_NAME
+              value: {{ .Values.ckan.sysadminName }}
+            - name: CKAN_SYSADMIN_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: ckancredentials
+                  key: sysadminPassword
+            - name: CKAN_SYSADMIN_EMAIL
+              value: {{ .Values.ckan.sysadminEmail }}
+            - name: CKAN__SITE_TITLE
+              value: {{ .Values.ckan.siteTitle }}
+            - name: CKAN_SITE_ID
+              value: {{ .Values.ckan.siteId }}
+            - name: CKAN_SITE_URL
+              value: {{ .Values.ckan.siteUrl }}
+            - name: CKAN__PLUGINS
+              value: {{ .Values.ckan.ckanPlugins }}
+            - name: CKANEXT__S3FILESTORE__AWS_ACCESS_KEY_ID
+              value: {{ .Values.ckan.s3filestore.awsAccessKeyId }}
+            - name: CKANEXT__S3FILESTORE__AWS_SECRET_ACCESS_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: ckancredentials
+                  key: awsSecretAccessKey
+            - name: CKANEXT__S3FILESTORE__AWS_BUCKET_NAME
+              value: {{ .Values.ckan.s3filestore.awsBucketName }}
+            - name: CKANEXT__S3FILESTORE__HOST_NAME
+              value: {{ .Values.ckan.s3filestore.hostName }}
+            - name: CKANEXT__S3FILESTORE__REGION_NAME
+              value: {{ .Values.ckan.s3filestore.regionName }}
+            - name: CKANEXT__S3FILESTORE__SIGNATURE_VERSION
+              value: {{ .Values.ckan.s3filestore.signatureVersion }}
+            - name: CKANEXT__S3FILESTORE__AWS_STORAGE_PATH
+              value: {{ .Values.ckan.s3filestore.awsStoragePath }}
+            # - name: CKANEXT__S3FILESTORE__FILESYSTEM_DOWNLOAD_FALLBACK
+            #   value: {{ .Values.ckan.s3filestore.filesystemDownloadFallback }}
+            - name: CKAN__STORAGE_PATH
+              value: {{ .Values.ckan.storagePath }}
+            - name: PSQL_MASTER
+              value: {{ .Values.ckan.psql.masterUser }}
+            - name: PSQL_PASSWD
+              valueFrom:
+                secretKeyRef:
+                  name: ckancredentials
+                  key: psqlMasterPassword
+            - name: PSQL_DB
+              value: {{ .Values.ckan.psql.masterDatabase }}
+            - name: CKAN_SQLALCHEMY_URL
+              valueFrom:
+                secretKeyRef:
+                  name: ckancredentials
+                  key: ckanSqlAlchemyUrl
+            - name: CKAN__DATASTORE__WRITE_URL
+              valueFrom:
+                secretKeyRef:
+                  name: ckancredentials
+                  key: ckanDatastoreWriteUrl
+            - name: CKAN__DATASTORE__READ_URL
+              valueFrom:
+                secretKeyRef:
+                  name: ckancredentials
+                  key: ckanDatastoreReadUrl
+            - name: CKAN_SOLR_URL
+              value: {{ .Values.ckan.solr }}
+            - name: CKAN__REDIS__URL
+              value: {{ .Values.ckan.redis }}
+            - name: CKANEXT__SPATIAL__SEARCH_BACKEND
+              value: {{ .Values.ckan.spatialBackend }}
+            - name: CKAN__LOCALES_OFFERED
+              value: {{ .Values.ckan.locale.offered | quote }}
+            - name: CKAN__LOCALE_DEFAULT
+              value: {{ .Values.ckan.locale.default }}
+            - name: CKAN__DATAPUSHER__URL
+              value: {{ .Values.ckan.datapusherUrl }}
+            - name: CKAN___SMTP__SERVER
+              value: {{ .Values.ckan.smtp.server | quote }}
+            - name: CKAN___SMTP__USER
+              value: {{ .Values.ckan.smtp.user }}
+            - name: CKAN___SMTP__PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: ckancredentials
+                  key: smtpPassword
+            - name: CKAN___SMTP__MAIL_FROM
+              value: {{ .Values.ckan.smtp.mailFrom }}
+            - name: CKAN___SMTP__TLS
+              value: {{ .Values.ckan.smtp.tls }}
+            - name: CKAN___SMTP__STARTTLS
+              value: {{ .Values.ckan.smtp.starttls | quote }}
+            - name: CKAN__ACTIVITY_STREAMS_EMAIL_NOTIFICATIONS
+              value: {{ .Values.ckan.activityStreamsEmailNotifications | quote }}
+            - name: CKANEXT__ISSUES__SEND_EMAIL_NOTIFICATIONS
+              value: {{ .Values.ckan.issues.sendEmailNotifications | quote }}
+          readinessProbe:
+            httpGet:
+              path: /api/3/action/status_show
+              port: http
+            initialDelaySeconds: {{ .Values.ckan.readiness.initialDelaySeconds }}
+            periodSeconds: {{ .Values.ckan.readiness.periodSeconds }}
+            failureThreshold: {{ .Values.ckan.readiness.failureThreshold }}
+            timeoutSeconds: {{ .Values.ckan.readiness.timeoutSeconds }}
+          livenessProbe:
+            httpGet:
+              path: /api/3/action/status_show
+              port: http
+            initialDelaySeconds: {{ .Values.ckan.liveness.initialDelaySeconds }}
+            periodSeconds: {{ .Values.ckan.liveness.periodSeconds }}
+            failureThreshold: {{ .Values.ckan.liveness.failureThreshold }}
+            timeoutSeconds: {{ .Values.ckan.liveness.timeoutSeconds }}
+          volumeMounts:
+          - name: "ckan"
+            mountPath: {{ .Values.ckan.storagePath }}
+            readOnly: false
+          resources:
+            {{- toYaml .Values.resources | nindent 12 }}
+      {{- with .Values.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+    {{- with .Values.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+    {{- end }}
+    {{- with .Values.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+    {{- end }}

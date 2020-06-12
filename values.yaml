@@ -1,0 +1,336 @@
+# Default values for ckan-chart.
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+
+replicaCount: 1
+
+image:
+  repository: keitaro/ckan
+  pullPolicy: Always
+
+imagePullSecrets: []
+nameOverride: ""
+fullnameOverride: "ckan"
+
+pvc:
+  enabled: "false"
+  size: "1Gi"
+
+# DBDeploymentName -- Variable for name override for postgres deployment
+DBDeploymentName: &DBDeploymentName postgres
+
+# RedisName -- Variable for name override for redis deployment
+RedisName: &RedisName redis
+
+# SolrName -- Variable for name override for solr deployment
+SolrName: &SolrName solr
+
+# DatapusherName -- Variable for name override for datapusher deployment
+DatapusherName: &DatapusherName datapusher
+
+# DBHost -- Variable for name of headless svc from postgres deployment
+DBHost: &DBHost postgres
+# MasterDBName -- Variable for name of the master user database in PostgreSQL
+MasterDBName: &MasterDBName postgres
+# MasterDBUser -- Variable for master user name for PostgreSQL
+MasterDBUser: &MasterDBUser postgres
+# MasterDBPass -- Variable for password for the master user in PostgreSQL
+MasterDBPass: &MasterDBPass pass
+
+# CkanDBName -- Variable for name of the database used by CKAN
+CkanDBName: &CkanDBName ckan_default
+# CkanDBUser -- Variable for username for the owner of the CKAN database
+CkanDBUser: &CkanDBUser ckan_default
+# CkanDBPass -- Variable for password for the CKAN database owner
+CkanDBPass: &CkanDBPass pass
+# DatastoreDBName -- Variable for name of the database used by Datastore
+DatastoreDBName: &DatastoreDBName datastore_default
+# DatastoreRWDBUser -- Variable for username for the user with write access to the datastore database
+DatastoreRWDBUser: &DatastoreRWDBUser datastorerw
+# DatastoreRWDBPass -- Variable for password for the datastore database user with write access
+DatastoreRWDBPass: &DatastoreRWDBPass pass
+# DatastoreRODBUser -- Variable for username for the user with read access to the datastore database
+DatastoreRODBUser: &DatastoreRODBUser datastorero
+# DatastoreRODBPass -- Variable for password for the datastore database user with read access
+DatastoreRODBPass: &DatastoreRODBPass pass
+
+# S3FileStoreAccessKey -- AWS access key
+S3FileStoreAccessKey: &S3FileStoreAccessKey "minio_admin"
+# S3FileStoreSecretKey -- AWS secret key
+S3FileStoreSecretKey: &S3FileStoreSecretKey "minio_pass"
+# S3FileStoreBucketName -- AWS bucket name
+S3FileStoreBucketName: &S3FileStoreBucketName ckan
+# S3FileStoreHostName -- Bucket host name
+S3FileStoreHostName: &S3FileStoreHostName "http://minio:9000"
+# S3FileStoreRegionName -- Bucket region name
+S3FileStoreRegionName: &S3FileStoreRegionName "minio"
+# S3FileStoreSignatureVersion -- S3 signature version
+S3FileStoreSignatureVersion: &S3FileStoreSignatureVersion "s3v4"
+# S3FileStoreStoragePath -- S3 storage path
+S3FileStoreStoragePath: &S3FileStoreStoragePath "ckan_storage"
+
+
+ckan:
+  # ckan.sysadminName -- CKAN system admin username
+  sysadminName: "ckan_admin"
+  # ckan.sysadminPassword -- CKAN system admin password
+  sysadminPassword: "PasswordHere"
+  # ckan.sysadminEmail -- CKAN system admin email
+  sysadminEmail: "admin@domain.com"
+  # ckan.siteTitle -- Site title for the instance
+  siteTitle: "Site Title here"
+  # ckan.siteId -- Site id
+  siteId: "site-id-here"
+  # ckan.siteUrl -- Url for the CKAN instance
+  siteUrl: "http://localhost:5000"
+  # ckan.ckanPlugins -- List of plugins to be used by the instance
+  ckanPlugins: "envvars s3filestore image_view text_view recline_view datastore datapusher"
+  # ckan.storagePath -- Storage path to be used by the instance
+  storagePath: "/var/lib/ckan/default"
+  activityStreamsEmailNotifications: "true"
+  debug: "true"
+  s3filestore:
+    # ckan.s3filestore.awsAccessKeyId -- AWS access key
+    awsAccessKeyId: *S3FileStoreAccessKey
+    # ckan.s3filestore.awsSecretAccessKey -- AWS secret key
+    awsSecretAccessKey: *S3FileStoreSecretKey
+    # ckan.s3filestore.awsBucketName -- S3 bucket name
+    awsBucketName: *S3FileStoreBucketName
+    # ckan.s3filestore.hostName -- S3 host name
+    hostName: *S3FileStoreHostName
+    # ckan.s3filestore.regionName -- S3 region name
+    regionName: *S3FileStoreRegionName
+    # ckan.s3filestore.signatureVersion -- S3 signature version
+    signatureVersion: *S3FileStoreSignatureVersion
+    # ckan.s3filestore.awsStoragePath -- S3 storage path
+    awsStoragePath: *S3FileStoreStoragePath    
+    # filesystemDownloadFallback: "false"
+  psql:
+    # ckan.psql.initialize -- Flag whether to initialize the PostgreSQL instance with the provided users and databases
+    initialize: true
+    # ckan.psql.masterUser -- PostgreSQL master username
+    masterUser: *MasterDBUser
+    # ckan.psql.masterPassword -- PostgreSQL master user password
+    masterPassword: *MasterDBPass
+    # ckan.psql.masterDatabase -- PostgreSQL database for the master user
+    masterDatabase: *MasterDBName
+  db:
+    # ckan.db.ckanDbUrl -- Url of the PostgreSQL server where the CKAN database is hosted
+    ckanDbUrl: *DBHost
+    # ckan.db.ckanDbName -- Name of the database to be used by CKAN
+    ckanDbName: *CkanDBName
+    # ckan.db.ckanDbUser -- Username of the database to be used by CKAN
+    ckanDbUser: *CkanDBUser
+    # ckan.db.ckanDbPassword -- Password of the user for the database to be used by CKAN
+    ckanDbPassword: *CkanDBPass
+  datastore:
+    # ckan.datastore.RwDbUrl -- Url of the PostgreSQL server where the datastore database is hosted
+    RwDbUrl: *DBHost
+    # ckan.datastore.RwDbName -- Name of the database to be used for Datastore
+    RwDbName: *DatastoreDBName
+    # ckan.datastore.RwDbUser -- Username for the datastore database with write permissions
+    RwDbUser: *DatastoreRWDBUser
+    # ckan.datastore.RwDbPassword -- Password for the datastore write permissions user
+    RwDbPassword: *DatastoreRWDBPass
+    # ckan.datastore.RoDbUrl -- Url of the PostgreSQL server where the datastore database is hosted
+    RoDbUrl: *DBHost
+    # ckan.datastore.RoDbName -- Name of the database to be used for Datastore
+    RoDbName: *DatastoreDBName
+    # ckan.datastore.RoDbUser -- Username for the datastore database with read permissions
+    RoDbUser: *DatastoreRODBUser
+    # ckan.datastore.RoDbPassword -- Password for the datastore read permissions user
+    RoDbPassword: *DatastoreRODBPass
+  # ckan.solr -- Location of SOLR collection used by the instance
+  solr: "http://solr-headless:8983/solr/ckancollection"
+  # ckan.redis -- Location of the Redis service to be used by the CKAN instance
+  redis: "redis://redis-headless:6379/0"
+  spatialBackend: "solr"
+  locale:
+    offered: "en"
+    default: "en"
+  # ckan.datapusherUrl -- Location of the datapusher service to be used by the CKAN instance
+  datapusherUrl: "http://datapusher-headless:8000"
+  smtp:
+    server: "smtpServerURLorIP:port"
+    user: "smtpUser" 
+    password: "smtpPassword"
+    mailFrom: "postmaster@domain.com"
+    tls: "enabled"
+    starttls: "true"
+  issues:
+    sendEmailNotifications: "true"
+
+  # ckan.extraEnv -- An array to add extra environment variables
+  # For example:
+  # extraEnv:
+  #   - name: FOO
+  #     value: "bar"
+  #
+  extraEnv: []
+
+  readiness:
+    # ckan.readiness.initialDelaySeconds -- Inital delay seconds for the readiness probe
+    initialDelaySeconds: 10
+    #  ckan.readiness.periodSeconds -- Check interval for the readiness probe
+    periodSeconds: 10
+    # ckan.readiness.failureThreshold -- Failure threshold for the readiness probe
+    failureThreshold: 6
+    # ckan.readiness.timeoutSeconds -- Timeout interval for the readiness probe
+    timeoutSeconds: 10
+  liveness:
+    # ckan.liveness.initialDelaySeconds -- Initial delay for the liveness probe
+    initialDelaySeconds: 10
+    # ckan.liveness.periodSeconds -- Check interval for the liveness probe
+    periodSeconds: 10
+    # ckan.liveness.failureThreshold -- Failure threshold for the liveness probe
+    failureThreshold: 6
+    # ckan.liveness.timeoutSeconds -- Timeout interval for the liveness probe
+    timeoutSeconds: 10
+
+serviceAccount:
+  # serviceAccount.create -- Specifies whether a service account should be created
+  create: false
+  # serviceAccount.annotations -- Annotations to add to the service account
+  annotations: {}
+  # serviceAccount.name -- The name of the service account to use.
+  # If not set and create is true, a name is generated using the fullname template
+  name:
+
+podSecurityContext: {}
+  # fsGroup: 2000
+
+securityContext: {}
+  # capabilities:
+  #   drop:
+  #   - ALL
+  # readOnlyRootFilesystem: true
+  # runAsNonRoot: true
+  # runAsUser: 1000
+
+service:
+  # service.type -- Type of the service created for the CKAN pod
+  type: ClusterIP
+  port: 80
+
+ingress:
+  enabled: false
+  annotations: {}
+    # kubernetes.io/ingress.class: nginx
+    # kubernetes.io/tls-acme: "true"
+  hosts:
+    - host: chart-example.local
+      paths: []
+  tls: []
+  #  - secretName: chart-example-tls
+  #    hosts:
+  #      - chart-example.local
+
+resources: {}
+  # We usually recommend not to specify default resources and to leave this as a conscious
+  # choice for the user. This also increases chances charts run on environments with little
+  # resources, such as Minikube. If you do want to specify resources, uncomment the following
+  # lines, adjust them as necessary, and remove the curly braces after 'resources:'.
+  # limits:
+  #   cpu: 100m
+  #   memory: 128Mi
+  # requests:
+  #   cpu: 100m
+  #   memory: 128Mi
+
+nodeSelector: {}
+
+tolerations: []
+
+affinity: {}
+
+datapusher:
+  # datapusher.enabled -- Flag to control whether to deploy the datapusher
+  enabled: true
+  # datapusher.fullnameOverride -- Name override for the datapusher deployment
+  fullnameOverride: *DatapusherName
+
+redis:
+  # Please see all available overrides at https://github.com/helm/charts/tree/master/stable/redis
+  # redis.enabled -- Flag to control whether to deploy Redis
+  enabled: true
+  # redis.fullnameOverride -- Name override for the redis deployment
+  fullnameOverride: *RedisName
+  cluster:
+    # redis.cluster.enabled -- Cluster mode for Redis
+    enabled: false
+  master:
+    persistence:
+      # redis.master.persistence.enabled -- Enable redis volume claim
+      enabled: false
+      # redis.master.persistence.size -- Size of the volume claim
+      size: 1Gi
+  # redis.usePassword -- Use password for accessing redis
+  usePassword: false
+
+solr:  
+  # Please see all available overrides at https://github.com/helm/charts/tree/master/incubator/solr
+  # solr.enabled -- Flag to control whether to deploy SOLR
+  enabled: true
+  initialize:
+    # solr.initialize.enabled -- Flag whether to initialize the SOLR instance with the provided collection name
+    enabled: true
+    # solr.initialize.numShards -- Number of shards for the SOLR collection
+    numShards: 2
+    # solr.initialize.replicationFactor -- Number of replicas for each SOLR shard
+    replicationFactor: 1
+    # solr.initialize.maxShardsPerNode -- Maximum shards per node
+    maxShardsPerNode: 10
+    # solr.initialize.configsetName -- Name of the config set used for initializing
+    configsetName: ckanConfigSet
+  # solr.fullnameOverride -- Name override for the SOLR deployment
+  fullnameOverride: *SolrName
+  # solr.replicaCount -- Number of SOLR instances in the cluster
+  replicaCount: 1
+  image:
+    # solr.image.repository -- Repository for the SOLR image
+    repository: solr
+    # solr.image.tag -- Tag for the SOLR image
+    tag: 6.6.6
+  zookeeper:
+    # solr.zookeeper.replicaCount -- Numer of Zookeeper replicas in the ZK cluster
+    replicaCount: 1
+
+postgresql:
+  # postgresql.enabled -- Flag to control whether to deploy PostgreSQL
+  enabled: true
+  persistence:
+    # postgresql.persistence.size -- Size of the PostgreSQL pvc
+    size: 1Gi
+  # postgresql.fullnameOverride -- Name override for the PostgreSQL deployment
+  fullnameOverride: *DBDeploymentName
+  # postgresql.pgPass -- Password for the master PostgreSQL user.
+  # Feeds into the `postgrescredentials` secret that is provided to the PostgreSQL chart
+  pgPass: *MasterDBPass
+  # postgresql.existingSecret -- Name of existing secret that holds passwords for PostgreSQL
+  existingSecret: postgrescredentials
+
+minio:
+  # minio.enabled -- Flag to control whether to deploy Minio
+  enabled: true
+  # minio.fullnameOverride -- Name override for the Minio deployment
+  fullnameOverride: minio
+  persistence:
+    # minio.persistence.size -- Size of the Minio PVC
+    size: 5Gi 
+  # minio.accessKey -- Access key for minio
+  accessKey: *S3FileStoreAccessKey
+  # minio.secretKey -- Secret key for minio
+  secretKey: *S3FileStoreSecretKey
+  defaultBucket:
+    # minio.defaultBucket.enabled -- Flag to control whether to create default bucket
+    enabled: true
+    # minio.defaultBucket.name -- Name of the default Minio bucket
+    name: *S3FileStoreBucketName
+    # minio.defaultBucket.policy -- Policy of the default Minio bucket
+    policy: upload
+  service:
+    # minio.service.type -- The service type of the Minio service
+    type: NodePort
+    # minio.service.port -- The port used by the Mino service
+    port: 9000
+
