@@ -286,6 +286,8 @@ solr:
   fullnameOverride: *SolrName
   # solr.replicaCount -- Number of SOLR instances in the cluster
   replicaCount: 1
+  volumeClaimTemplates:
+    storageSize: 5Gi
   image:
     # solr.image.repository -- Repository for the SOLR image
     repository: solr
@@ -294,6 +296,8 @@ solr:
   zookeeper:
     # solr.zookeeper.replicaCount -- Numer of Zookeeper replicas in the ZK cluster
     replicaCount: 1
+    persistence:
+      size: 1Gi
 
 postgresql:
   # postgresql.enabled -- Flag to control whether to deploy PostgreSQL
