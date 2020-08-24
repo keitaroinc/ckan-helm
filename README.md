@@ -154,5 +154,7 @@ Current chart version is `0.1.0`
 | solr.initialize.numShards | int | `2` | Number of shards for the SOLR collection |
 | solr.initialize.replicationFactor | int | `1` | Number of replicas for each SOLR shard |
 | solr.replicaCount | int | `1` | Number of SOLR instances in the cluster |
+| solr.volumeClaimTemplates.storageSize | string | `"5Gi"` | Size of Solr PVC |
 | solr.zookeeper.replicaCount | int | `1` | Numer of Zookeeper replicas in the ZK cluster |
+| solr.zookeeper.persistence.size | string | `"1Gi"` | Size of ZK PVC |
 | tolerations | list | `[]` |  |

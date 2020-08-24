@@ -21,10 +21,13 @@ spec:
       serviceAccountName: {{ include "ckan-chart.serviceAccountName" . }}
       securityContext:
         {{- toYaml .Values.podSecurityContext | nindent 8 }}
+      {{ if .Values.pvc.enabled }}
       volumes:
         - name: "ckan"
           persistentVolumeClaim:
             claimName: "ckan"
+      {{ end }}
+      {{ if .Values.pvc.enabled }}
       initContainers:
       - name: set-volume-ownsership
         image: busybox
@@ -33,6 +36,7 @@ spec:
         - name: ckan
           mountPath: {{ .Values.ckan.storagePath }}
           readOnly: false
+      {{ end }}
       containers:
         - name: {{ .Chart.Name }}
           securityContext:
@@ -160,10 +164,12 @@ spec:
             periodSeconds: {{ .Values.ckan.liveness.periodSeconds }}
             failureThreshold: {{ .Values.ckan.liveness.failureThreshold }}
             timeoutSeconds: {{ .Values.ckan.liveness.timeoutSeconds }}
+          {{ if .Values.pvc.enabled }}
           volumeMounts:
           - name: "ckan"
             mountPath: {{ .Values.ckan.storagePath }}
             readOnly: false
+          {{ end }}
           resources:
             {{- toYaml .Values.resources | nindent 12 }}
       {{- with .Values.nodeSelector }}
