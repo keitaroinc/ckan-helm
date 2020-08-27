@@ -35,6 +35,7 @@ Current chart version is `0.1.0`
 | MasterDBPass | string | `"pass"` | Variable for password for the master user in PostgreSQL |
 | MasterDBUser | string | `"postgres"` | Variable for master user name for PostgreSQL |
 | RedisName | string | `"redis"` | Variable for name override for redis deployment |
+| S3AclSetting | string | `"private"` | ACL setting for the S3 bucket |
 | S3FileStoreAccessKey | string | `"minio_admin"` | AWS access key |
 | S3FileStoreBucketName | string | `"ckan"` | AWS bucket name |
 | S3FileStoreHostName | string | `"http://minio:9000"` | Bucket host name |
@@ -77,6 +78,7 @@ Current chart version is `0.1.0`
 | ckan.readiness.periodSeconds | int | `10` |  |
 | ckan.readiness.timeoutSeconds | int | `10` | Timeout interval for the readiness probe |
 | ckan.redis | string | `"redis://redis-headless:6379/0"` | Location of the Redis service to be used by the CKAN instance |
+| ckan.s3filestore.acl | string | `"private"` | ACL setting for the S3 bucket. Possible values: `'private'|'public-read'|'public-read-write'|'authenticated-read'|'aws-exec-read'|'bucket-owner-read'|'bucket-owner-full-control'` |
 | ckan.s3filestore.awsAccessKeyId | string | `"minio_admin"` | AWS access key |
 | ckan.s3filestore.awsBucketName | string | `"ckan"` | S3 bucket name |
 | ckan.s3filestore.awsSecretAccessKey | string | `"minio_pass"` | AWS secret key |
@@ -104,6 +106,7 @@ Current chart version is `0.1.0`
 | fullnameOverride | string | `"ckan"` |  |
 | image.pullPolicy | string | `"Always"` |  |
 | image.repository | string | `"keitaro/ckan"` |  |
+| image.tag | string | `"2.8.4"` |  |
 | imagePullSecrets | list | `[]` |  |
 | ingress.annotations | object | `{}` |  |
 | ingress.enabled | bool | `false` |  |

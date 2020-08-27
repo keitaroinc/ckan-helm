@@ -41,7 +41,7 @@ spec:
         - name: {{ .Chart.Name }}
           securityContext:
             {{- toYaml .Values.securityContext | nindent 12 }}
-          image: "{{ .Values.image.repository }}:{{ .Chart.AppVersion }}"
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           ports:
             - name: http
@@ -89,6 +89,8 @@ spec:
               value: {{ .Values.ckan.s3filestore.signatureVersion }}
             - name: CKANEXT__S3FILESTORE__AWS_STORAGE_PATH
               value: {{ .Values.ckan.s3filestore.awsStoragePath }}
+            - name: CKANEXT__S3FILESTORE__ACL
+              value: {{ .Values.ckan.s3filestore.acl }}
             # - name: CKANEXT__S3FILESTORE__FILESYSTEM_DOWNLOAD_FALLBACK
             #   value: {{ .Values.ckan.s3filestore.filesystemDownloadFallback }}
             - name: CKAN__STORAGE_PATH

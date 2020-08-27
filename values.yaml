@@ -6,6 +6,7 @@ replicaCount: 1
 
 image:
   repository: keitaro/ckan
+  tag: 2.8.4
   pullPolicy: Always
 
 imagePullSecrets: []
@@ -68,7 +69,8 @@ S3FileStoreRegionName: &S3FileStoreRegionName "minio"
 S3FileStoreSignatureVersion: &S3FileStoreSignatureVersion "s3v4"
 # S3FileStoreStoragePath -- S3 storage path
 S3FileStoreStoragePath: &S3FileStoreStoragePath "ckan_storage"
-
+# S3AclSetting -- ACL setting for the S3 bucket
+S3AclSetting: &S3AclSetting "private"
 
 ckan:
   # ckan.sysadminName -- CKAN system admin username
@@ -103,7 +105,9 @@ ckan:
     # ckan.s3filestore.signatureVersion -- S3 signature version
     signatureVersion: *S3FileStoreSignatureVersion
     # ckan.s3filestore.awsStoragePath -- S3 storage path
-    awsStoragePath: *S3FileStoreStoragePath    
+    awsStoragePath: *S3FileStoreStoragePath 
+    # ckan.s3filestore.acl -- ACL setting for the S3 bucket. Possible values: `'private'|'public-read'|'public-read-write'|'authenticated-read'|'aws-exec-read'|'bucket-owner-read'|'bucket-owner-full-control'`
+    acl: *S3AclSetting   
     # filesystemDownloadFallback: "false"
   psql:
     # ckan.psql.initialize -- Flag whether to initialize the PostgreSQL instance with the provided users and databases
