@@ -101,13 +101,14 @@ def set_db_permissions(db_params, sql):
         con = psycopg2.connect(user=master_user,
                                host=db_params.db_host,
                                password=master_passwd,
-                               database=master_database)
+                               database=db_params.db_name)
         con.set_isolation_level(ISOLATION_LEVEL_AUTOCOMMIT)
         cur = con.cursor()
-        print("Setting datastore permissions")
+        print("Setting datastore permissions\n")
+        print(sql)
         cur.execute(sql)
         print("Datastore permissions applied.")
-    except(Exception, psycopg2.DatabaseError) as error:
+    except Exception as error:
         print("ERROR DB: ", error)
     finally:
         cur.close()
