@@ -4,7 +4,9 @@ A Helm chart for CKAN
 
 Current chart version is `0.1.0`
 
+This chart deploys a self contained CKAN instance with all of its dependencies. These can be enabled/disabled if they already exist in your infrastructure.
 
+Two jobs for initializing Postgres and SOLR can also be enabled through the values. These will use the provided CKAN environment to set the access permissions for the ckan and datastore DB users as well as create a SOLR collection for the CKAN instance.
 
 ## Chart Requirements
 
