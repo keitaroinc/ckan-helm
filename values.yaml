@@ -7,7 +7,7 @@ replicaCount: 1
 image:
   repository: keitaro/ckan
   tag: 2.8.5
-  pullPolicy: Always
+  pullPolicy: IfNotPresent
 
 imagePullSecrets: []
 nameOverride: ""
