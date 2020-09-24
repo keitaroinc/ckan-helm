@@ -40,6 +40,12 @@ spec:
               value: {{ .Values.datapusher.insertRows | quote }}
             - name: DATAPUSHER_DOWNLOAD_TIMEOUT
               value: {{ .Values.datapusher.downloadTimeout | quote }}
+            - name: DATAPUSHER_SSL_VERIFY
+              value: {{ .Values.datapusher.datapusherSslVerify | quote }}
+            - name: DATAPUSHER_REWRITE_RESOURCES
+              value: {{ .Values.datapusher.datapusherRewriteResources | quote }}
+            - name: DATAPUSHER_REWRITE_URL
+              value: {{ .Values.datapusher.datapusherRewriteUrl | quote }}
           livenessProbe:
             httpGet:
               path: /

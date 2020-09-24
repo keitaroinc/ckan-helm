@@ -38,8 +38,4 @@ dependencies:
     version: "1.0.0"
     repository: "file://dependency-charts/datapusher"
     condition: datapusher.enabled
-  - name: minio
-    version: "5.0.27"
-    repository: "https://kubernetes-charts.storage.googleapis.com/"
-    condition: minio.enabled
 
