@@ -91,6 +91,8 @@ spec:
               value: {{ .Values.ckan.s3filestore.awsStoragePath }}
             - name: CKANEXT__S3FILESTORE__ACL
               value: {{ .Values.ckan.s3filestore.acl }}
+            - name: CKANEXT__S3FILESTORE__ADDRESSING_STYLE
+              value: {{ .Values.ckan.s3filestore.addressingStyle }}
             # - name: CKANEXT__S3FILESTORE__FILESYSTEM_DOWNLOAD_FALLBACK
             #   value: {{ .Values.ckan.s3filestore.filesystemDownloadFallback }}
             - name: CKAN__STORAGE_PATH

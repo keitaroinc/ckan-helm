@@ -31,6 +31,15 @@ spec:
             - name: http
               containerPort: 8000
               protocol: TCP
+          env:
+            - name: DATAPUSHER_MAX_CONTENT_LENGTH
+              value: {{ .Values.datapusher.maxContentLength | quote }}
+            - name: DATAPUSHER_CHUNK_SIZE
+              value: {{ .Values.datapusher.chunkSize | quote }}
+            - name: DATAPUSHER_CHUNK_INSERT_ROWS
+              value: {{ .Values.datapusher.insertRows | quote }}
+            - name: DATAPUSHER_DOWNLOAD_TIMEOUT
+              value: {{ .Values.datapusher.downloadTimeout | quote }}
           livenessProbe:
             httpGet:
               path: /

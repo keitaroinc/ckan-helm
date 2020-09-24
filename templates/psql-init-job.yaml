@@ -12,7 +12,7 @@ spec:
             name: psql-init-configmap
       containers:
       - name: psql-init
-        image: "{{ .Values.image.repository }}:{{ .Chart.AppVersion }}"
+        image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
         imagePullPolicy: {{ .Values.image.pullPolicy }}
         env:
         - name: PSQL_MASTER

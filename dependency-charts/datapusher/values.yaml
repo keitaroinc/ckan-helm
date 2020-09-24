@@ -6,11 +6,21 @@ replicaCount: 1
 
 image:
   repository: keitaro/ckan-datapusher
-  pullPolicy: IfNotPresent
+  pullPolicy: Always
 
 imagePullSecrets: []
 nameOverride: ""
 fullnameOverride: ""
+
+datapusher:
+  # datapusher.maxContentSize -- Maximum size of content to be uploaded in bytes.
+  maxContentLength: "10485760"
+  # datapusher.chunkSize -- Size of chunks of the data that is being downloaded in bytes
+  chunkSize: "16384"
+  # datapusher.insertRows -- Number of rows to take from the data and upload them as chunks to datastore
+  insertRows: "250"
+  # datapusher.downloadTimeout -- Timeout limit of the download request
+  downloadTimeout: "30"
 
 serviceAccount:
   # Specifies whether a service account should be created

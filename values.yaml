@@ -71,6 +71,8 @@ S3FileStoreSignatureVersion: &S3FileStoreSignatureVersion "s3v4"
 S3FileStoreStoragePath: &S3FileStoreStoragePath "ckan_storage"
 # S3AclSetting -- ACL setting for the S3 bucket
 S3AclSetting: &S3AclSetting "private"
+# S3AddressingStyle -- Addresing style setting for S3
+S3AddressingStyle: &S3AddressingStyle 'path'
 
 ckan:
   # ckan.sysadminName -- CKAN system admin username
@@ -108,6 +110,8 @@ ckan:
     awsStoragePath: *S3FileStoreStoragePath 
     # ckan.s3filestore.acl -- ACL setting for the S3 bucket. Possible values: `'private'|'public-read'|'public-read-write'|'authenticated-read'|'aws-exec-read'|'bucket-owner-read'|'bucket-owner-full-control'`
     acl: *S3AclSetting   
+    # ckan.s3filestore.addressingStyle -- An optional setting to specify which addressing style to use. This controls whether the bucket name is in the hostname or is part of the URL. Accepted values are `auto` (default), `path` or `virtual`.
+    addressingStyle: *S3AddressingStyle   
     # filesystemDownloadFallback: "false"
   psql:
     # ckan.psql.initialize -- Flag whether to initialize the PostgreSQL instance with the provided users and databases
@@ -252,6 +256,11 @@ datapusher:
   enabled: true
   # datapusher.fullnameOverride -- Name override for the datapusher deployment
   fullnameOverride: *DatapusherName
+  datapusher:
+    maxContentLength: "102400000"
+    chunkSize: "10240000"
+    insertRows: "50000"
+    downloadTimeout: "300"
 
 redis:
   # Please see all available overrides at https://github.com/helm/charts/tree/master/stable/redis
