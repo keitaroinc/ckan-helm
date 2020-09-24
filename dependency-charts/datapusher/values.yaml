@@ -6,7 +6,8 @@ replicaCount: 1
 
 image:
   repository: keitaro/ckan-datapusher
-  pullPolicy: Always
+  tag: 0.0.17
+  pullPolicy: IfNotPresent
 
 imagePullSecrets: []
 nameOverride: ""
