@@ -21,8 +21,9 @@ Current chart version is `1.0.0`
 | datapusher.insertRows | string | `"250"` | Number of rows to take from the data and upload them as chunks to datastore |
 | datapusher.maxContentLength | string | `"10485760"` | Maximum size of content to be uploaded in bytes. |
 | fullnameOverride | string | `""` |  |
-| image.pullPolicy | string | `"Always"` |  |
+| image.pullPolicy | string | `"IfNotPresent"` |  |
 | image.repository | string | `"keitaro/ckan-datapusher"` |  |
+| image.tag | string | `"0.0.17"` |  |
 | imagePullSecrets | list | `[]` |  |
 | ingress.annotations | object | `{}` |  |
 | ingress.enabled | bool | `false` |  |

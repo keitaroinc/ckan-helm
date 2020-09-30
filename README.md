@@ -97,7 +97,7 @@ Two jobs for initializing Postgres and SOLR can also be enabled through the valu
 | datapusher.enabled | bool | `true` | Flag to control whether to deploy the datapusher |
 | datapusher.fullnameOverride | string | `"datapusher"` | Name override for the datapusher deployment |
 | fullnameOverride | string | `"ckan"` |  |
-| image.pullPolicy | string | `"Always"` |  |
+| image.pullPolicy | string | `"IfNotPresent"` |  |
 | image.repository | string | `"keitaro/ckan"` |  |
 | image.tag | string | `"2.8.5"` |  |
 | imagePullSecrets | list | `[]` |  |
