@@ -1,0 +1,15 @@
+dependencies:
+- name: redis
+  repository: https://kubernetes-charts.storage.googleapis.com/
+  version: 10.5.6
+- name: solr
+  repository: https://kubernetes-charts-incubator.storage.googleapis.com/
+  version: 1.4.0
+- name: postgresql
+  repository: https://kubernetes-charts.storage.googleapis.com/
+  version: 8.6.4
+- name: datapusher
+  repository: file://dependency-charts/datapusher
+  version: 1.0.0
+digest: sha256:bf437d2c5f4da6ca447116a7c3d8b520443ba12f3528f2cca6a37b844dbfd319
+generated: "2020-09-24T15:39:58.767117823+02:00"

@@ -6,8 +6,8 @@ replicaCount: 1
 
 image:
   repository: keitaro/ckan
-  tag: 2.8.4
-  pullPolicy: Always
+  tag: 2.8.5
+  pullPolicy: IfNotPresent
 
 imagePullSecrets: []
 nameOverride: ""
@@ -55,23 +55,6 @@ DatastoreRODBUser: &DatastoreRODBUser datastorero
 # DatastoreRODBPass -- Variable for password for the datastore database user with read access
 DatastoreRODBPass: &DatastoreRODBPass pass
 
-# S3FileStoreAccessKey -- AWS access key
-S3FileStoreAccessKey: &S3FileStoreAccessKey "minio_admin"
-# S3FileStoreSecretKey -- AWS secret key
-S3FileStoreSecretKey: &S3FileStoreSecretKey "minio_pass"
-# S3FileStoreBucketName -- AWS bucket name
-S3FileStoreBucketName: &S3FileStoreBucketName ckan
-# S3FileStoreHostName -- Bucket host name
-S3FileStoreHostName: &S3FileStoreHostName "http://minio:9000"
-# S3FileStoreRegionName -- Bucket region name
-S3FileStoreRegionName: &S3FileStoreRegionName "minio"
-# S3FileStoreSignatureVersion -- S3 signature version
-S3FileStoreSignatureVersion: &S3FileStoreSignatureVersion "s3v4"
-# S3FileStoreStoragePath -- S3 storage path
-S3FileStoreStoragePath: &S3FileStoreStoragePath "ckan_storage"
-# S3AclSetting -- ACL setting for the S3 bucket
-S3AclSetting: &S3AclSetting "private"
-
 ckan:
   # ckan.sysadminName -- CKAN system admin username
   sysadminName: "ckan_admin"
@@ -86,29 +69,11 @@ ckan:
   # ckan.siteUrl -- Url for the CKAN instance
   siteUrl: "http://localhost:5000"
   # ckan.ckanPlugins -- List of plugins to be used by the instance
-  ckanPlugins: "envvars s3filestore image_view text_view recline_view datastore datapusher"
+  ckanPlugins: "envvars image_view text_view recline_view datastore datapusher"
   # ckan.storagePath -- Storage path to be used by the instance
   storagePath: "/var/lib/ckan/default"
   activityStreamsEmailNotifications: "true"
   debug: "true"
-  s3filestore:
-    # ckan.s3filestore.awsAccessKeyId -- AWS access key
-    awsAccessKeyId: *S3FileStoreAccessKey
-    # ckan.s3filestore.awsSecretAccessKey -- AWS secret key
-    awsSecretAccessKey: *S3FileStoreSecretKey
-    # ckan.s3filestore.awsBucketName -- S3 bucket name
-    awsBucketName: *S3FileStoreBucketName
-    # ckan.s3filestore.hostName -- S3 host name
-    hostName: *S3FileStoreHostName
-    # ckan.s3filestore.regionName -- S3 region name
-    regionName: *S3FileStoreRegionName
-    # ckan.s3filestore.signatureVersion -- S3 signature version
-    signatureVersion: *S3FileStoreSignatureVersion
-    # ckan.s3filestore.awsStoragePath -- S3 storage path
-    awsStoragePath: *S3FileStoreStoragePath 
-    # ckan.s3filestore.acl -- ACL setting for the S3 bucket. Possible values: `'private'|'public-read'|'public-read-write'|'authenticated-read'|'aws-exec-read'|'bucket-owner-read'|'bucket-owner-full-control'`
-    acl: *S3AclSetting   
-    # filesystemDownloadFallback: "false"
   psql:
     # ckan.psql.initialize -- Flag whether to initialize the PostgreSQL instance with the provided users and databases
     initialize: true
@@ -154,6 +119,8 @@ ckan:
     default: "en"
   # ckan.datapusherUrl -- Location of the datapusher service to be used by the CKAN instance
   datapusherUrl: "http://datapusher-headless:8000"
+  # ckan.datapusherCallbackUrlBase -- Location of the CKAN k8s service to be used by the Datapusher, overriding the default site url route.
+  datapusherCallbackUrlBase: http://ckan
   smtp:
     server: "smtpServerURLorIP:port"
     user: "smtpUser" 
@@ -252,6 +219,21 @@ datapusher:
   enabled: true
   # datapusher.fullnameOverride -- Name override for the datapusher deployment
   fullnameOverride: *DatapusherName
+  datapusher:
+    # datapusher.datapusher.maxContentSize -- Maximum size of content to be uploaded in bytes.
+    maxContentLength: "102400000"
+    # datapusher.datapusher.chunkSize -- Size of chunks of the data that is being downloaded in bytes
+    chunkSize: "10240000"
+    # datapusher.datapusher.insertRows -- Number of rows to take from the data and upload them as chunks to datastore
+    insertRows: "50000"
+    # datapusher.datapusher.downloadTimeout -- Timeout limit of the download request
+    downloadTimeout: "300"
+    # datapusher.datapusher.datapusherSslVerify -- Enable or disable (boolean) verification of SSL when trying to get resources. Default: True
+    datapusherSslVerify: "False"
+    # datapusher.datapusher.datapusherRewriteResources -- Enable or disable (boolean) whether datapusher should rewrite resources uploaded to CKAN's filestore, since datapusher takes the CKAN Site URL value for generating the resource URL. Default: False
+    datapusherRewriteResources: "True"
+    # datapusher.datapusher.datapusherRewriteUrl -- Sets the rewrite URL that datapushed will rewrite resources that are uploaded to CKAN's filestore. Default: http://ckan:5000
+    datapusherRewriteUrl: http://ckan
 
 redis:
   # Please see all available overrides at https://github.com/helm/charts/tree/master/stable/redis
@@ -318,29 +300,3 @@ postgresql:
   pgPass: *MasterDBPass
   # postgresql.existingSecret -- Name of existing secret that holds passwords for PostgreSQL
   existingSecret: postgrescredentials
-
-minio:
-  # minio.enabled -- Flag to control whether to deploy Minio
-  enabled: true
-  # minio.fullnameOverride -- Name override for the Minio deployment
-  fullnameOverride: minio
-  persistence:
-    # minio.persistence.size -- Size of the Minio PVC
-    size: 5Gi 
-  # minio.accessKey -- Access key for minio
-  accessKey: *S3FileStoreAccessKey
-  # minio.secretKey -- Secret key for minio
-  secretKey: *S3FileStoreSecretKey
-  defaultBucket:
-    # minio.defaultBucket.enabled -- Flag to control whether to create default bucket
-    enabled: true
-    # minio.defaultBucket.name -- Name of the default Minio bucket
-    name: *S3FileStoreBucketName
-    # minio.defaultBucket.policy -- Policy of the default Minio bucket
-    policy: upload
-  service:
-    # minio.service.type -- The service type of the Minio service
-    type: NodePort
-    # minio.service.port -- The port used by the Mino service
-    port: 9000
-

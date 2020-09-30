@@ -14,7 +14,6 @@ Two jobs for initializing Postgres and SOLR can also be enabled through the valu
 |------------|------|---------|
 | file://dependency-charts/datapusher | datapusher | 1.0.0 |
 | https://kubernetes-charts-incubator.storage.googleapis.com/ | solr | 1.4.0 |
-| https://kubernetes-charts.storage.googleapis.com/ | minio | 5.0.27 |
 | https://kubernetes-charts.storage.googleapis.com/ | postgresql | 8.6.4 |
 | https://kubernetes-charts.storage.googleapis.com/ | redis | 10.5.6 |
 
@@ -37,18 +36,11 @@ Two jobs for initializing Postgres and SOLR can also be enabled through the valu
 | MasterDBPass | string | `"pass"` | Variable for password for the master user in PostgreSQL |
 | MasterDBUser | string | `"postgres"` | Variable for master user name for PostgreSQL |
 | RedisName | string | `"redis"` | Variable for name override for redis deployment |
-| S3AclSetting | string | `"private"` | ACL setting for the S3 bucket |
-| S3FileStoreAccessKey | string | `"minio_admin"` | AWS access key |
-| S3FileStoreBucketName | string | `"ckan"` | AWS bucket name |
-| S3FileStoreHostName | string | `"http://minio:9000"` | Bucket host name |
-| S3FileStoreRegionName | string | `"minio"` | Bucket region name |
-| S3FileStoreSecretKey | string | `"minio_pass"` | AWS secret key |
-| S3FileStoreSignatureVersion | string | `"s3v4"` | S3 signature version |
-| S3FileStoreStoragePath | string | `"ckan_storage"` | S3 storage path |
 | SolrName | string | `"solr"` | Variable for name override for solr deployment |
 | affinity | object | `{}` |  |
 | ckan.activityStreamsEmailNotifications | string | `"true"` |  |
-| ckan.ckanPlugins | string | `"envvars s3filestore image_view text_view recline_view datastore datapusher"` | List of plugins to be used by the instance |
+| ckan.ckanPlugins | string | `"envvars image_view text_view recline_view datastore datapusher"` | List of plugins to be used by the instance |
+| ckan.datapusherCallbackUrlBase | string | `"http://ckan"` | Location of the CKAN k8s service to be used by the Datapusher, overriding the default site url route. |
 | ckan.datapusherUrl | string | `"http://datapusher-headless:8000"` | Location of the datapusher service to be used by the CKAN instance |
 | ckan.datastore.RoDbName | string | `"datastore_default"` | Name of the database to be used for Datastore |
 | ckan.datastore.RoDbPassword | string | `"pass"` | Password for the datastore read permissions user |
@@ -80,14 +72,6 @@ Two jobs for initializing Postgres and SOLR can also be enabled through the valu
 | ckan.readiness.periodSeconds | int | `10` |  |
 | ckan.readiness.timeoutSeconds | int | `10` | Timeout interval for the readiness probe |
 | ckan.redis | string | `"redis://redis-headless:6379/0"` | Location of the Redis service to be used by the CKAN instance |
-| ckan.s3filestore.acl | string | `"private"` | ACL setting for the S3 bucket. Possible values: `'private'|'public-read'|'public-read-write'|'authenticated-read'|'aws-exec-read'|'bucket-owner-read'|'bucket-owner-full-control'` |
-| ckan.s3filestore.awsAccessKeyId | string | `"minio_admin"` | AWS access key |
-| ckan.s3filestore.awsBucketName | string | `"ckan"` | S3 bucket name |
-| ckan.s3filestore.awsSecretAccessKey | string | `"minio_pass"` | AWS secret key |
-| ckan.s3filestore.awsStoragePath | string | `"ckan_storage"` | S3 storage path |
-| ckan.s3filestore.hostName | string | `"http://minio:9000"` | S3 host name |
-| ckan.s3filestore.regionName | string | `"minio"` | S3 region name |
-| ckan.s3filestore.signatureVersion | string | `"s3v4"` | S3 signature version |
 | ckan.siteId | string | `"site-id-here"` | Site id |
 | ckan.siteTitle | string | `"Site Title here"` | Site title for the instance |
 | ckan.siteUrl | string | `"http://localhost:5000"` | Url for the CKAN instance |
@@ -103,28 +87,25 @@ Two jobs for initializing Postgres and SOLR can also be enabled through the valu
 | ckan.sysadminEmail | string | `"admin@domain.com"` | CKAN system admin email |
 | ckan.sysadminName | string | `"ckan_admin"` | CKAN system admin username |
 | ckan.sysadminPassword | string | `"PasswordHere"` | CKAN system admin password |
+| datapusher.datapusher.chunkSize | string | `"10240000"` | Size of chunks of the data that is being downloaded in bytes |
+| datapusher.datapusher.datapusherRewriteResources | string | `"True"` | Enable or disable (boolean) whether datapusher should rewrite resources uploaded to CKAN's filestore, since datapusher takes the CKAN Site URL value for generating the resource URL. Default: False |
+| datapusher.datapusher.datapusherRewriteUrl | string | `"http://ckan"` | Sets the rewrite URL that datapushed will rewrite resources that are uploaded to CKAN's filestore. Default: http://ckan:5000 |
+| datapusher.datapusher.datapusherSslVerify | string | `"False"` | Enable or disable (boolean) verification of SSL when trying to get resources. Default: True |
+| datapusher.datapusher.downloadTimeout | string | `"300"` | Timeout limit of the download request |
+| datapusher.datapusher.insertRows | string | `"50000"` | Number of rows to take from the data and upload them as chunks to datastore |
+| datapusher.datapusher.maxContentLength | string | `"102400000"` |  |
 | datapusher.enabled | bool | `true` | Flag to control whether to deploy the datapusher |
 | datapusher.fullnameOverride | string | `"datapusher"` | Name override for the datapusher deployment |
 | fullnameOverride | string | `"ckan"` |  |
-| image.pullPolicy | string | `"Always"` |  |
+| image.pullPolicy | string | `"IfNotPresent"` |  |
 | image.repository | string | `"keitaro/ckan"` |  |
-| image.tag | string | `"2.8.4"` |  |
+| image.tag | string | `"2.8.5"` |  |
 | imagePullSecrets | list | `[]` |  |
 | ingress.annotations | object | `{}` |  |
 | ingress.enabled | bool | `false` |  |
 | ingress.hosts[0].host | string | `"chart-example.local"` |  |
 | ingress.hosts[0].paths | list | `[]` |  |
 | ingress.tls | list | `[]` |  |
-| minio.accessKey | string | `"minio_admin"` | Access key for minio |
-| minio.defaultBucket.enabled | bool | `true` | Flag to control whether to create default bucket |
-| minio.defaultBucket.name | string | `"ckan"` | Name of the default Minio bucket |
-| minio.defaultBucket.policy | string | `"upload"` | Policy of the default Minio bucket |
-| minio.enabled | bool | `true` | Flag to control whether to deploy Minio |
-| minio.fullnameOverride | string | `"minio"` | Name override for the Minio deployment |
-| minio.persistence.size | string | `"5Gi"` | Size of the Minio PVC |
-| minio.secretKey | string | `"minio_pass"` | Secret key for minio |
-| minio.service.port | int | `9000` | The port used by the Mino service |
-| minio.service.type | string | `"NodePort"` | The service type of the Minio service |
 | nameOverride | string | `""` |  |
 | nodeSelector | object | `{}` |  |
 | podSecurityContext | object | `{}` |  |
@@ -133,7 +114,7 @@ Two jobs for initializing Postgres and SOLR can also be enabled through the valu
 | postgresql.fullnameOverride | string | `"postgres"` | Name override for the PostgreSQL deployment |
 | postgresql.persistence.size | string | `"1Gi"` | Size of the PostgreSQL pvc |
 | postgresql.pgPass | string | `"pass"` | Password for the master PostgreSQL user. Feeds into the `postgrescredentials` secret that is provided to the PostgreSQL chart |
-| pvc.enabled | string | `"false"` |  |
+| pvc.enabled | bool | `true` |  |
 | pvc.size | string | `"1Gi"` |  |
 | redis.cluster.enabled | bool | `false` | Cluster mode for Redis |
 | redis.enabled | bool | `true` | Flag to control whether to deploy Redis |
@@ -160,6 +141,6 @@ Two jobs for initializing Postgres and SOLR can also be enabled through the valu
 | solr.initialize.replicationFactor | int | `1` | Number of replicas for each SOLR shard |
 | solr.replicaCount | int | `1` | Number of SOLR instances in the cluster |
 | solr.volumeClaimTemplates.storageSize | string | `"5Gi"` | Size of Solr PVC |
-| solr.zookeeper.replicaCount | int | `1` | Numer of Zookeeper replicas in the ZK cluster |
 | solr.zookeeper.persistence.size | string | `"1Gi"` | Size of ZK PVC |
+| solr.zookeeper.replicaCount | int | `1` | Numer of Zookeeper replicas in the ZK cluster |
 | tolerations | list | `[]` |  |

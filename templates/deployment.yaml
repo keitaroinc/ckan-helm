@@ -72,27 +72,6 @@ spec:
               value: {{ .Values.ckan.siteUrl }}
             - name: CKAN__PLUGINS
               value: {{ .Values.ckan.ckanPlugins }}
-            - name: CKANEXT__S3FILESTORE__AWS_ACCESS_KEY_ID
-              value: {{ .Values.ckan.s3filestore.awsAccessKeyId }}
-            - name: CKANEXT__S3FILESTORE__AWS_SECRET_ACCESS_KEY
-              valueFrom:
-                secretKeyRef:
-                  name: ckancredentials
-                  key: awsSecretAccessKey
-            - name: CKANEXT__S3FILESTORE__AWS_BUCKET_NAME
-              value: {{ .Values.ckan.s3filestore.awsBucketName }}
-            - name: CKANEXT__S3FILESTORE__HOST_NAME
-              value: {{ .Values.ckan.s3filestore.hostName }}
-            - name: CKANEXT__S3FILESTORE__REGION_NAME
-              value: {{ .Values.ckan.s3filestore.regionName }}
-            - name: CKANEXT__S3FILESTORE__SIGNATURE_VERSION
-              value: {{ .Values.ckan.s3filestore.signatureVersion }}
-            - name: CKANEXT__S3FILESTORE__AWS_STORAGE_PATH
-              value: {{ .Values.ckan.s3filestore.awsStoragePath }}
-            - name: CKANEXT__S3FILESTORE__ACL
-              value: {{ .Values.ckan.s3filestore.acl }}
-            # - name: CKANEXT__S3FILESTORE__FILESYSTEM_DOWNLOAD_FALLBACK
-            #   value: {{ .Values.ckan.s3filestore.filesystemDownloadFallback }}
             - name: CKAN__STORAGE_PATH
               value: {{ .Values.ckan.storagePath }}
             - name: PSQL_MASTER
@@ -131,6 +110,8 @@ spec:
               value: {{ .Values.ckan.locale.default }}
             - name: CKAN__DATAPUSHER__URL
               value: {{ .Values.ckan.datapusherUrl }}
+            - name: CKAN__DATAPUSHER__CALLBACK_URL_BASE
+              value: {{ .Values.ckan.datapusherCallbackUrlBase }}
             - name: CKAN___SMTP__SERVER
               value: {{ .Values.ckan.smtp.server | quote }}
             - name: CKAN___SMTP__USER

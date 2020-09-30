@@ -6,11 +6,28 @@ replicaCount: 1
 
 image:
   repository: keitaro/ckan-datapusher
+  tag: 0.0.17
   pullPolicy: IfNotPresent
 
 imagePullSecrets: []
 nameOverride: ""
 fullnameOverride: ""
+
+datapusher:
+  # datapusher.maxContentLength -- Maximum size of content to be uploaded in bytes.
+  maxContentLength: "10485760"
+  # datapusher.chunkSize -- Size of chunks of the data that is being downloaded in bytes
+  chunkSize: "16384"
+  # datapusher.insertRows -- Number of rows to take from the data and upload them as chunks to datastore
+  insertRows: "250"
+  # datapusher.downloadTimeout -- Timeout limit of the download request
+  downloadTimeout: "30"
+  # datapusher.datapusherSslVerify -- Enable or disable (boolean) verification of SSL when trying to get resources. Default: True
+  datapusherSslVerify: "False"
+  # datapusher.datapusherRewriteResources -- Enable or disable (boolean) whether datapusher should rewrite resources uploaded to CKAN's filestore, since datapusher takes the CKAN Site URL value for generating the resource URL. Default: False
+  datapusherRewriteResources: "True"
+  # Sets the rewrite URL that datapushed will rewrite resources that are uploaded to CKAN's filestore. Default: http://ckan:5000
+  datapusherRewriteUrl: http://ckan
 
 serviceAccount:
   # Specifies whether a service account should be created
