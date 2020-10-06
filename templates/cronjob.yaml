@@ -1,0 +1,79 @@
+{{- if .Values.ckan.activityStreamsEmailNotifications -}}
+apiVersion: batch/v1beta1
+kind: CronJob
+metadata:
+  name: ckan-email-notifications
+spec:
+  schedule: "*/15 * * * *"
+  concurrencyPolicy: Forbid
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          containers:
+          - name: ckan-email-notifications
+            securityContext:
+              {{- toYaml .Values.securityContext | nindent 14 }}
+            image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+            imagePullPolicy: {{ .Values.image.pullPolicy }}
+            command: ["paster"]
+            args:
+            - --plugin=ckan
+            - post
+            - -c
+            - /srv/app/production.ini
+            - /api/action/send_email_notifications
+            env:
+{{- if .Values.ckan.extraEnv }}
+{{ toYaml .Values.ckan.extraEnv | indent 12 }}
+{{- end }}
+            - name: CKAN__SITE_TITLE
+              value: {{ .Values.ckan.siteTitle }}
+            - name: CKAN_SITE_ID
+              value: {{ .Values.ckan.siteId }}
+            - name: CKAN_SITE_URL
+              value: {{ .Values.ckan.siteUrl }}
+            - name: CKAN__PLUGINS
+              value: {{ .Values.ckan.ckanPlugins }}
+            - name: CKAN_SQLALCHEMY_URL
+              valueFrom:
+                secretKeyRef:
+                  name: ckancredentials
+                  key: ckanSqlAlchemyUrl
+            - name: CKAN__DATASTORE__WRITE_URL
+              valueFrom:
+                secretKeyRef:
+                  name: ckancredentials
+                  key: ckanDatastoreWriteUrl
+            - name: CKAN__DATASTORE__READ_URL
+              valueFrom:
+                secretKeyRef:
+                  name: ckancredentials
+                  key: ckanDatastoreReadUrl
+            - name: CKAN_SOLR_URL
+              value: {{ .Values.ckan.solr }}
+            - name: CKAN__REDIS__URL
+              value: {{ .Values.ckan.redis }}
+            - name: CKAN__DATAPUSHER__URL
+              value: {{ .Values.ckan.datapusherUrl }}
+            - name: CKAN___SMTP__SERVER
+              value: {{ .Values.ckan.smtp.server | quote }}
+            - name: CKAN___SMTP__USER
+              value: {{ .Values.ckan.smtp.user }}
+            - name: CKAN___SMTP__PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: ckancredentials
+                  key: smtpPassword
+            - name: CKAN___SMTP__MAIL_FROM
+              value: {{ .Values.ckan.smtp.mailFrom }}
+            - name: CKAN___SMTP__TLS
+              value: {{ .Values.ckan.smtp.tls }}
+            - name: CKAN___SMTP__STARTTLS
+              value: {{ .Values.ckan.smtp.starttls | quote }}
+            - name: CKAN__ACTIVITY_STREAMS_EMAIL_NOTIFICATIONS
+              value: {{ .Values.ckan.activityStreamsEmailNotifications | quote }}
+            - name: CKANEXT__ISSUES__SEND_EMAIL_NOTIFICATIONS
+              value: {{ .Values.ckan.issues.sendEmailNotifications | quote }}
+          restartPolicy: OnFailure
+{{- end }}
