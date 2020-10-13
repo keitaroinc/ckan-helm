@@ -8,6 +8,33 @@ This chart deploys a self contained CKAN instance with all of its dependencies. 
 
 Two jobs for initializing Postgres and SOLR can also be enabled through the values. These will use the provided CKAN environment to set the access permissions for the ckan and datastore DB users as well as create a SOLR collection for the CKAN instance.
 
+## Prerequisites Details
+* Kubernetes 1.9
+* Install [Helm](https://github.com/helm/helm/releases)
+* Setup correctly kubectl and kubeconfig setup before running helm.
+
+## Deploy CKAN on kubernetes cluster
+To deploy CKAN on kubernetes cluster with the release name `<release-name>`:
+```console
+$ helm dependency update .
+$ helm install <release-name> .
+```
+
+## Configuration
+Production deployment values can be set in values.yaml [here](https://github.com/keitaroinc/ckan-helm/blob/master/values.yaml).
+This file contains variables that will be passed to the templates. All configurable values should be placed in this file.
+Alternatively, you can specify each parameter using the `--set key=value[,key=value]` argument to `helm install`.
+
+## Cleanup
+To remove the spawned pods you can run a simple `helm delete <release-name>`.
+Helm will however preserve created persistent volume claims, to also remove them execute the commands below.
+```console
+$ release=<release-name>
+$ helm delete $release
+$ kubectl delete pvc -l release=$release
+```
+
+
 ## Chart Requirements
 
 | Repository | Name | Version |
