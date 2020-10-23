@@ -100,7 +100,7 @@ def solr_collection_alreadyexists(solr_url):
     response_dict = json.loads(res.text)
     if collection_name in response_dict['collections']:
         print('Collection exists. Aborting.')
-        sys.exit(5)
+        sys.exit(0)
 
     print('Collection does not exist. OK...')
 
