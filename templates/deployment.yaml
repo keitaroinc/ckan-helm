@@ -50,6 +50,8 @@ spec:
           env:
             - name: DEBUG
               value: {{ .Values.ckan.debug | quote }}
+            - name: MAINTENANCE_MODE
+              value: {{ .Values.ckan.maintenanceMode | quote }}
             - name: CKAN___DEBUG
               value: {{ .Values.ckan.debug | quote }}
 {{- if .Values.ckan.extraEnv }}

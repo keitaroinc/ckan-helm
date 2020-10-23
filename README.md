@@ -90,6 +90,7 @@ $ kubectl delete pvc -l release=$release
 | ckan.liveness.timeoutSeconds | int | `10` | Timeout interval for the liveness probe |
 | ckan.locale.default | string | `"en"` |  |
 | ckan.locale.offered | string | `"en"` |  |
+| ckan.maintenanceMode | string | `"false"` | Set to true to disable CKAN from starting and serve a maintenance page |
 | ckan.psql.initialize | bool | `true` | Flag whether to initialize the PostgreSQL instance with the provided users and databases |
 | ckan.psql.masterDatabase | string | `"postgres"` | PostgreSQL database for the master user |
 | ckan.psql.masterPassword | string | `"pass"` | PostgreSQL master user password |
