@@ -74,6 +74,8 @@ ckan:
   storagePath: "/var/lib/ckan/default"
   activityStreamsEmailNotifications: "true"
   debug: "true"
+  # ckan.maintenanceMode -- Set to true to disable CKAN from starting and serve a maintenance page
+  maintenanceMode: "false"
   psql:
     # ckan.psql.initialize -- Flag whether to initialize the PostgreSQL instance with the provided users and databases
     initialize: true
