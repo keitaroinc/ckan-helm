@@ -28,11 +28,11 @@ dependencies:
     condition: redis.enabled
   - name: solr
     version: 1.4.0
-    repository: "https://kubernetes-charts-incubator.storage.googleapis.com/"
+    repository: "https://charts.helm.sh/incubator"
     condition: solr.enabled
   - name: postgresql
-    version: "8.6.4"
-    repository: "https://kubernetes-charts.storage.googleapis.com/"
+    version: "10.1.1"
+    repository: "https://charts.bitnami.com/bitnami"
     condition: postgresql.enabled
   - name: datapusher
     version: "1.0.0"

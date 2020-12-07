@@ -90,12 +90,12 @@ spec:
                 secretKeyRef:
                   name: ckancredentials
                   key: ckanSqlAlchemyUrl
-            - name: CKAN__DATASTORE__WRITE_URL
+            - name: CKAN_DATASTORE_WRITE_URL
               valueFrom:
                 secretKeyRef:
                   name: ckancredentials
                   key: ckanDatastoreWriteUrl
-            - name: CKAN__DATASTORE__READ_URL
+            - name: CKAN_DATASTORE_READ_URL
               valueFrom:
                 secretKeyRef:
                   name: ckancredentials

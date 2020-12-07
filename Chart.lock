@@ -3,13 +3,13 @@ dependencies:
   repository: https://kubernetes-charts.storage.googleapis.com/
   version: 10.5.6
 - name: solr
-  repository: https://kubernetes-charts-incubator.storage.googleapis.com/
+  repository: https://charts.helm.sh/incubator
   version: 1.4.0
 - name: postgresql
-  repository: https://kubernetes-charts.storage.googleapis.com/
-  version: 8.6.4
+  repository: https://charts.bitnami.com/bitnami
+  version: 10.1.1
 - name: datapusher
   repository: file://dependency-charts/datapusher
   version: 1.0.0
-digest: sha256:bf437d2c5f4da6ca447116a7c3d8b520443ba12f3528f2cca6a37b844dbfd319
-generated: "2020-09-24T15:39:58.767117823+02:00"
+digest: sha256:e0b160fabe56a5cbfd5e7a1e0e11db72f546aa8731a71d252693dddebb93759c
+generated: "2020-12-04T15:07:09.83874553+01:00"
