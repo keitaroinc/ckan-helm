@@ -16,12 +16,11 @@ spec:
               {{- toYaml .Values.securityContext | nindent 14 }}
             image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
             imagePullPolicy: {{ .Values.image.pullPolicy }}
-            command: ["paster"]
+            command: ["ckan"]
             args:
-            - --plugin=ckan
-            - post
             - -c
             - /srv/app/production.ini
+            - post
             - /api/action/send_email_notifications
             env:
 {{- if .Values.ckan.extraEnv }}

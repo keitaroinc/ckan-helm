@@ -154,14 +154,13 @@ try:
 except(Exception, psycopg2.DatabaseError) as error:
     print("ERROR DB: ", error)
 
-# replace ckan.plugins so that paster can run and apply datastore permissions
+# replace ckan.plugins so that ckan cli can run and apply datastore permissions
 sed_string = "s/ckan.plugins =.*/ckan.plugins = envvars image_view text_view recline_view datastore/g" # noqa
 subprocess.Popen(["/bin/sed", sed_string, "-i", "/srv/app/production.ini"])
-sql = subprocess.check_output(["/usr/bin/paster",
-                               "--plugin=ckan",
+sql = subprocess.check_output(["/usr/bin/ckan",
+                               "-c", "/srv/app/production.ini",
                                "datastore",
-                               "set-permissions",
-                               "-c", "/srv/app/production.ini"],
+                               "set-permissions"],
                               stderr=subprocess.PIPE)
 # Remove the connect clause from the output
 sql = re.sub("\\\connect.*", "", sql)
