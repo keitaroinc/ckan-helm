@@ -21,11 +21,13 @@ spec:
           value: {{ .Values.ckan.psql.masterPassword }}
         - name: PSQL_DB
           value: {{ .Values.ckan.psql.masterDatabase }}
+        - name: CKAN_SOLR_URL
+          value: {{ .Values.ckan.solr }}
         - name: CKAN_SQLALCHEMY_URL
           value: "postgresql://{{ .Values.ckan.db.ckanDbUser }}:{{ .Values.ckan.db.ckanDbPassword }}@{{ .Values.ckan.db.ckanDbUrl }}/{{ .Values.ckan.db.ckanDbName }}"
-        - name: CKAN__DATASTORE__WRITE_URL
+        - name: CKAN_DATASTORE_WRITE_URL
           value: "postgresql://{{ .Values.ckan.datastore.RwDbUser }}:{{ .Values.ckan.datastore.RwDbPassword }}@{{ .Values.ckan.datastore.RwDbUrl }}/{{ .Values.ckan.datastore.RwDbName }}"
-        - name: CKAN__DATASTORE__READ_URL
+        - name: CKAN_DATASTORE_READ_URL
           value: "postgresql://{{ .Values.ckan.datastore.RoDbUser }}:{{ .Values.ckan.datastore.RoDbPassword }}@{{ .Values.ckan.datastore.RoDbUrl }}/{{ .Values.ckan.datastore.RoDbName }}"
         command: ["python"]
         args: ["/srv/psql-init/psql-init.py"]
@@ -33,5 +35,5 @@ spec:
         - name: psql-init-configmap
           mountPath: /srv/psql-init
       restartPolicy: Never
-  backoffLimit: 1
+  backoffLimit: 2
 {{- end }}
