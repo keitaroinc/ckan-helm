@@ -73,7 +73,7 @@ ckan:
   # ckan.storagePath -- Storage path to be used by the instance
   storagePath: "/var/lib/ckan/default"
   activityStreamsEmailNotifications: "true"
-  debug: "true"
+  debug: "false"
   # ckan.maintenanceMode -- Set to true to disable CKAN from starting and serve a maintenance page
   maintenanceMode: "false"
   psql:
