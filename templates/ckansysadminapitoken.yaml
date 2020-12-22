@@ -1,0 +1,7 @@
+apiVersion: v1
+kind: Secret
+metadata:
+  name: ckansysadminapitoken
+type: Opaque
+stringData:
+  sysadminApiToken: {{ .Values.ckan.sysadminApiToken }}

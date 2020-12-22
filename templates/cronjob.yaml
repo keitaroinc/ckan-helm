@@ -16,12 +16,14 @@ spec:
               {{- toYaml .Values.securityContext | nindent 14 }}
             image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
             imagePullPolicy: {{ .Values.image.pullPolicy }}
-            command: ["ckan"]
+            command: ["curl"]
             args:
-            - -c
-            - /srv/app/production.ini
-            - post
-            - /api/action/send_email_notifications
+            - -s
+            - -H 
+            - "Authorization: $(CKAN_SYSADMIN_API_TOKEN)"
+            - -d
+            - "{}"
+            - "http://ckan/api/action/send_email_notifications"
             env:
 {{- if .Values.ckan.extraEnv }}
 {{ toYaml .Values.ckan.extraEnv | indent 12 }}
@@ -36,6 +38,11 @@ spec:
               value: {{ .Values.ckan.ckanPlugins }}
             - name: CKAN__STORAGE_PATH
               value: {{ .Values.ckan.storagePath }}
+            - name: CKAN_SYSADMIN_API_TOKEN
+              valueFrom:
+                secretKeyRef:
+                  name: ckansysadminapitoken
+                  key: sysadminApiToken
             - name: CKAN_SQLALCHEMY_URL
               valueFrom:
                 secretKeyRef:

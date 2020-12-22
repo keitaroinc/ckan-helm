@@ -19,3 +19,5 @@
   kubectl --namespace {{ .Release.Namespace }} port-forward $POD_NAME 5000:5000
   echo "Visit http://127.0.0.1:5000 to use CKAN"
 {{- end }}
+2. Generate an API Token for the sysadmin user using the CKAN UI, replace it in your values file and replace the secret with the new value at runtime
+  kubectl -n {namespace} create secret generic ckansysadminapitoken --from-literal=sysadminApiToken={insert_generated_api_token_here} --dry-run -o yaml | kubectl apply -f -
