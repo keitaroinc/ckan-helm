@@ -1,4 +1,4 @@
-{{- if .Values.ckan.activityStreamsEmailNotifications -}}
+{{- if eq .Values.ckan.activityStreamsEmailNotifications "true" -}}
 apiVersion: batch/v1beta1
 kind: CronJob
 metadata:
@@ -34,17 +34,19 @@ spec:
               value: {{ .Values.ckan.siteUrl }}
             - name: CKAN__PLUGINS
               value: {{ .Values.ckan.ckanPlugins }}
+            - name: CKAN__STORAGE_PATH
+              value: {{ .Values.ckan.storagePath }}
             - name: CKAN_SQLALCHEMY_URL
               valueFrom:
                 secretKeyRef:
                   name: ckancredentials
                   key: ckanSqlAlchemyUrl
-            - name: CKAN__DATASTORE__WRITE_URL
+            - name: CKAN_DATASTORE_WRITE_URL
               valueFrom:
                 secretKeyRef:
                   name: ckancredentials
                   key: ckanDatastoreWriteUrl
-            - name: CKAN__DATASTORE__READ_URL
+            - name: CKAN_DATASTORE_READ_URL
               valueFrom:
                 secretKeyRef:
                   name: ckancredentials
