@@ -1,15 +1,15 @@
 dependencies:
 - name: redis
-  repository: https://kubernetes-charts.storage.googleapis.com/
-  version: 10.5.6
+  repository: https://charts.bitnami.com/bitnami
+  version: 12.2.3
 - name: solr
   repository: https://charts.helm.sh/incubator
   version: 1.4.0
 - name: postgresql
   repository: https://charts.bitnami.com/bitnami
-  version: 10.1.1
+  version: 10.2.0
 - name: datapusher
   repository: file://dependency-charts/datapusher
   version: 1.0.0
-digest: sha256:e0b160fabe56a5cbfd5e7a1e0e11db72f546aa8731a71d252693dddebb93759c
-generated: "2020-12-04T15:07:09.83874553+01:00"
+digest: sha256:cccf0fcd53076f5ccddde279ef1f875da70aa535efca2d5e61e75c3a12476081
+generated: "2020-12-21T22:45:38.481976117+01:00"

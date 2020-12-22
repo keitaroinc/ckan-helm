@@ -7,8 +7,8 @@ from psycopg2.extensions import ISOLATION_LEVEL_AUTOCOMMIT
 from psycopg2.extensions import AsIs
 
 ckan_conn_str = os.environ.get('CKAN_SQLALCHEMY_URL', '')
-datastorerw_conn_str = os.environ.get('CKAN__DATASTORE__WRITE_URL', '')
-datastorero_conn_str = os.environ.get('CKAN__DATASTORE__READ_URL', '')
+datastorerw_conn_str = os.environ.get('CKAN_DATASTORE_WRITE_URL', '')
+datastorero_conn_str = os.environ.get('CKAN_DATASTORE_READ_URL', '')
 
 master_user = os.environ.get('PSQL_MASTER', '')
 master_passwd = os.environ.get('PSQL_PASSWD', '')
@@ -163,6 +163,6 @@ sql = subprocess.check_output(["/usr/bin/ckan",
                                "set-permissions"],
                               stderr=subprocess.PIPE)
 # Remove the connect clause from the output
-sql = re.sub("\\\connect.*", "", sql)
+sql = re.sub("\\\connect.*", "", sql.decode('utf-8'))
 
 set_db_permissions(datastorerw_db, sql)

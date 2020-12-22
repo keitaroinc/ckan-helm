@@ -40,9 +40,9 @@ $ kubectl delete pvc -l release=$release
 | Repository | Name | Version |
 |------------|------|---------|
 | file://dependency-charts/datapusher | datapusher | 1.0.0 |
-| https://kubernetes-charts-incubator.storage.googleapis.com/ | solr | 1.4.0 |
-| https://kubernetes-charts.storage.googleapis.com/ | postgresql | 8.6.4 |
-| https://kubernetes-charts.storage.googleapis.com/ | redis | 10.5.6 |
+| https://charts.helm.sh/incubator | solr | 1.4.0 |
+| https://charts.bitnami.com/bitnami | postgresql | 10.2.0 |
+| https://charts.bitnami.com/bitnami | redis | 12.2.3 |
 
 ## Chart Values
 
