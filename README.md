@@ -1,5 +1,8 @@
-ckan-chart
+CKAN Helm Chart
 ==========
+
+[![License][]][1][![Chat on Gitter][]][2]
+
 A Helm chart for CKAN
 
 Current chart version is `0.1.0`
@@ -172,3 +175,8 @@ $ kubectl delete pvc -l release=$release
 | solr.zookeeper.persistence.size | string | `"1Gi"` | Size of ZK PVC |
 | solr.zookeeper.replicaCount | int | `1` | Numer of Zookeeper replicas in the ZK cluster |
 | tolerations | list | `[]` |  |
+
+  [License]: https://img.shields.io/badge/license-Apache--2.0-blue.svg?style=flat
+  [1]: https://opensource.org/licenses/Apache-2.0
+  [Chat on Gitter]: https://badges.gitter.im/gitterHQ/gitter.svg
+  [2]: https://gitter.im/keitaroinc/docker-ckan
