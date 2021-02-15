@@ -9,7 +9,7 @@ dependencies:
   repository: https://charts.bitnami.com/bitnami
   version: 10.2.0
 - name: datapusher
-  repository: file://dependency-charts/datapusher
+  repository: https://keitaro-charts.storage.googleapis.com
   version: 1.0.0
-digest: sha256:cccf0fcd53076f5ccddde279ef1f875da70aa535efca2d5e61e75c3a12476081
-generated: "2020-12-21T22:45:38.481976117+01:00"
+digest: sha256:3268691cc5ef66b97fbf8fc0c850b1d6b4b677a3aaada00b6e0570e40088c1ed
+generated: "2021-02-15T17:16:23.888464975+01:00"

@@ -5,7 +5,7 @@ CKAN Helm Chart
 
 A Helm chart for CKAN
 
-Current chart version is `0.1.0`
+Current chart version is `1.0.1`
 
 This chart deploys a self contained CKAN instance with all of its dependencies. These can be enabled/disabled if they already exist in your infrastructure.
 
@@ -16,11 +16,17 @@ Two jobs for initializing Postgres and SOLR can also be enabled through the valu
 * Install [Helm](https://github.com/helm/helm/releases)
 * Setup correctly kubectl and kubeconfig setup before running helm.
 
+## Helm repo
+The datapusher and ckan charts can be found on Keitaro's helm repo:
+```console
+$ helm repo add keitaro-charts https://keitaro-charts.storage.googleapis.com
+```
+
 ## Deploy CKAN on kubernetes cluster
 To deploy CKAN on kubernetes cluster with the release name `<release-name>`:
 ```console
-$ helm dependency update .
-$ helm install <release-name> .
+$ helm repo add keitaro-charts https://keitaro-charts.storage.googleapis.com
+$ helm install <release-name> keitaro-charts/ckan
 ```
 
 ## Configuration

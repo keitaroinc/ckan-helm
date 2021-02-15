@@ -1,6 +1,6 @@
 apiVersion: v2
 name: ckan
-description: A Helm chart for CKAN
+description: CKAN Helm chart
 
 # A chart can be either an 'application' or a 'library' chart.
 #
@@ -36,6 +36,6 @@ dependencies:
     condition: postgresql.enabled
   - name: datapusher
     version: 1.0.0
-    repository: "file://dependency-charts/datapusher"
+    repository: "https://keitaro-charts.storage.googleapis.com"
     condition: datapusher.enabled
 
