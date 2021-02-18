@@ -83,16 +83,19 @@ def create_db(db_params):
                                database=master_database)
         con.set_isolation_level(ISOLATION_LEVEL_AUTOCOMMIT)
         cur = con.cursor()
-        cur.execute('GRANT "' + db_params.db_user.split("@")
-                    [0] + '" TO "' + master_user.split("@")[0] + '"')
 
         print("Creating database " + db_params.db_name + " with owner " +
               db_params.db_user.split("@")[0])
         cur.execute('CREATE DATABASE ' + db_params.db_name + ' OWNER "' +
                     db_params.db_user.split("@")[0] + '"')
-        cur.execute('GRANT CONNECT ON DATABASE ' +
+        cur.execute('GRANT ALL PRIVILEGES ON DATABASE ' +
                     db_params.db_name + ' TO "' +
                     db_params.db_user.split("@")[0] + '"')
+        if is_pg_buffercache_enabled(db_params) >= 1:
+            print("Granting privileges on pg_buffercache to " +
+                  db_params.db_user.split("@")[0])
+            cur.execute('GRANT ALL PRIVILEGES ON TABLE pg_buffercache TO ' +
+                        db_params.db_user.split("@")[0])
     except(Exception, psycopg2.DatabaseError) as error:
         print("ERROR DB: ", error)
     finally:
@@ -100,8 +103,9 @@ def create_db(db_params):
         con.close()
 
 
-def set_db_permissions(db_params, sql):
+def is_pg_buffercache_enabled(db_params):
     con = None
+    result = None
     try:
         con = psycopg2.connect(user=master_user,
                                host=db_params.db_host,
@@ -109,6 +113,34 @@ def set_db_permissions(db_params, sql):
                                database=db_params.db_name)
         con.set_isolation_level(ISOLATION_LEVEL_AUTOCOMMIT)
         cur = con.cursor()
+        cur.execute("SELECT count(*) FROM pg_extension " +
+                    "WHERE extname = 'pg_buffercache'")
+        result = cur.fetchone()
+    except(Exception, psycopg2.DatabaseError) as error:
+        print("ERROR DB: ", error)
+    finally:
+        cur.close()
+        con.close()
+    return result[0]
+
+
+def set_datastore_permissions(datastore_rw_params, datastore_ro_params, sql):
+    con = None
+    try:
+        con = psycopg2.connect(user=master_user,
+                               host=datastore_rw_params.db_host,
+                               password=master_passwd,
+                               database=datastore_rw_params.db_name)
+        con.set_isolation_level(ISOLATION_LEVEL_AUTOCOMMIT)
+        cur = con.cursor()
+        cur.execute('GRANT CONNECT ON DATABASE ' +
+                    datastore_rw_params.db_name +
+                    ' TO ' + datastore_ro_params.db_user.split("@")[0])
+        if is_pg_buffercache_enabled(datastore_rw_params) >= 1:
+            print("Granting privileges on pg_buffercache to " +
+                  datastore_ro_params.db_user.split("@")[0])
+            cur.execute('GRANT ALL PRIVILEGES ON TABLE pg_buffercache TO ' +
+                        datastore_ro_params.db_user.split("@")[0])
         print("Setting datastore permissions\n")
         print(sql)
         cur.execute(sql)
@@ -130,40 +162,6 @@ print("Master DB: " + master_database + " Master User: " + master_user)
 ckan_db = DB_Params(ckan_conn_str)
 datastorerw_db = DB_Params(datastorerw_conn_str)
 datastorero_db = DB_Params(datastorero_conn_str)
-
-
-def set_azure_db_permissions(db_params):
-    con = None
-    try:
-        con = psycopg2.connect(user=master_user,
-                               host=db_params.db_host,
-                               password=master_passwd,
-                               database=db_params.db_name)
-        con.set_isolation_level(ISOLATION_LEVEL_AUTOCOMMIT)
-        cur = con.cursor()
-        print("Setting privileges required by Azure")
-        # GRANT ALL PRIVILEGES ON DATABASE <newdb> TO <db_user>;
-        cur.execute('GRANT ALL PRIVILEGES ON DATABASE ' +
-                    datastorerw_db.db_name +
-                    ' TO ' + datastorero_db.db_user.split("@")[0])
-        cur.execute('GRANT ALL PRIVILEGES ON DATABASE ' +
-                    datastorerw_db.db_name +
-                    ' TO ' + datastorerw_db.db_user.split("@")[0])
-        cur.execute('GRANT ALL PRIVILEGES ON DATABASE ' +
-                    datastorerw_db.db_name +
-                    ' TO ' + ckan_db.db_user.split("@")[0])
-
-        cur.execute('GRANT ALL PRIVILEGES ON TABLE pg_buffercache TO ' +
-                    ckan_db.db_user.split("@")[0])
-        cur.execute('GRANT ALL PRIVILEGES ON TABLE pg_buffercache TO ' +
-                    datastorerw_db.db_user.split("@")[0])
-        cur.execute('GRANT ALL PRIVILEGES ON TABLE pg_buffercache TO ' +
-                    datastorero_db.db_user.split("@")[0])
-    except Exception as error:
-        print("ERROR DB: ", error)
-    finally:
-        cur.close()
-        con.close()
 
 
 # Check to see whether we can connect to the database, exit after 10 mins
@@ -194,10 +192,6 @@ try:
 except(Exception, psycopg2.DatabaseError) as error:
     print("ERROR DB: ", error)
 
-try:
-    set_azure_db_permissions(datastorerw_db)
-except(Exception, psycopg2.DatabaseError) as error:
-    print("ERROR DB: ", error)
 # replace ckan.plugins so that ckan cli can run and apply datastore permissions
 sed_string = "s/ckan.plugins =.*/ckan.plugins = envvars image_view text_view recline_view datastore/g"  # noqa
 subprocess.Popen(["/bin/sed", sed_string, "-i", "/srv/app/production.ini"])
@@ -213,6 +207,6 @@ sql = sql.replace("@"+datastorerw_db.db_host, "")
 sql = re.sub('\\\\connect \"(.*)\"', '', sql)
 
 try:
-    set_db_permissions(datastorerw_db, sql)
+    set_datastore_permissions(datastorerw_db, datastorero_db, sql)
 except(Exception, psycopg2.DatabaseError) as error:
     print("ERROR DB: ", error)
