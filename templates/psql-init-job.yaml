@@ -24,11 +24,20 @@ spec:
         - name: CKAN_SOLR_URL
           value: {{ .Values.ckan.solr }}
         - name: CKAN_SQLALCHEMY_URL
-          value: "postgresql://{{ .Values.ckan.db.ckanDbUser }}:{{ .Values.ckan.db.ckanDbPassword }}@{{ .Values.ckan.db.ckanDbUrl }}/{{ .Values.ckan.db.ckanDbName }}"
+          valueFrom:
+            secretKeyRef:
+              name: ckancredentials
+              key: ckanSqlAlchemyUrl
         - name: CKAN_DATASTORE_WRITE_URL
-          value: "postgresql://{{ .Values.ckan.datastore.RwDbUser }}:{{ .Values.ckan.datastore.RwDbPassword }}@{{ .Values.ckan.datastore.RwDbUrl }}/{{ .Values.ckan.datastore.RwDbName }}"
+          valueFrom:
+            secretKeyRef:
+              name: ckancredentials
+              key: ckanDatastoreWriteUrl
         - name: CKAN_DATASTORE_READ_URL
-          value: "postgresql://{{ .Values.ckan.datastore.RoDbUser }}:{{ .Values.ckan.datastore.RoDbPassword }}@{{ .Values.ckan.datastore.RoDbUrl }}/{{ .Values.ckan.datastore.RoDbName }}"
+          valueFrom:
+            secretKeyRef:
+              name: ckancredentials
+              key: ckanDatastoreReadUrl
         command: ["python"]
         args: ["/srv/psql-init/psql-init.py"]
         volumeMounts:
