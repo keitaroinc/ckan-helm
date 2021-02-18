@@ -52,6 +52,8 @@ $ kubectl delete pvc -l release=$release
 | https://charts.helm.sh/incubator | solr | 1.4.0 |
 | https://charts.bitnami.com/bitnami | postgresql | 10.2.0 |
 | https://charts.bitnami.com/bitnami | redis | 12.2.3 |
+| https://charts.helm.sh/incubator | solr | 1.4.0 |
+| https://keitaro-charts.storage.googleapis.com | datapusher | 1.0.0 |
 
 ## Chart Values
 
@@ -121,6 +123,7 @@ $ kubectl delete pvc -l release=$release
 | ckan.solr | string | `"http://solr-headless:8983/solr/ckancollection"` | Location of SOLR collection used by the instance |
 | ckan.spatialBackend | string | `"solr"` |  |
 | ckan.storagePath | string | `"/var/lib/ckan/default"` | Storage path to be used by the instance |
+| ckan.sysadminApiToken | string | `"replace_this_with_generated_api_token_for_sysadmin"` | CKAN system admin API token Needs to be generated via the CKAN UI and replaced after initial deployment |
 | ckan.sysadminEmail | string | `"admin@domain.com"` | CKAN system admin email |
 | ckan.sysadminName | string | `"ckan_admin"` | CKAN system admin username |
 | ckan.sysadminPassword | string | `"PasswordHere"` | CKAN system admin password |

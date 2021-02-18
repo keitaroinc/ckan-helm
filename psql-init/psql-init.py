@@ -5,7 +5,7 @@ import re
 import psycopg2
 from psycopg2.extensions import ISOLATION_LEVEL_AUTOCOMMIT
 from psycopg2.extensions import AsIs
-import sqlalchemy
+from sqlalchemy.engine.url import make_url
 
 ckan_conn_str = os.environ.get('CKAN_SQLALCHEMY_URL', '')
 datastorerw_conn_str = os.environ.get('CKAN_DATASTORE_WRITE_URL', '')
@@ -18,10 +18,10 @@ master_database = os.environ.get('PSQL_DB', '')
 
 class DB_Params:
     def __init__(self, conn_str):
-        self.db_user = sqlalchemy.engine.url.make_url(conn_str).username
-        self.db_passwd = sqlalchemy.engine.url.make_url(conn_str).password
-        self.db_host = sqlalchemy.engine.url.make_url(conn_str).host
-        self.db_name = sqlalchemy.engine.url.make_url(conn_str).database
+        self.db_user = make_url(conn_str).username
+        self.db_passwd = make_url(conn_str).password
+        self.db_host = make_url(conn_str).host
+        self.db_name = make_url(conn_str).database
 
 def check_db_connection(db_params, retry=None):
 
