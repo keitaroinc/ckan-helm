@@ -210,7 +210,7 @@ sql = sql.decode('utf-8')
 sql = sql.replace("@"+datastorerw_db.db_host, "")
 
 # Remove the connect clause from the output
-sql = re.sub("\\\connect.*", "", sql)
+sql = re.sub('\\\\connect \"(.*)\"', '', sql)
 
 try:
     set_db_permissions(datastorerw_db, sql)
