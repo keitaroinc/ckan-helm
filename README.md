@@ -137,14 +137,14 @@ $ kubectl delete pvc -l release=$release
 | fullnameOverride | string | `"ckan"` |  |
 | image.pullPolicy | string | `"IfNotPresent"` |  |
 | image.repository | string | `"keitaro/ckan"` |  |
-| image.tag | string | `"2.9.1"` |  |
+| image.tag | string | `"2.9.2"` |  |
 | imagePullSecrets | list | `[]` |  |
 | ingress.annotations | object | `{}` |  |
 | ingress.enabled | bool | `false` |  |
 | ingress.hosts[0].host | string | `"chart-example.local"` |  |
 | ingress.hosts[0].paths | list | `[]` |  |
 | ingress.tls | list | `[]` |  |
-| ingressRoute.enabled | bool | `true` |  |
+| ingressRoute.enabled | bool | `false` |  |
 | ingressRoute.host | string | `"chart-example.local"` | Used in conjunction with a Traefik v2 deployment |
 | nameOverride | string | `""` |  |
 | nodeSelector | object | `{}` |  |

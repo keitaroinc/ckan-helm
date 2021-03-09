@@ -6,7 +6,7 @@ replicaCount: 1
 
 image:
   repository: keitaro/ckan
-  tag: 2.9.1
+  tag: 2.9.2
   pullPolicy: IfNotPresent
 
 imagePullSecrets: []
@@ -203,7 +203,7 @@ ingress:
 
 # ingressRoute -- Used in conjunction with a Traefik v2 deployment
 ingressRoute:
-  enabled: true
+  enabled: false
   host: chart-example.local
 
 resources: {}
