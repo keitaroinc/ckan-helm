@@ -83,7 +83,7 @@ def create_db(db_params):
                                database=master_database)
         con.set_isolation_level(ISOLATION_LEVEL_AUTOCOMMIT)
         cur = con.cursor()
-
+        cur.execute('GRANT "' + db_params.db_user.split("@")[0] + '" TO "' + master_user.split("@")[0] + '"')
         print("Creating database " + db_params.db_name + " with owner " +
               db_params.db_user.split("@")[0])
         cur.execute('CREATE DATABASE ' + db_params.db_name + ' OWNER "' +
