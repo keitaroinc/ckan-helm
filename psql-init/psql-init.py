@@ -83,7 +83,8 @@ def create_db(db_params):
                                database=master_database)
         con.set_isolation_level(ISOLATION_LEVEL_AUTOCOMMIT)
         cur = con.cursor()
-        cur.execute('GRANT "' + db_params.db_user.split("@")[0] + '" TO "' + master_user.split("@")[0] + '"')
+        cur.execute('GRANT "' + db_params.db_user.split("@")
+                    [0] + '" TO "' + master_user.split("@")[0] + '"')
         print("Creating database " + db_params.db_name + " with owner " +
               db_params.db_user.split("@")[0])
         cur.execute('CREATE DATABASE ' + db_params.db_name + ' OWNER "' +
@@ -92,10 +93,9 @@ def create_db(db_params):
                     db_params.db_name + ' TO "' +
                     db_params.db_user.split("@")[0] + '"')
         if is_pg_buffercache_enabled(db_params) >= 1:
-            print("Granting privileges on pg_buffercache to " +
+            print("Granting privileges on pg_monitor to " +
                   db_params.db_user.split("@")[0])
-            cur.execute('GRANT ALL PRIVILEGES ON TABLE pg_buffercache TO ' +
-                        db_params.db_user.split("@")[0])
+            cur.execute('GRANT "pg_monitor" TO "' + db_params.db_user.split("@")[0] + '"')
     except(Exception, psycopg2.DatabaseError) as error:
         print("ERROR DB: ", error)
     finally:
@@ -137,9 +137,9 @@ def set_datastore_permissions(datastore_rw_params, datastore_ro_params, sql):
                     datastore_rw_params.db_name +
                     ' TO ' + datastore_ro_params.db_user.split("@")[0])
         if is_pg_buffercache_enabled(datastore_rw_params) >= 1:
-            print("Granting privileges on pg_buffercache to " +
+            print("Granting privileges on pg_monitor to " +
                   datastore_ro_params.db_user.split("@")[0])
-            cur.execute('GRANT ALL PRIVILEGES ON TABLE pg_buffercache TO ' +
+            cur.execute('GRANT ALL PRIVILEGES ON TABLE pg_monitor TO ' +
                         datastore_ro_params.db_user.split("@")[0])
         print("Setting datastore permissions\n")
         print(sql)
@@ -207,8 +207,6 @@ sql = sql.replace("@"+datastorerw_db.db_host, "")
 sql = re.sub('\\\\connect \"(.*)\"', '', sql)
 
 try:
-    set_datastore_permissions(ckan_db, ckan_db, sql)
-    set_datastore_permissions(datastorerw_db, datastorerw_db, sql)
-    set_datastore_permissions(datastorero_db, datastorero_db, sql)
+    set_datastore_permissions(datastorerw_db, datastorero_db, sql)
 except(Exception, psycopg2.DatabaseError) as error:
     print("ERROR DB: ", error)
