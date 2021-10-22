@@ -1,0 +1,16 @@
+{{- if .Values.ingressRoute.enabled }}
+apiVersion: traefik.containo.us/v1alpha1
+kind: IngressRoute
+metadata:
+  name: {{ include "ckan-chart.fullname" . }}
+spec:
+  entryPoints:
+    - web
+    - websecure
+  routes:
+    - match: Host(`{{ .Values.ingressRoute.host }}`)
+      kind: Rule
+      services:
+        - name: {{ include "ckan-chart.fullname" . }}
+          port: {{ .Values.service.port }}
+{{- end }}

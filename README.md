@@ -48,8 +48,6 @@ $ kubectl delete pvc -l release=$release
 
 | Repository | Name | Version |
 |------------|------|---------|
-| file://dependency-charts/datapusher | datapusher | 1.0.0 |
-| https://charts.helm.sh/incubator | solr | 1.4.0 |
 | https://charts.bitnami.com/bitnami | postgresql | 10.2.0 |
 | https://charts.bitnami.com/bitnami | redis | 12.2.3 |
 | https://charts.helm.sh/incubator | solr | 1.4.0 |
@@ -92,7 +90,7 @@ $ kubectl delete pvc -l release=$release
 | ckan.db.ckanDbPassword | string | `"pass"` | Password of the user for the database to be used by CKAN |
 | ckan.db.ckanDbUrl | string | `"postgres"` | Url of the PostgreSQL server where the CKAN database is hosted |
 | ckan.db.ckanDbUser | string | `"ckan_default"` | Username of the database to be used by CKAN |
-| ckan.debug | string | `"true"` |  |
+| ckan.debug | string | `"false"` |  |
 | ckan.extraEnv | list | `[]` | An array to add extra environment variables For example: extraEnv:   - name: FOO     value: "bar" |
 | ckan.issues.sendEmailNotifications | string | `"true"` |  |
 | ckan.liveness.failureThreshold | int | `6` | Failure threshold for the liveness probe |
@@ -139,13 +137,15 @@ $ kubectl delete pvc -l release=$release
 | fullnameOverride | string | `"ckan"` |  |
 | image.pullPolicy | string | `"IfNotPresent"` |  |
 | image.repository | string | `"keitaro/ckan"` |  |
-| image.tag | string | `"2.8.5"` |  |
+| image.tag | string | `"2.9.2"` |  |
 | imagePullSecrets | list | `[]` |  |
 | ingress.annotations | object | `{}` |  |
 | ingress.enabled | bool | `false` |  |
 | ingress.hosts[0].host | string | `"chart-example.local"` |  |
 | ingress.hosts[0].paths | list | `[]` |  |
 | ingress.tls | list | `[]` |  |
+| ingressRoute.enabled | bool | `false` |  |
+| ingressRoute.host | string | `"chart-example.local"` | Used in conjunction with a Traefik v2 deployment |
 | nameOverride | string | `""` |  |
 | nodeSelector | object | `{}` |  |
 | podSecurityContext | object | `{}` |  |
