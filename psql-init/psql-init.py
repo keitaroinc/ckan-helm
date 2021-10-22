@@ -21,6 +21,7 @@ import re
 import psycopg2
 from psycopg2.extensions import ISOLATION_LEVEL_AUTOCOMMIT
 from psycopg2.extensions import AsIs
+from sqlalchemy.engine.url import make_url
 
 ckan_conn_str = os.environ.get('CKAN_SQLALCHEMY_URL', '')
 datastorerw_conn_str = os.environ.get('CKAN_DATASTORE_WRITE_URL', '')
@@ -33,16 +34,10 @@ master_database = os.environ.get('PSQL_DB', '')
 
 class DB_Params:
     def __init__(self, conn_str):
-        conn_protocol, conn_info = conn_str.split('://')
-        db_user, db_passwd = conn_info.split(':')
-        db_passwd, db_host = db_passwd.split('@')
-        db_host, db_name = db_host.split('/')
-
-        self.db_protocol = conn_protocol
-        self.db_user = db_user
-        self.db_passwd = db_passwd
-        self.db_host = db_host
-        self.db_name = db_name
+        self.db_user = make_url(conn_str).username
+        self.db_passwd = make_url(conn_str).password
+        self.db_host = make_url(conn_str).host
+        self.db_name = make_url(conn_str).database
 
 
 def check_db_connection(db_params, retry=None):
@@ -80,9 +75,14 @@ def create_user(db_params):
                                database=master_database)
         con.set_isolation_level(ISOLATION_LEVEL_AUTOCOMMIT)
         cur = con.cursor()
-        print("Creating user " + db_params.db_user)
-        cur.execute('CREATE USER %s WITH PASSWORD %s',
-                    (AsIs(db_params.db_user), db_params.db_passwd,))
+        print("Creating user " + db_params.db_user.split("@")[0])
+        cur.execute('CREATE ROLE "%s" ' +
+                    'WITH ' +
+                    'LOGIN NOSUPERUSER INHERIT ' +
+                    'CREATEDB NOCREATEROLE NOREPLICATION ' +
+                    'PASSWORD %s',
+                    (AsIs(db_params.db_user.split("@")[0]),
+                     db_params.db_passwd,))
     except(Exception, psycopg2.DatabaseError) as error:
         print("ERROR DB: ", error)
     finally:
@@ -99,11 +99,22 @@ def create_db(db_params):
                                database=master_database)
         con.set_isolation_level(ISOLATION_LEVEL_AUTOCOMMIT)
         cur = con.cursor()
-        cur.execute('GRANT ' + db_params.db_user + ' TO ' + master_user)
+        cur.execute('GRANT "' + db_params.db_user.split("@")
+                    [0] + '" TO "' + master_user.split("@")[0] + '"')
         print("Creating database " + db_params.db_name + " with owner " +
-              db_params.db_user)
-        cur.execute('CREATE DATABASE ' + db_params.db_name + ' OWNER ' +
-                    db_params.db_user)
+              db_params.db_user.split("@")[0])
+        cur.execute('CREATE DATABASE ' + db_params.db_name + ' OWNER "' +
+                    db_params.db_user.split("@")[0] + '"')
+        cur.execute('GRANT ALL PRIVILEGES ON DATABASE ' +
+                    db_params.db_name + ' TO "' +
+                    db_params.db_user.split("@")[0] + '"')
+        if is_pg_buffercache_enabled(db_params) >= 1:
+            # FIXME: This is a known issue with pg_buffercache access
+            # For more info check this thread:
+            # https://www.postgresql.org/message-id/21009351582737086%40iva6-22e79380f52c.qloud-c.yandex.net
+            print("Granting privileges on pg_monitor to " +
+                  db_params.db_user.split("@")[0])
+            cur.execute('GRANT "pg_monitor" TO "' + db_params.db_user.split("@")[0] + '"')
     except(Exception, psycopg2.DatabaseError) as error:
         print("ERROR DB: ", error)
     finally:
@@ -111,8 +122,9 @@ def create_db(db_params):
         con.close()
 
 
-def set_db_permissions(db_params, sql):
+def is_pg_buffercache_enabled(db_params):
     con = None
+    result = None
     try:
         con = psycopg2.connect(user=master_user,
                                host=db_params.db_host,
@@ -120,6 +132,34 @@ def set_db_permissions(db_params, sql):
                                database=db_params.db_name)
         con.set_isolation_level(ISOLATION_LEVEL_AUTOCOMMIT)
         cur = con.cursor()
+        cur.execute("SELECT count(*) FROM pg_extension " +
+                    "WHERE extname = 'pg_buffercache'")
+        result = cur.fetchone()
+    except(Exception, psycopg2.DatabaseError) as error:
+        print("ERROR DB: ", error)
+    finally:
+        cur.close()
+        con.close()
+    return result[0]
+
+
+def set_datastore_permissions(datastore_rw_params, datastore_ro_params, sql):
+    con = None
+    try:
+        con = psycopg2.connect(user=master_user,
+                               host=datastore_rw_params.db_host,
+                               password=master_passwd,
+                               database=datastore_rw_params.db_name)
+        con.set_isolation_level(ISOLATION_LEVEL_AUTOCOMMIT)
+        cur = con.cursor()
+        cur.execute('GRANT CONNECT ON DATABASE ' +
+                    datastore_rw_params.db_name +
+                    ' TO ' + datastore_ro_params.db_user.split("@")[0])
+        if is_pg_buffercache_enabled(datastore_rw_params) >= 1:
+            print("Granting privileges on pg_monitor to " +
+                  datastore_ro_params.db_user.split("@")[0])
+            cur.execute('GRANT ALL PRIVILEGES ON TABLE pg_monitor TO ' +
+                        datastore_ro_params.db_user.split("@")[0])
         print("Setting datastore permissions\n")
         print(sql)
         cur.execute(sql)
@@ -141,6 +181,7 @@ print("Master DB: " + master_database + " Master User: " + master_user)
 ckan_db = DB_Params(ckan_conn_str)
 datastorerw_db = DB_Params(datastorerw_conn_str)
 datastorero_db = DB_Params(datastorero_conn_str)
+
 
 # Check to see whether we can connect to the database, exit after 10 mins
 check_db_connection(ckan_db)
@@ -171,14 +212,20 @@ except(Exception, psycopg2.DatabaseError) as error:
     print("ERROR DB: ", error)
 
 # replace ckan.plugins so that ckan cli can run and apply datastore permissions
-sed_string = "s/ckan.plugins =.*/ckan.plugins = envvars image_view text_view recline_view datastore/g" # noqa
+sed_string = "s/ckan.plugins =.*/ckan.plugins = envvars image_view text_view recline_view datastore/g"  # noqa
 subprocess.Popen(["/bin/sed", sed_string, "-i", "/srv/app/production.ini"])
-sql = subprocess.check_output(["/usr/bin/ckan",
+sql = subprocess.check_output(["ckan",
                                "-c", "/srv/app/production.ini",
                                "datastore",
                                "set-permissions"],
                               stderr=subprocess.PIPE)
-# Remove the connect clause from the output
-sql = re.sub("\\\connect.*", "", sql.decode('utf-8'))
+sql = sql.decode('utf-8')
+sql = sql.replace("@"+datastorerw_db.db_host, "")
 
-set_db_permissions(datastorerw_db, sql)
+# Remove the connect clause from the output
+sql = re.sub('\\\\connect \"(.*)\"', '', sql)
+
+try:
+    set_datastore_permissions(datastorerw_db, datastorero_db, sql)
+except(Exception, psycopg2.DatabaseError) as error:
+    print("ERROR DB: ", error)

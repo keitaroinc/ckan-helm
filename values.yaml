@@ -6,7 +6,7 @@ replicaCount: 1
 
 image:
   repository: keitaro/ckan
-  tag: 2.9.2
+  tag: 2.9.4
   pullPolicy: IfNotPresent
 
 imagePullSecrets: []
@@ -80,6 +80,8 @@ ckan:
   # ckan.maintenanceMode -- Set to true to disable CKAN from starting and serve a maintenance page
   maintenanceMode: "false"
   psql:
+    # ckan.psql.runOnAzure -- Set to true to run on Azure (if true wont run on anything other then azure) set to false to run on other platforms
+    runOnAzure: false
     # ckan.psql.initialize -- Flag whether to initialize the PostgreSQL instance with the provided users and databases
     initialize: true
     # ckan.psql.masterUser -- PostgreSQL master username
