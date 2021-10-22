@@ -93,6 +93,9 @@ def create_db(db_params):
                     db_params.db_name + ' TO "' +
                     db_params.db_user.split("@")[0] + '"')
         if is_pg_buffercache_enabled(db_params) >= 1:
+            # FIXME: This is a known issue with pg_buffercache access
+            # For more info check this thread:
+            # https://www.postgresql.org/message-id/21009351582737086%40iva6-22e79380f52c.qloud-c.yandex.net
             print("Granting privileges on pg_monitor to " +
                   db_params.db_user.split("@")[0])
             cur.execute('GRANT "pg_monitor" TO "' + db_params.db_user.split("@")[0] + '"')
