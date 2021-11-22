@@ -29,7 +29,7 @@ spec:
       {{ end }}
       {{ if .Values.pvc.enabled }}
       initContainers:
-      - name: set-volume-ownsership
+      - name: set-volume-ownership
         image: busybox
         command: ["sh", "-c", "chown -R 92:92 /var/lib/ckan"] # 92 is the uid and gid of ckan user/group
         volumeMounts:
@@ -133,22 +133,118 @@ spec:
               value: {{ .Values.ckan.activityStreamsEmailNotifications | quote }}
             - name: CKANEXT__ISSUES__SEND_EMAIL_NOTIFICATIONS
               value: {{ .Values.ckan.issues.sendEmailNotifications | quote }}
-          readinessProbe:
-            httpGet:
-              path: /api/3/action/status_show
-              port: http
-            initialDelaySeconds: {{ .Values.ckan.readiness.initialDelaySeconds }}
-            periodSeconds: {{ .Values.ckan.readiness.periodSeconds }}
-            failureThreshold: {{ .Values.ckan.readiness.failureThreshold }}
-            timeoutSeconds: {{ .Values.ckan.readiness.timeoutSeconds }}
-          livenessProbe:
-            httpGet:
-              path: /api/3/action/status_show
-              port: http
-            initialDelaySeconds: {{ .Values.ckan.liveness.initialDelaySeconds }}
-            periodSeconds: {{ .Values.ckan.liveness.periodSeconds }}
-            failureThreshold: {{ .Values.ckan.liveness.failureThreshold }}
-            timeoutSeconds: {{ .Values.ckan.liveness.timeoutSeconds }}
+
+            # docker ckan env vars
+            - name: START_CKAN
+              value: "1"
+            - name: POSTGRES_PASSWORD
+              value: ckan
+            - name: CKAN_DB_NAME
+              value: {{ .Values.ckan.db.ckanDbName }}
+            # TEST_CKAN_DB_NAME - not setup for prod
+            - name: PGDATA
+              value: /var/lib/postgresql/data/ckan/
+            - name: DATASTORE_READONLY_PASSWORD
+              value: datastore
+            # Basic
+            - name: CKAN_SITE_ID
+              value: {{ .Values.ckan.siteId }}  # default
+            - name: DEV_CKAN_SITE_URL
+              value: {{ .Values.ckan.siteUrl }}  # http://localhost:5008
+            - name: CKAN_PORT
+              value: "5000"
+            - name: TZ
+              value: UTC
+            - name: CKAN_TEST_SYSADMIN_NAME
+              value: ckan_admin_test
+            - name: CKAN_TEST_SYSADMIN_PASSWORD
+              value: test1234
+            - name: CKAN_DEBUG
+              value: "False"
+            - name: DEV_CKAN_SQLALCHEMY_URL
+              valueFrom:
+                secretKeyRef:
+                  name: ckancredentials
+                  key: ckanSqlAlchemyUrl
+
+            # Test database connections
+            - name: TEST_CKAN_SQLALCHEMY_URL
+              value: postgresql://ckan:ckan@db/ckan_test
+            - name: TEST_CKAN_DATASTORE_WRITE_URL
+              value: postgresql://ckan:ckan@db/datastore_test
+            - name: TEST_CKAN_DATASTORE_READ_URL
+              value: postgresql://datastore_ro:datastore@db/datastore_test
+
+            # Other services connections
+            - name: DEV_CKAN_SOLR_URL
+              value: {{ .Values.ckan.solr }}  # http://solr:8983/solr/ckan
+            - name: DEV_CKAN_REDIS_URL
+              value: {{ .Values.ckan.redis }}  # redis://redis:6379/1
+            - name: CKAN_DATAPUSHER_URL
+              value: {{ .Values.ckan.datapusherUrl }}  # http://datapusher:8800
+            - name: TEST_CKAN_SITE_URL
+              value: http://test.ckan.net
+            - name: TEST_CKAN_SOLR_URL
+              value: {{ .Values.ckan.solr }}
+            - name: TEST_CKAN_REDIS_URL
+              value: {{ .Values.ckan.redis }}
+            - name: TEST_CKAN_REDIS_HOSTNAME
+              value: redis-headless
+            - name: CKAN_REDIS_HOSTNAME
+              value: redis-headless
+            - name: DEV_EXTENSIONS_WHITELIST
+              value: ckan,ckanext-dcat,ckanext-spatial
+            - name: CKAN_S3_AWS_ACCESS_KEY_ID
+              value: XXX
+            - name: CKAN_S3_AWS_SECRET_ACCESS_KEY
+              value: XXX
+            - name: CKAN_S3_BUCKET_NAME
+              value: xxx
+            - name: CKAN_S3_URL_PREFIX
+              value: https://xxx.com/xxx/
+            - name: CKAN_S3_AWS_REGION_NAME
+              value: xxx
+            # Core settings
+            - name: CKAN_SMTP_SERVER
+              value: email-smtp.eu-west-1.amazonaws.com:587
+            - name: CKAN_SMTP_STARTTLS
+              value: "True"
+            
+            - name: CKAN_SMTP_USER
+              value: XXX
+            - name: CKAN_SMTP_PASSWORD
+              value: XXX
+            - name: CKAN_SMTP_MAIL_FROM
+              value: xxx@example.uk
+            # Extensions
+
+            - name: CKAN__HARVEST__MQ__TYPE
+              value: redis
+            - name: CKAN__HARVEST__MQ__HOSTNAME
+              value: "redis-headless" 
+            - name: CKAN__HARVEST__MQ__PORT
+              value: "6379"
+            - name: CKAN__HARVEST__MQ__REDIS_DB
+              value: "1"
+            - name: CKAN__HARVEST__TIMEOUT
+              value: "10"
+
+          # readinessProbe:
+          #   httpGet:
+          #     path: /api/3/action/status_show
+          #     port: http
+          #   initialDelaySeconds: {{ .Values.ckan.readiness.initialDelaySeconds }}
+          #   periodSeconds: {{ .Values.ckan.readiness.periodSeconds }}
+          #   failureThreshold: {{ .Values.ckan.readiness.failureThreshold }}
+          #   timeoutSeconds: {{ .Values.ckan.readiness.timeoutSeconds }}
+          # livenessProbe:
+          #   httpGet:
+          #     path: /api/3/action/status_show
+          #     port: http
+          #   initialDelaySeconds: {{ .Values.ckan.liveness.initialDelaySeconds }}
+          #   periodSeconds: {{ .Values.ckan.liveness.periodSeconds }}
+          #   failureThreshold: {{ .Values.ckan.liveness.failureThreshold }}
+          #   timeoutSeconds: {{ .Values.ckan.liveness.timeoutSeconds }}
           {{ if .Values.pvc.enabled }}
           volumeMounts:
           - name: "ckan"
