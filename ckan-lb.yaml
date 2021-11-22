@@ -1,0 +1,11 @@
+kind: Service
+apiVersion: v1
+metadata:
+  name: ckan-lb
+spec:
+  ports:
+    - port: 5000
+      targetPort: 5000
+  selector:
+    app.kubernetes.io/name: ckan
+  type: LoadBalancer
