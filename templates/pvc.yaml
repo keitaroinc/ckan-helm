@@ -11,4 +11,5 @@ spec:
   resources:
     requests:
       storage: {{ .Values.pvc.size }}
+  storageClassName: {{ .Values.pvc.storageClassName }}
 {{- end }}

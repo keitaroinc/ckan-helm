@@ -156,6 +156,7 @@ $ kubectl delete pvc -l release=$release
 | postgresql.pgPass | string | `"pass"` | Password for the master PostgreSQL user. Feeds into the `postgrescredentials` secret that is provided to the PostgreSQL chart |
 | pvc.enabled | bool | `true` |  |
 | pvc.size | string | `"1Gi"` |  |
+| pvc.storageClassName | string | `""` |  |
 | redis.cluster.enabled | bool | `false` | Cluster mode for Redis |
 | redis.enabled | bool | `true` | Flag to control whether to deploy Redis |
 | redis.fullnameOverride | string | `"redis"` | Name override for the redis deployment |

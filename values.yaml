@@ -16,6 +16,7 @@ fullnameOverride: "ckan"
 pvc:
   enabled: true
   size: "1Gi"
+  storageClassName: ""
 
 # DBDeploymentName -- Variable for name override for postgres deployment
 DBDeploymentName: &DBDeploymentName postgres
