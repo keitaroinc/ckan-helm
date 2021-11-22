@@ -5,7 +5,12 @@
 replicaCount: 1
 
 image:
-  repository: keitaro/ckan
+  # repository: keitaro/ckan
+  # repository: localhost:5000/govuk/ckan-k8s
+  # repository: ckan-registry:51180/govuk/ckan-k8s-dev
+  # repository: localhost:5000/govuk/ckan-k8s-dev
+  repository: govuk/ckan-k8s-dev
+  # repository: govuk/ckan-k8s
   tag: 2.9.4
   pullPolicy: IfNotPresent
 
@@ -66,16 +71,18 @@ ckan:
   # ckan.sysadminEmail -- CKAN system admin email
   sysadminEmail: "admin@domain.com"
   # ckan.siteTitle -- Site title for the instance
-  siteTitle: "Site Title here"
+  siteTitle: "Datagovuk"
   # ckan.siteId -- Site id
-  siteId: "site-id-here"
+  siteId: "datagovuk"
   # ckan.siteUrl -- Url for the CKAN instance
-  siteUrl: "http://localhost:5000"
+  ## siteUrl **** needs to be updated if the loadbalancer is replaced ****
+  siteUrl: "http://localhost:30001"  # if using nodeport
   # ckan.ckanPlugins -- List of plugins to be used by the instance
-  ckanPlugins: "envvars image_view text_view recline_view datastore datapusher"
+  # ckanPlugins: "envvars image_view text_view recline_view datastore datapusher"
+  ckanPlugins: "recline_view envvars datagovuk_publisher_form datagovuk dcat harvest ckan_harvester dcat_rdf_harvester dcat_json_harvester dcat_json_interface spatial_metadata spatial_query spatial_harvest_metadata_api gemini_csw_harvester gemini_waf_harvester gemini_doc_harvester inventory_harvester"
   # ckan.storagePath -- Storage path to be used by the instance
   storagePath: "/var/lib/ckan/default"
-  activityStreamsEmailNotifications: "true"
+  activityStreamsEmailNotifications: "false"
   debug: "false"
   # ckan.maintenanceMode -- Set to true to disable CKAN from starting and serve a maintenance page
   maintenanceMode: "false"
