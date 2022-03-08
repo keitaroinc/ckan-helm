@@ -6,7 +6,7 @@ replicaCount: 1
 
 image:
   repository: keitaro/ckan
-  tag: 2.9.4
+  tag: 2.9.5
   pullPolicy: IfNotPresent
 
 imagePullSecrets: []
@@ -118,7 +118,7 @@ ckan:
     # ckan.datastore.RoDbPassword -- Password for the datastore read permissions user
     RoDbPassword: *DatastoreRODBPass
   # ckan.solr -- Location of SOLR collection used by the instance
-  solr: "http://solr-headless:8983/solr/ckancollection"
+  solr: "http://solr-headless:8983"
   # ckan.redis -- Location of the Redis service to be used by the CKAN instance
   redis: "redis://redis-headless:6379/0"
   spatialBackend: "solr"
@@ -267,20 +267,13 @@ redis:
   usePassword: false
 
 solr:  
-  # Please see all available overrides at https://github.com/helm/charts/tree/master/incubator/solr
-  # solr.enabled -- Flag to control whether to deploy SOLR
-  enabled: true
-  initialize:
-    # solr.initialize.enabled -- Flag whether to initialize the SOLR instance with the provided collection name
-    enabled: true
-    # solr.initialize.numShards -- Number of shards for the SOLR collection
-    numShards: 2
-    # solr.initialize.replicationFactor -- Number of replicas for each SOLR shard
-    replicationFactor: 1
-    # solr.initialize.maxShardsPerNode -- Maximum shards per node
-    maxShardsPerNode: 10
-    # solr.initialize.configsetName -- Name of the config set used for initializing
-    configsetName: ckanConfigSet
+  # Please see all available overrides at https://github.com/bitnami/charts/tree/master/bitnami/solr/#installing-the-chart
+  # solr.collectionShards -- Number of shards for the SOLR collection
+  collectionShards: 1
+  # solr.collectionReplicas -- Number of replicas for each SOLR shard
+  collectionReplicas: 0
+  # solr.auth.enabled	-- Enable Solr authentication	
+  auth.enabled: false
   # solr.fullnameOverride -- Name override for the SOLR deployment
   fullnameOverride: *SolrName
   # solr.replicaCount -- Number of SOLR instances in the cluster
@@ -289,10 +282,11 @@ solr:
     # solr.volumeClaimTemplates.storageSize -- Size of Solr PVC
     storageSize: 5Gi
   image:
+    registry: docker.io
     # solr.image.repository -- Repository for the SOLR image
-    repository: solr
+    repository: bitnami/solr
     # solr.image.tag -- Tag for the SOLR image
-    tag: 6.6.6
+    tag: 8.9.0
   zookeeper:
     # solr.zookeeper.replicaCount -- Numer of Zookeeper replicas in the ZK cluster
     replicaCount: 1
