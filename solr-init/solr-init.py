@@ -50,7 +50,7 @@ def prepare_configset(cfset_name):
     # Copy configset files from configmap volume into rw volume
     # and include schema.xml from ckan src
     shutil.copytree("/srv/solr-configset", "/srv/app/solr-configset")
-    shutil.copyfile("/srv/app/src/ckan/ckan/config/solr/schema.xml",
+    shutil.copyfile("/srv/app/src/ckan/ckan/config/solr/schema.solr8.xml",
                     "/srv/app/solr-configset/schema.xml")
 
     # Create zip

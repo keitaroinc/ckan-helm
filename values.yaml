@@ -5,18 +5,18 @@
 replicaCount: 1
 
 image:
-  repository: keitaro/ckan
+  repository: localhost:5000/ckan
   tag: 2.9.5
-  pullPolicy: IfNotPresent
+  pullPolicy: Always
 
 imagePullSecrets: []
-nameOverride: "standard"
+nameOverride: ""
 fullnameOverride: "ckan"
 
 pvc:
   enabled: true
   size: "1Gi"
-  storageClassName: ""
+  storageClassName: "standard"
 
 # DBDeploymentName -- Variable for name override for postgres deployment
 DBDeploymentName: &DBDeploymentName postgres
@@ -118,7 +118,9 @@ ckan:
     # ckan.datastore.RoDbPassword -- Password for the datastore read permissions user
     RoDbPassword: *DatastoreRODBPass
   # ckan.solr -- Location of SOLR collection used by the instance
-  solr: "http://solr-headless:8983"
+  solr: "http://admin:pass@solr-headless:8983/solr/ckancollection"
+  # ckan.solr.auth -- Location of SOLR collection used by the instance without the admin user and password
+  solr_auth: "http://solr-headless:8983/solr/ckancollection"
   # ckan.redis -- Location of the Redis service to be used by the CKAN instance
   redis: "redis://redis-headless:6379/0"
   spatialBackend: "solr"
@@ -249,12 +251,13 @@ datapusher:
     datapusherRewriteUrl: http://ckan
 
 redis:
-  # Please see all available overrides at https://github.com/helm/charts/tree/master/stable/redis
+  # Please see all available overrides at https://github.com/bitnami/charts/tree/master/bitnami/redis
   # redis.enabled -- Flag to control whether to deploy Redis
   enabled: true
   # redis.fullnameOverride -- Name override for the redis deployment
   fullnameOverride: *RedisName
   replicaCount: 1
+  # redis.architecture -- Redis architecture for standalone or replication versions
   architecture: standalone
   master:
     persistence:
@@ -262,22 +265,32 @@ redis:
       enabled: false
       # redis.master.persistence.size -- Size of the volume claim
       size: 1Gi
-  # redis.usePassword -- Use password for accessing redis
   auth:
+  # redis.auth.enabled -- Enable or disable redis password auth
     enabled: false
+  # redis.auth.sentinel -- Enables or disables passwords for sentinels
+    sentinel: false
+  # redis.auth.password --  The password of redis if auth is enabled
+    password: 
 
 
 solr: 
   # Please see all available overrides at https://github.com/bitnami/charts/tree/master/bitnami/solr/#installing-the-chart
   # solr.enabled -- Flag to control whether to deploy SOLR
   enabled: true
-  # solr.auth.enabled	-- Enable or Disable Solr authentication	
   auth:
-    enabled: false
+  # solr.auth.enabled -- Enable or disable auth (if auth is disabled solr-init cant upload the configset/schema.xml for ckan)
+    enabled: true
+  # solr.auth.adminUser -- The name of the solr admin user
+    adminUsername: admin
+  # solr.auth.adminPassword -- The password of the solr admin user
+    adminPassword: pass
+  # solr.collection -- the name of the collection created by solr (since we are creating one with solr-init this needs to be blank)
+  collection:
   # solr.collectionShards -- Number of shards for the SOLR collection
-  collectionShards: 1
+  collectionShards: 
   # solr.collectionReplicas -- Number of replicas for each SOLR shard
-  collectionReplicas: 1
+  collectionReplicas: 
   # solr.fullnameOverride -- Name override for the SOLR deployment
   fullnameOverride: *SolrName
   # solr.replicaCount -- Number of SOLR instances in the cluster
@@ -300,6 +313,15 @@ solr:
   initialize:
     # solr.initialize.enabled -- Flag whether to initialize the SOLR instance with the provided collection name
     enabled: true
+    # solr.initialize.numShards -- Number of shards for the SOLR collection
+    numShards: 2
+    # solr.initialize.replicationFactor -- Number of replicas for each SOLR shard
+    replicationFactor: 1
+    # solr.initialize.maxShardsPerNode -- Maximum shards per node
+    maxShardsPerNode: 10
+    # solr.initialize.configsetName -- Name of the config set used for initializing
+    configsetName: ckanConfigSet
+
 
 
 postgresql:
@@ -312,6 +334,12 @@ postgresql:
   fullnameOverride: *DBDeploymentName
   # postgresql.pgPass -- Password for the master PostgreSQL user.
   # Feeds into the `postgrescredentials` secret that is provided to the PostgreSQL chart
-  pgPass: *MasterDBPass
+  auth:
+    postgresPassword: *MasterDBPass
   # postgresql.existingSecret -- Name of existing secret that holds passwords for PostgreSQL
-  existingSecret: postgrescredentials
+    existingSecret: postgrescredentials
+    username: *CkanDBUser
+    password: *CkanDBPass
+    database: *CkanDBName
+  
+  
