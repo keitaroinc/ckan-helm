@@ -7,9 +7,9 @@ dependencies:
   version: 3.0.7
 - name: postgresql
   repository: https://charts.bitnami.com/bitnami
-  version: 11.1.4
+  version: 10.2.0
 - name: datapusher
   repository: https://keitaro-charts.storage.googleapis.com
   version: 1.0.0
-digest: sha256:efb721f059a996f94066093d01061d67374bc082ef6be741514786dcc96954b1
-generated: "2022-03-08T16:19:26.225377367+01:00"
+digest: sha256:33be91b5aec30742bd5148bee8c202ded999ecbf546d01c10372f0dce36b6915
+generated: "2022-03-15T14:11:36.050887556+01:00"
