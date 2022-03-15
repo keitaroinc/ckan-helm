@@ -118,9 +118,7 @@ ckan:
     # ckan.datastore.RoDbPassword -- Password for the datastore read permissions user
     RoDbPassword: *DatastoreRODBPass
   # ckan.solr -- Location of SOLR collection used by the instance
-  solr: "http://admin:pass@solr-headless:8983/solr/ckancollection"
-  # ckan.solr.auth -- Location of SOLR collection used by the instance without the admin user and password
-  solr_auth: "http://solr-headless:8983/solr/ckancollection"
+  solr: "http://solr-headless:8983/solr/ckancollection"
   # ckan.redis -- Location of the Redis service to be used by the CKAN instance
   redis: "redis://redis-headless:6379/0"
   spatialBackend: "solr"
@@ -285,7 +283,8 @@ solr:
     adminUsername: admin
   # solr.auth.adminPassword -- The password of the solr admin user
     adminPassword: pass
-  # solr.collection -- the name of the collection created by solr (since we are creating one with solr-init this needs to be blank)
+  # solr.collection -- the name of the collection created by solr 
+  # since we are creating one with solr-init this needs to be blank
   collection:
   # solr.collectionShards -- Number of shards for the SOLR collection
   collectionShards: 
@@ -334,12 +333,8 @@ postgresql:
   fullnameOverride: *DBDeploymentName
   # postgresql.pgPass -- Password for the master PostgreSQL user.
   # Feeds into the `postgrescredentials` secret that is provided to the PostgreSQL chart
-  auth:
-    postgresPassword: *MasterDBPass
+  pgPass: *MasterDBPass
   # postgresql.existingSecret -- Name of existing secret that holds passwords for PostgreSQL
-    existingSecret: postgrescredentials
-    username: *CkanDBUser
-    password: *CkanDBPass
-    database: *CkanDBName
+  existingSecret: postgrescredentials
   
   

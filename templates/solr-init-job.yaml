@@ -20,6 +20,10 @@ spec:
         env:
         - name: CKAN_SOLR_URL
           value: {{ .Values.ckan.solr }}
+        - name: SOLR_ADMIN_USERNAME
+          value: {{ .Values.solr.auth.adminUsername }}
+        - name: SOLR_ADMIN_PASSWORD
+          value: {{ .Values.solr.auth.adminPassword }}
         - name: CKAN_SOLR_INIT_NUMSHARDS
           value: "{{ .Values.solr.initialize.numShards }}"
         - name: CKAN_SOLR_INIT_REPLICATIONFACTOR

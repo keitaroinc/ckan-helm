@@ -19,6 +19,7 @@ import os
 import sys
 import requests
 import json
+import base64
 
 
 def check_solr_connection(solr_url, retry=None):
@@ -32,7 +33,11 @@ def check_solr_connection(solr_url, retry=None):
         sys.exit(1)
 
     try:
-        requests.get(solr_url)
+        username = os.environ.get('SOLR_ADMIN_USERNAME', '')
+        password = os.environ.get('SOLR_ADMIN_PASSWORD', '')
+        base64string = base64.b64encode(bytes('%s:%s' % (username, password),'ascii'))
+        requests.get(solr_url, 
+                    headers={'Authorization': "Basic %s" % base64string.decode('utf-8')})
     except requests.exceptions.RequestException as e:
         print((str(e)))
         print('Unable to connect to solr...retrying.')
@@ -63,10 +68,14 @@ def prepare_configset(cfset_name):
     url = solr_url + '/solr/admin/configs?action=UPLOAD&name=' + cfset_name
     print("Trying: " + url)
     try:
+        username = os.environ.get('SOLR_ADMIN_USERNAME', '')
+        password = os.environ.get('SOLR_ADMIN_PASSWORD', '')
+        base64string = base64.b64encode(bytes('%s:%s' % (username, password),'ascii'))
         res = requests.post(url,
                             data=data,
                             headers={'Content-Type':
-                                     'application/octet-stream'})
+                                     'application/octet-stream',
+                                     'Authorization': "Basic %s" % base64string.decode('utf-8')})
     except requests.exceptions.RequestException as e:
         print('HTTP Status: ' + str(res.status_code) +
               ' Reason: ' + res.reason)
@@ -87,7 +96,11 @@ def create_solr_collection(name, cfset_name, num_shards, repl_factor,
     url = url + '&collection.configName=' + cfset_name
     print("Trying: " + url)
     try:
-        res = requests.post(url)
+        username = os.environ.get('SOLR_ADMIN_USERNAME', '')
+        password = os.environ.get('SOLR_ADMIN_PASSWORD', '')
+        base64string = base64.b64encode(bytes('%s:%s' % (username, password),'ascii'))
+        res = requests.post(url, 
+                            headers={'Authorization': "Basic %s" % base64string.decode('utf-8')})
     except requests.exceptions.RequestException as e:
         print('HTTP Status: ' + str(res.status_code) +
               ' Reason: ' + res.reason)
@@ -104,7 +117,11 @@ def solr_collection_alreadyexists(solr_url):
     url = solr_url + '/solr/admin/collections?action=LIST&wt=json'
     print("Trying: " + url)
     try:
-        res = requests.post(url)
+        username = os.environ.get('SOLR_ADMIN_USERNAME', '')
+        password = os.environ.get('SOLR_ADMIN_PASSWORD', '')
+        base64string = base64.b64encode(bytes('%s:%s' % (username, password),'ascii'))
+        res = requests.post(url, 
+                            headers={'Authorization': "Basic %s" % base64string.decode('utf-8')})
     except requests.exceptions.RequestException as e:
         print('HTTP Status: ' + str(res.status_code) +
               ' Reason: ' + res.reason)

@@ -31,7 +31,7 @@ dependencies:
     repository: "https://charts.bitnami.com/bitnami"
     condition: solr.enabled
   - name: postgresql
-    version: 11.1.4
+    version: 10.2.0
     repository: "https://charts.bitnami.com/bitnami"
     condition: postgresql.enabled
   - name: datapusher
