@@ -102,9 +102,9 @@ spec:
                   key: ckanDatastoreReadUrl
             - name: CKAN_SOLR_URL
               value: {{ .Values.ckan.solr }}
-            - name: SOLR_ADMIN_USERNAME
+            - name: CKAN_SOLR_USER
               value: {{ .Values.solr.auth.adminUsername }}
-            - name: SOLR_ADMIN_PASSWORD
+            - name: CKAN_SOLR_PASSWORD
               value: {{ .Values.solr.auth.adminPassword }}
             - name: CKAN__REDIS__URL
               value: {{ .Values.ckan.redis }}
