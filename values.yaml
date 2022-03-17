@@ -189,7 +189,7 @@ securityContext: {}
 service:
   # service.type -- Type of the service created for the CKAN pod
   type: ClusterIP
-  port: 5005
+  port: 80
 
 ingress:
   enabled: false
