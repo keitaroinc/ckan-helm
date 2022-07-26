@@ -1,11 +1,12 @@
 {{- if eq .Values.ckan.activityStreamsEmailNotifications "true" -}}
-apiVersion: batch/v1beta1
+apiVersion: batch/v1
 kind: CronJob
 metadata:
   name: ckan-email-notifications
 spec:
   schedule: "*/15 * * * *"
   concurrencyPolicy: Forbid
+  successfulJobsHistoryLimit: 1
   jobTemplate:
     spec:
       template:
