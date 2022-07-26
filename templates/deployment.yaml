@@ -54,6 +54,8 @@ spec:
               value: {{ .Values.ckan.maintenanceMode | quote }}
             - name: CKAN___DEBUG
               value: {{ .Values.ckan.debug | quote }}
+            - name: UWSGI_PROC_NO
+              value: {{ .Values.ckan.uwsg_num | quote }}
 {{- if .Values.ckan.extraEnv }}
 {{ toYaml .Values.ckan.extraEnv | indent 12 }}
 {{- end }}
