@@ -251,22 +251,27 @@ datapusher:
     datapusherRewriteUrl: http://ckan
 
 redis:
-  # Please see all available overrides at https://github.com/helm/charts/tree/master/stable/redis
+  # Please see all available overrides at https://github.com/bitnami/charts/tree/master/bitnami/redis
   # redis.enabled -- Flag to control whether to deploy Redis
   enabled: true
   # redis.fullnameOverride -- Name override for the redis deployment
   fullnameOverride: *RedisName
-  cluster:
-    # redis.cluster.enabled -- Cluster mode for Redis
-    enabled: false
+  replicaCount: 1
+  # redis.architecture -- Redis architecture for standalone or replication versions
+  architecture: standalone
   master:
     persistence:
       # redis.master.persistence.enabled -- Enable redis volume claim
       enabled: false
       # redis.master.persistence.size -- Size of the volume claim
       size: 1Gi
-  # redis.usePassword -- Use password for accessing redis
-  usePassword: false
+  auth:
+  # redis.auth.enabled -- Enable or disable redis password auth
+    enabled: false
+  # redis.auth.sentinel -- Enables or disables passwords for sentinels
+    sentinel: false
+  # redis.auth.password --  The password of redis if auth is enabled
+    password: 
 
 solr:  
   # Please see all available overrides at https://github.com/helm/charts/tree/master/incubator/solr

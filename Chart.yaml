@@ -14,7 +14,7 @@ type: application
 
 # This is the chart version. This version number should be incremented each time you make changes
 # to the chart and its templates, including the app version.
-version: 1.0.2
+version: 2.0.0
 
 # This is the version number of the application being deployed. This version number should be
 # incremented each time you make changes to the application.
@@ -23,7 +23,7 @@ appVersion: 2.9.2
 # Dependencies
 dependencies:
   - name: redis 
-    version: 12.2.3
+    version: 16.5.5
     repository: "https://charts.bitnami.com/bitnami"
     condition: redis.enabled
   - name: solr
@@ -31,7 +31,7 @@ dependencies:
     repository: "https://charts.helm.sh/incubator"
     condition: solr.enabled
   - name: postgresql
-    version: 10.2.0
+    version: 10.16.2
     repository: "https://charts.bitnami.com/bitnami"
     condition: postgresql.enabled
   - name: datapusher
