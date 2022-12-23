@@ -19,6 +19,7 @@ import os
 import sys
 import requests
 import json
+import yaml
 
 
 def check_solr_connection(solr_url, retry=None):
@@ -76,6 +77,29 @@ def prepare_configset(cfset_name):
 
     print("OK")
 
+def update_existing_collection(current_repl_factor, current_num_shards, current_max_shards_node):
+
+
+        print("\nUpdate Solr collection based on the current values")
+        url = solr_url + '/solr/admin/collection?action=MODIFYCOLLECTION&collection=' + cfset_name
+        url = url + '&numShards=' + num_shards
+        url = url + '&maxShardsPerNode=' + max_shards_node
+        url = url + '&replicationFactor' + repl_factor
+
+        if (current_repl_factor == repl_factor) or (current_max_shards_node == max_shards_node) or (current_num_shards == num_shards):
+            solr_collection_alreadyexists(solr_url)
+        else:
+            try:
+                res = requests.put(url)
+            except requests.exceptions.RequestException as e:
+                print('HTTP Status: ' + str(res.status_code) + 'Reason: ' + res.reason)
+                print('HTTP Response: \n' + res.text)
+                print((str(e)))
+                print("\nAborting..")
+                sys.exit(3)
+
+            print("OK")
+
 
 def create_solr_collection(name, cfset_name, num_shards, repl_factor,
                            max_shards_node):
@@ -99,6 +123,7 @@ def create_solr_collection(name, cfset_name, num_shards, repl_factor,
     print("OK")
 
 
+
 def solr_collection_alreadyexists(solr_url):
     print("\nChecking if solr collection already exists")
     url = solr_url + '/solr/admin/collections?action=LIST&wt=json'
@@ -116,6 +141,8 @@ def solr_collection_alreadyexists(solr_url):
     response_dict = json.loads(res.text)
     if collection_name in response_dict['collections']:
         print('Collection exists. Aborting.')
+    else:
+        update_existing_collection(repl_factor, num_shards, max_shards_node)
         sys.exit(0)
 
     print('Collection does not exist. OK...')
