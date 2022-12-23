@@ -14,7 +14,7 @@ type: application
 
 # This is the chart version. This version number should be incremented each time you make changes
 # to the chart and its templates, including the app version.
-version: 2.0.0
+version: 2.0.1
 
 # This is the version number of the application being deployed. This version number should be
 # incremented each time you make changes to the application.
@@ -24,15 +24,15 @@ appVersion: 2.9.2
 dependencies:
   - name: redis 
     version: 16.5.5
-    repository: "https://charts.bitnami.com/bitnami"
+    repository: "https://keitaro-charts.storage.googleapis.com"
     condition: redis.enabled
   - name: solr
     version: 1.4.0
-    repository: "https://charts.helm.sh/incubator"
+    repository: "https://keitaro-charts.storage.googleapis.com"
     condition: solr.enabled
   - name: postgresql
     version: 10.16.2
-    repository: "https://charts.bitnami.com/bitnami"
+    repository: "https://keitaro-charts.storage.googleapis.com"
     condition: postgresql.enabled
   - name: datapusher
     version: 1.0.0
