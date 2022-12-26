@@ -87,7 +87,7 @@ def update_existing_collection(updated_repl_factor, updated_num_shards, updated_
         url = url + '&replicationFactor' + repl_factor
 
         if (updated_repl_factor == repl_factor) or (updated_max_shards_node == max_shards_node) or (updated_num_shards == num_shards):
-            solr_collection_alreadyexists(solr_url)
+            print('There is no new values to update..continuing')
         else:
             try:
                 res = requests.put(url)
@@ -96,7 +96,7 @@ def update_existing_collection(updated_repl_factor, updated_num_shards, updated_
                 print('HTTP Response: \n' + res.text)
                 print((str(e)))
                 print("\nAborting..")
-                sys.exit(3)
+                sys.exit(0)
 
             print("OK")
 
@@ -142,7 +142,6 @@ def solr_collection_alreadyexists(solr_url):
     if collection_name in response_dict['collections']:
         print('Collection exists. Aborting.')
     else:
-        update_existing_collection(repl_factor, num_shards, max_shards_node)
         sys.exit(0)
 
     print('Collection does not exist. OK...')
