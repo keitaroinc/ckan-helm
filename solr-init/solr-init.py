@@ -77,16 +77,16 @@ def prepare_configset(cfset_name):
 
     print("OK")
 
-def update_existing_collection(current_repl_factor, current_num_shards, current_max_shards_node):
+def update_existing_collection(updated_repl_factor, updated_num_shards, updated_max_shards_node):
 
 
         print("\nUpdate Solr collection based on the current values")
-        url = solr_url + '/solr/admin/collection?action=MODIFYCOLLECTION&collection=' + cfset_name
+        url = solr_url + '/solr/admin/collection?action=MODIFYCOLLECTION&collection=' + collection_name
         url = url + '&numShards=' + num_shards
         url = url + '&maxShardsPerNode=' + max_shards_node
         url = url + '&replicationFactor' + repl_factor
 
-        if (current_repl_factor == repl_factor) or (current_max_shards_node == max_shards_node) or (current_num_shards == num_shards):
+        if (updated_repl_factor == repl_factor) or (updated_max_shards_node == max_shards_node) or (updated_num_shards == num_shards):
             solr_collection_alreadyexists(solr_url)
         else:
             try:
@@ -166,6 +166,7 @@ print("Solr host: " + solr_url)
 print("Collection name: " + collection_name)
 
 check_solr_connection(solr_url)
+update_existing_collection(repl_factor, num_shards, max_shards_node)
 solr_collection_alreadyexists(solr_url)
 prepare_configset(cfset_name)
 create_solr_collection(collection_name, cfset_name, num_shards,
