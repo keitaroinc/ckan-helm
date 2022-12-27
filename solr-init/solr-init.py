@@ -79,18 +79,18 @@ def prepare_configset(cfset_name):
 
 def update_existing_collection(updated_repl_factor, updated_num_shards, updated_max_shards_node):
 
-
         print("\nUpdate Solr collection based on the current values")
         url = solr_url + '/solr/admin/collection?action=MODIFYCOLLECTION&collection=' + collection_name
         url = url + '&numShards=' + num_shards
         url = url + '&maxShardsPerNode=' + max_shards_node
-        url = url + '&replicationFactor' + repl_factor
+        url = url + '&replicationFactor=' + repl_factor
 
         if (updated_repl_factor == repl_factor) or (updated_max_shards_node == max_shards_node) or (updated_num_shards == num_shards):
             print('There is no new values to update..continuing')
         else:
             try:
-                res = requests.put(url)
+                res = requests.post(url)
+                print('Response result for' + res.json())
             except requests.exceptions.RequestException as e:
                 print('HTTP Status: ' + str(res.status_code) + 'Reason: ' + res.reason)
                 print('HTTP Response: \n' + res.text)
@@ -140,8 +140,10 @@ def solr_collection_alreadyexists(solr_url):
 
     response_dict = json.loads(res.text)
     if collection_name in response_dict['collections']:
-        print('Collection exists. Aborting.')
+        #print('Collection exists. Aborting.')
+        print('Collection exists. Checking if there is new changes in the values...')
     else:
+        update_existing_collection(repl_factor, num_shards, max_shards_node)
         sys.exit(0)
 
     print('Collection does not exist. OK...')
@@ -165,7 +167,6 @@ print("Solr host: " + solr_url)
 print("Collection name: " + collection_name)
 
 check_solr_connection(solr_url)
-update_existing_collection(repl_factor, num_shards, max_shards_node)
 solr_collection_alreadyexists(solr_url)
 prepare_configset(cfset_name)
 create_solr_collection(collection_name, cfset_name, num_shards,
