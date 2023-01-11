@@ -4,9 +4,6 @@
 
 replicaCount: 1
 
-ckan-labels:
-  label1: value1
-
 image:
   repository: keitaro/ckan
   tag: 2.9.4
@@ -151,6 +148,13 @@ ckan:
   #     value: "bar"
   #
   extraEnv: []
+
+  # labels.ckan -- A map where you can add extra labels to the ckan deployment:
+  # example:
+  # ckan:
+  #   test: label1
+  labels:
+    ckan: []
 
   readiness:
     # ckan.readiness.initialDelaySeconds -- Inital delay seconds for the readiness probe
