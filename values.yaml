@@ -4,6 +4,9 @@
 
 replicaCount: 1
 
+ckan-labels:
+  label1: value1
+
 image:
   repository: keitaro/ckan
   tag: 2.9.4
