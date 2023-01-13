@@ -142,7 +142,7 @@ def solr_collection_alreadyexists(solr_url):
     if collection_name in response_dict['collections']:
         #print('Collection exists. Aborting.')
         print('Collection exists. Checking if there is new changes in the values...')
-    else:
+
         update_existing_collection(repl_factor, num_shards, max_shards_node)
         sys.exit(0)
 
