@@ -89,7 +89,7 @@ def update_existing_collection(updated_repl_factor, updated_max_shards_node):
         else:
             try:
                 res = requests.post(url)
-                print('Response result for' + res.json())
+                print('Updating new values in existing collection: ' + res.text)
             except requests.exceptions.RequestException as e:
                 print('HTTP Status: ' + str(res.status_code) + 'Reason: ' + res.reason)
                 print('HTTP Response: \n' + res.text)
@@ -99,27 +99,6 @@ def update_existing_collection(updated_repl_factor, updated_max_shards_node):
 
             print("OK")
 
-def test_update(test_repl_factor, test_max_shards_node):
-
-    print("\nTest update collection parameters ")
-    url = solr_url + '/solr/admin/collection?action=CLUSTERPROP&collection' + collection_name
-    url = url + '&maxShardsPerNode=' + max_shards_node
-    url = url + '&replicationFactor=' + repl_factor
-
-    if (test_max_shards_node == max_shards_node) or (test_repl_factor == repl_factor):
-        print("Testing API to update parameters")
-    else:
-        try:
-            res = requests.get(url)
-            print('Response result from test API: ' + res.json())
-        except requests.exceptions.RequestException as e:
-            print('HTTP Status: ' + str(res.status_code) + 'Reason: ' + res.reason)
-            print('HTTP Response: \n' + res.text)
-            print(str(e))
-            print("\nAborting..")
-            sys.exit(0)
-
-        print("OK")
 def create_solr_collection(name, cfset_name, num_shards, repl_factor,
                            max_shards_node):
     print("\nCreating Solr collection based on uploaded configset...")
@@ -159,10 +138,9 @@ def solr_collection_alreadyexists(solr_url):
 
     response_dict = json.loads(res.text)
     if collection_name in response_dict['collections']:
-        #print('Collection exists. Aborting.')
         print('Collection exists. Checking if there is new changes in the values...')
-        test_update(repl_factor, max_shards_node)
-        #update_existing_collection(repl_factor, num_shards, max_shards_node)
+
+        update_existing_collection(repl_factor, max_shards_node)
         sys.exit(0)
 
     print('Collection does not exist. OK...')
