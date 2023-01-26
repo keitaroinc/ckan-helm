@@ -12,6 +12,7 @@ jobs:
     - name: Package the helm chart
       run: |
         mkdir charts
+        helm dep up
         helm package . --version "${{  github.ref_name }}" --destination charts
     - name: Authenticate to Google Cloud
       id: auth
