@@ -22,10 +22,6 @@ jobs:
         helm package . --version "${{  github.ref_name }}" --destination charts
         gcloud auth activate-service-account githubaction@keitaro-kubernetes-001.iam.gserviceaccount.com --key-file="${{ steps.auth.outputs.credentials_file_path }}"
         gcloud config get-value account
-        PACKED_CHART_NAME=$(ls charts/*.tgz)
-        echo "Preparing to push ${PACKED_CHART_NAME} to keitaro-charts"
-        echo "Tag name from GITHUB_REF_NAME: $GITHUB_REF_NAME"
-        echo "Tag name from github.ref_name: ${{  github.ref_name }}"
         gsutil cp charts/* gs://keitaro-charts
         gsutil cp gs://keitaro-charts/index.yaml .
         helm repo index . --merge index.yaml
