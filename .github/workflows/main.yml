@@ -23,6 +23,7 @@ jobs:
         gcloud auth activate-service-account githubaction@keitaro-kubernetes-001.iam.gserviceaccount.com --key-file="${{ steps.auth.outputs.credentials_file_path }}"
         gcloud config get-value account
         gsutil cp charts/* gs://keitaro-charts
+        cd charts
         gsutil cp gs://keitaro-charts/index.yaml .
         helm repo index . --merge index.yaml
         gsutil cp index.yaml gs://keitaro-charts
