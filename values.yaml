@@ -178,11 +178,11 @@ serviceAccount:
   # If not set and create is true, a name is generated using the fullname template
   name:
 
- # labels.ckan -- A map where you can add extra labels to the ckan deployment:
- # example:
- # ckan:
- #   test: label1
- labels:
+# labels.ckan -- A map where you can add extra labels to the ckan deployment:
+# example:
+# ckan:
+#   test: label1
+labels:
   ckan: []
 
 podSecurityContext: {}
