@@ -149,12 +149,12 @@ ckan:
   #
   extraEnv: []
 
-  # labels.ckan -- A map where you can add extra labels to the ckan deployment:
-  # example:
-  # ckan:
-  #   test: label1
-  labels:
-    ckan: []
+ # labels.ckan -- A map where you can add extra labels to the ckan deployment:
+ # example:
+ # ckan:
+ #   test: label1
+ labels:
+   ckan: []
 
   readiness:
     # ckan.readiness.initialDelaySeconds -- Inital delay seconds for the readiness probe
