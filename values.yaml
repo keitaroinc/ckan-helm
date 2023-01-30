@@ -149,12 +149,6 @@ ckan:
   #
   extraEnv: []
 
- # labels.ckan -- A map where you can add extra labels to the ckan deployment:
- # example:
- # ckan:
- #   test: label1
- labels:
-   ckan: []
 
   readiness:
     # ckan.readiness.initialDelaySeconds -- Inital delay seconds for the readiness probe
@@ -183,6 +177,13 @@ serviceAccount:
   # serviceAccount.name -- The name of the service account to use.
   # If not set and create is true, a name is generated using the fullname template
   name:
+
+ # labels.ckan -- A map where you can add extra labels to the ckan deployment:
+ # example:
+ # ckan:
+ #   test: label1
+ labels:
+  ckan: []
 
 podSecurityContext: {}
   # fsGroup: 2000
