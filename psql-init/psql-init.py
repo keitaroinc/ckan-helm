@@ -39,6 +39,33 @@ class DB_Params:
         self.db_host = make_url(conn_str).host
         self.db_name = make_url(conn_str).database
 
+def datapusher_plus(db_params):
+    print('Creating datapusher-plus database with users...')
+    role_name = os.environ.get('DATAPUSHER_ROLE_NAME')
+    role_pass = os.environ.get('DATAPUSHER_ROLE_PASS')
+    datastore_name = os.environ.get('DATAPUSHER_DATASTORE_NAME')
+    con = None
+    try:
+        con = psycopg2.connect(user=master_user,
+                               host=db_params.db_host,
+                               password=master_passwd,
+                               database=master_database)
+        con.set_isolation_level(ISOLATION_LEVEL_AUTOCOMMIT)
+        cur = con.cursor()
+        cur.execute('CREATE ROLE "%s" ' +
+                    'LOGIN PASSWORD %s',
+                    (role_name,
+                     role_pass,))
+        cur.execute( 'GRANT CREATE, CONNECT, TEMPORARY, SUPERUSER ON DATABASE %s TO %s'
+        (datastore_name,role_name))
+        cur.execute ( 'GRANT SELECT, INSERT, UPDATE, DELETE, TRUNCATE ON ALL TABLES IN SCHEMA public TO %s'
+        (role_name))
+    except(Exception, psycopg2.DatabaseError) as error:
+        print("ERROR DB: ", error)
+    finally:
+        cur.close()
+        con.close()
+
 
 def check_db_connection(db_params, retry=None):
 

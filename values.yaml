@@ -71,13 +71,15 @@ ckan:
   # ckan.siteId -- Site id
   siteId: "site-id-here"
   # ckan.siteUrl -- Url for the CKAN instance
-  siteUrl: "http://localhost:5000"
+  siteUrl: "http://localhost:5003"
   # ckan.ckanPlugins -- List of plugins to be used by the instance
   ckanPlugins: "envvars image_view text_view recline_view datastore datapusher"
   # ckan.storagePath -- Storage path to be used by the instance
   storagePath: "/var/lib/ckan/default"
   activityStreamsEmailNotifications: "true"
   debug: "false"
+  # uswgi.proc.num -- The number of uswgi workers ckan will start
+  uwsg_num: "2"
   # ckan.maintenanceMode -- Set to true to disable CKAN from starting and serve a maintenance page
   maintenanceMode: "false"
   psql:
@@ -147,6 +149,7 @@ ckan:
   #
   extraEnv: []
 
+
   readiness:
     # ckan.readiness.initialDelaySeconds -- Inital delay seconds for the readiness probe
     initialDelaySeconds: 10
@@ -174,6 +177,11 @@ serviceAccount:
   # serviceAccount.name -- The name of the service account to use.
   # If not set and create is true, a name is generated using the fullname template
   name:
+
+# labels.ckan -- A map where you can add extra labels to the ckan deployment:
+# example:
+# ckan:
+#   test: label1
 
 podSecurityContext: {}
   # fsGroup: 2000
@@ -227,26 +235,114 @@ tolerations: []
 
 affinity: {}
 
-datapusher:
+datapusher-plus:
   # datapusher.enabled -- Flag to control whether to deploy the datapusher
   enabled: true
   # datapusher.fullnameOverride -- Name override for the datapusher deployment
   fullnameOverride: *DatapusherName
-  datapusher:
-    # datapusher.datapusher.maxContentSize -- Maximum size of content to be uploaded in bytes.
-    maxContentLength: "102400000"
-    # datapusher.datapusher.chunkSize -- Size of chunks of the data that is being downloaded in bytes
-    chunkSize: "10240000"
-    # datapusher.datapusher.insertRows -- Number of rows to take from the data and upload them as chunks to datastore
-    insertRows: "50000"
-    # datapusher.datapusher.downloadTimeout -- Timeout limit of the download request
-    downloadTimeout: "300"
-    # datapusher.datapusher.datapusherSslVerify -- Enable or disable (boolean) verification of SSL when trying to get resources. Default: True
+  image:
+    repository: localhost:5000/test
+    tag: red
+
+ 
+
+  datapusher-plus:
+    db:
+    role_name: "datapusher"
+    role_pass: "pass"
+
+    # turns on logger at Debug level
+    debug: "False"
+    # If False, configures the logger for production
+    # i.e. logs to STDERR and LOG_FILE (autorotates after 68mb, with 5 backups),
+    # and emails errors to admins.
+    testing: "False"
+    # The connect string of the Datapusher+ Job database
+    write_engine_url: "postgresql://datastorerw:pass@postgres/datastore_default"
+    # datapusher.maxContentLength -- Maximum size of content to be uploaded in bytes.
+    maxContentLength: "10485760"
+    # datapusher.chunkSize -- Size of chunks of the data that is being downloaded in bytes
+    chunkSize: "16384"
+    # datapusher.insertRows -- Number of rows to take from the data and upload them as chunks to datastore
+    insertRows: "250"
+    # datapusher.downloadTimeout -- Timeout limit of the download request
+    downloadTimeout: "30"
+    # datapusher.datapusherSslVerify -- Enable or disable (boolean) verification of SSL when trying to get resources. Default: True
     datapusherSslVerify: "False"
-    # datapusher.datapusher.datapusherRewriteResources -- Enable or disable (boolean) whether datapusher should rewrite resources uploaded to CKAN's filestore, since datapusher takes the CKAN Site URL value for generating the resource URL. Default: False
+    # datapusher.datapusherRewriteResources -- Enable or disable (boolean) whether datapusher should rewrite resources uploaded to CKAN's filestore, since datapusher takes the CKAN Site URL value for generating the resource URL. Default: False
     datapusherRewriteResources: "True"
-    # datapusher.datapusher.datapusherRewriteUrl -- Sets the rewrite URL that datapushed will rewrite resources that are uploaded to CKAN's filestore. Default: http://ckan:5000
+    # Sets the rewrite URL that datapushed will rewrite resources that are uploaded to CKAN's filestore. Default: http://ckan:5000
     datapusherRewriteUrl: http://ckan
+    # If this is not zero, the number of preview rows to push into the datastore
+    # If zero, it pushes the entire file
+    preview_rows: "0"
+    # If this is True, only the first n PREVIEW_ROWS are downloaded, and not the whole file
+    download_preivew_only: "False"
+
+    # ============ QSV ANALYSIS SETTINGS ==========
+
+    # The zero-based index of the default sheet to export to CSV. 0 is the first sheet.
+    # Accepts negative numbers. -1 is the last sheet, -2 the 2nd to last sheet, etc.
+    default_excel_sheet: "0"
+    # Check if a file is sorted and has duplicates
+    sort_and_dupe_check: "True"
+    # Should CSVs be deduped? Note that deduping also
+    # sorts the CSV.
+    dedup: "False"
+
+    # -------- SUMMARY STATS SETTINGS -----------
+
+    # Create a resource for calculated summary stats?
+    add_summary_stats_resource: "False"
+    # Summary Stats don't make sense if PREVIEW_ROWS > 0
+    # because, you're only summarizing the preview, not the whole file
+    # Set to True if Summary Stats should also be done for previews
+    summary_stats_with_preview: "False"
+    # additional command line options to pass to qsv stats when creating
+    # summary stats. Set to `--everything` if you want to include all the stats,
+    # particularly, when ADD_SUMMARY_STATS_RESOURCE is True
+    summary_stats_options: "--everything"
+
+    # -------- AUTO INDEX SETTINGS ----------
+
+    # if AUTO_INDEX_THRESHOLD > 0 or AUTO_INDEX_DATES is true
+    # create indices automatically based on as column's cardinality (number of unique values)
+    #   - if a column's cardinality <= AUTO_INDEX_THRESHOLD, create an index for that column
+    #   - if AUTO_INDEX_THRESHOLD = -1, index all columns regardless of its cardinality
+    auto_index_threshold: "3"
+    # for columns w/ cardinality equal to record_count, it's all unique values, create a unique index
+    auto_unique_index: "True"
+    # always index date fields?
+    auto_index_dates: "True"
+
+    # ------ AUTO ALIAS SETTINGS ----------
+
+    # Should an alias be automatically created?
+    # Aliases are easier to use than resource_ids, and can be used with the CKAN API where
+    # resource_ids are used. Aliases are also SQL views that are easier to use when querying
+    # the CKAN Datastore database.
+    # Aliases are created by concatenating "{resource_name}-{package_name}-{owner_org_name}"
+    # truncated at 55-characters.
+    auto_alias: "False"
+    # Should aliases should always be unique? In case of an alias name collision, a three-digit
+    # sequence number is appended.
+    auto_alias_unique: "False"
+
+    # -------- PII SETTINGS -----------
+
+    pii_screening: "False"
+    # Stop scanning on first PII found
+    pii_quick_screen: "False"
+    # Abort Datapusher+ job if PII is found
+    pii_found_abort: "True"
+    # Create a resource where PII candidates are stored?
+    pii_show_candidates: "True"
+    # The resource ID/alias of a Text file that has the 
+    # regex patterns to use for PII scanning.
+    # If this is not specified, the default PII scanning rules in
+    # default_pii_regexes.txt are used
+    pii_regex_resource_id_or_alias: ""
+
 
 redis:
   # Please see all available overrides at https://github.com/bitnami/charts/tree/master/bitnami/redis
