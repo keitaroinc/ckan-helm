@@ -1,5 +1,6 @@
 dependencies:
 - name: redis
+
   repository: https://keitaro-charts.storage.googleapis.com
   version: 16.5.5
 - name: solr
