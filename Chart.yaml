@@ -34,8 +34,8 @@ dependencies:
     version: 10.16.2
     repository: "https://keitaro-charts.storage.googleapis.com"
     condition: postgresql.enabled
-  - name: datapusher
+  - name: datapusher-plus
     version: 1.0.0
     repository: "https://keitaro-charts.storage.googleapis.com"
-    condition: datapusher.enabled
+    condition: datapusher-plus.enabled
 
