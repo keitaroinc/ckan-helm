@@ -32,8 +32,15 @@ spec:
           value: "{{ .Values.solr.initialize.maxShardsPerNode }}"
         - name: CKAN_SOLR_INIT_CONFIGSETNAME
           value: "{{ .Values.solr.initialize.configsetName }}"
-        command: ["python"]
-        args: ["/srv/solr-init/solr-init.py"]
+        - name: CKAN_SQLALCHEMY_URL
+          valueFrom:
+            secretKeyRef:
+              name: ckancredentials
+              key: ckanSqlAlchemyUrl
+        # command: ["python"]
+        # args: ["/srv/solr-init/solr-init.py"]
+        command: ["sleep"]
+        args: ["infinity"]
         volumeMounts:
         - name: solr-init-configmap
           mountPath: /srv/solr-init

@@ -47,6 +47,8 @@ spec:
             - name: http
               containerPort: 5000
               protocol: TCP
+          # command: ["sleep"]
+          # args: ["infinity"]
           env:
             - name: DEBUG
               value: {{ .Values.ckan.debug | quote }}
@@ -146,6 +148,8 @@ spec:
               value: {{ index .Values "datapusher-plus" "datapusher-plus" "db" "role_pass"  | quote }}
             - name: DATAPUSHER_DATASTORE_NAME
               value: {{ .Values.DatastoreDBName | quote }}
+            - name: DATAPUSHER_PLUS_INIT_DB
+              value: "True"
             {{- end }}
           readinessProbe:
             httpGet:

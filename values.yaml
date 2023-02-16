@@ -5,8 +5,8 @@
 replicaCount: 1
 
 image:
-  repository: localhost:5000/ckan
-  tag: 2.9.5
+  repository: europe-west3-docker.pkg.dev/amplus-data/common/ckan-solar
+  tag: v0.10.1
   pullPolicy: Always
 
 imagePullSecrets: []
@@ -231,25 +231,35 @@ resources: {}
 
 nodeSelector: {}
 
-tolerations: []
 
-affinity: {}
+tolerations: 
+- key: "amplus"
+  operator: "Equal"
+  value: "ckans"
+  effect: "NoSchedule"
+
+
+affinity:
+  nodeAffinity:
+    requiredDuringSchedulingIgnoredDuringExecution:
+      nodeSelectorTerms:
+      - matchExpressions:
+        - key: montreal2-9
+          operator: In
+          values:
+            - ckan-2-9
+
 
 datapusher-plus:
   # datapusher.enabled -- Flag to control whether to deploy the datapusher
   enabled: true
   # datapusher.fullnameOverride -- Name override for the datapusher deployment
   fullnameOverride: *DatapusherName
-  image:
-    repository: localhost:5000/test
-    tag: red
-
  
-
   datapusher-plus:
     db:
-    role_name: "datapusher"
-    role_pass: "pass"
+      role_name: "datapusher"
+      role_pass: "pass"
 
     # turns on logger at Debug level
     debug: "False"

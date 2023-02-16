@@ -39,7 +39,7 @@ class DB_Params:
         self.db_host = make_url(conn_str).host
         self.db_name = make_url(conn_str).database
 
-def datapusher_plus(db_params):
+def datapusher_plus_init(db_params):
     print('Creating datapusher-plus database with users...')
     role_name = os.environ.get('DATAPUSHER_ROLE_NAME')
     role_pass = os.environ.get('DATAPUSHER_ROLE_PASS')
@@ -56,10 +56,10 @@ def datapusher_plus(db_params):
                     'LOGIN PASSWORD %s',
                     (role_name,
                      role_pass,))
-        cur.execute( 'GRANT CREATE, CONNECT, TEMPORARY, SUPERUSER ON DATABASE %s TO %s'
-        (datastore_name,role_name))
-        cur.execute ( 'GRANT SELECT, INSERT, UPDATE, DELETE, TRUNCATE ON ALL TABLES IN SCHEMA public TO %s'
-        (role_name))
+        cur.execute( 'GRANT CREATE, CONNECT, TEMPORARY, SUPERUSER ON DATABASE %s TO "%s"',
+        (datastore_name,role_name,))
+        cur.execute ( 'GRANT SELECT, INSERT, UPDATE, DELETE, TRUNCATE ON ALL TABLES IN SCHEMA public TO "%s"',
+        (role_name,))
     except(Exception, psycopg2.DatabaseError) as error:
         print("ERROR DB: ", error)
     finally:
@@ -237,6 +237,12 @@ try:
     create_db(datastorerw_db)
 except(Exception, psycopg2.DatabaseError) as error:
     print("ERROR DB: ", error)
+
+if os.environ.get("DATAPUSHER_PLUS_INIT_DB") == "True" :
+    try:
+        datapusher_plus_init(ckan_db)
+    except(Exception, psycopg2.DatabaseError) as error:
+        print("ERROR DB: ", error)
 
 # replace ckan.plugins so that ckan cli can run and apply datastore permissions
 sed_string = "s/ckan.plugins =.*/ckan.plugins = envvars image_view text_view recline_view datastore/g"  # noqa
