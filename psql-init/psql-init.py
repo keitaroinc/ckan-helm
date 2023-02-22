@@ -214,11 +214,10 @@ except(Exception, psycopg2.DatabaseError) as error:
 # replace ckan.plugins so that ckan cli can run and apply datastore permissions
 sed_string = "s/ckan.plugins =.*/ckan.plugins = envvars image_view text_view recline_view datastore/g"  # noqa
 subprocess.Popen(["/bin/sed", sed_string, "-i", "/srv/app/production.ini"])
-sql = subprocess.check_output(["ckan",
-                               "-c", "/srv/app/production.ini",
-                               "datastore",
-                               "set-permissions"],
-                              stderr=subprocess.PIPE)
+try:
+    sql = subprocess.check_output(["ckan","-c", "/srv/app/production.ini","datastore","set-permissions"],stderr=subprocess.STDOUT)
+except subprocess.CalledProcessError as e:
+    raise RuntimeError("command '{}' return with error (code {}): {}".format(e.cmd, e.returncode, e.output))
 sql = sql.decode('utf-8')
 sql = sql.replace("@"+datastorerw_db.db_host, "")
 
