@@ -4,7 +4,9 @@ metadata:
   name: {{ include "ckan-chart.fullname" . }}
   labels:
     {{- include "ckan-chart.labels" . | nindent 4 }}
+    {{- if .Values.labels.enabled }}
     {{- .Values.labels.ckan | toYaml | nindent 4 }}
+    {{- end }}
 spec:
   replicas: {{ .Values.replicaCount }}
   selector:

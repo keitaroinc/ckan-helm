@@ -183,6 +183,7 @@ serviceAccount:
 # ckan:
 #   test: label1
 labels:
+  enabled: false
   ckan: []
 
 podSecurityContext: {}
