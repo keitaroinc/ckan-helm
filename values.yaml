@@ -6,7 +6,7 @@ replicaCount: 1
 
 image:
   repository: europe-west3-docker.pkg.dev/amplus-data/common/ckan-solar
-  tag: v0.10.1
+  tag: test
   pullPolicy: Always
 
 imagePullSecrets: []
@@ -15,8 +15,8 @@ fullnameOverride: "ckan"
 
 pvc:
   enabled: true
-  size: "1Gi"
-  storageClassName: "standard"
+  size: "11Gi"
+  storageClassName: "regional-disk-storage-class"
 
 # DBDeploymentName -- Variable for name override for postgres deployment
 DBDeploymentName: &DBDeploymentName postgres
@@ -73,7 +73,7 @@ ckan:
   # ckan.siteUrl -- Url for the CKAN instance
   siteUrl: "http://localhost:5003"
   # ckan.ckanPlugins -- List of plugins to be used by the instance
-  ckanPlugins: "envvars image_view text_view recline_view datastore datapusher"
+  ckanPlugins: "envvars stats text_view image_view recline_view datastore resource_proxy recline_grid_view recline_graph_view recline_map_view webpage_view datapusher"
   # ckan.storagePath -- Storage path to be used by the instance
   storagePath: "/var/lib/ckan/default"
   activityStreamsEmailNotifications: "true"
@@ -232,11 +232,7 @@ resources: {}
 nodeSelector: {}
 
 
-tolerations: 
-- key: "amplus"
-  operator: "Equal"
-  value: "ckans"
-  effect: "NoSchedule"
+tolerations: []
 
 
 affinity:
@@ -244,10 +240,10 @@ affinity:
     requiredDuringSchedulingIgnoredDuringExecution:
       nodeSelectorTerms:
       - matchExpressions:
-        - key: montreal2-9
+        - key: ckan
           operator: In
           values:
-            - ckan-2-9
+            - dev
 
 
 datapusher-plus:

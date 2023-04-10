@@ -247,6 +247,7 @@ if os.environ.get("DATAPUSHER_PLUS_INIT_DB") == "True" :
 # replace ckan.plugins so that ckan cli can run and apply datastore permissions
 sed_string = "s/ckan.plugins =.*/ckan.plugins = envvars image_view text_view recline_view datastore/g"  # noqa
 subprocess.Popen(["/bin/sed", sed_string, "-i", "/srv/app/production.ini"])
+subprocess.Popen(["/usr/bin/ckan", "config-tool", "/srv/app/production.ini", "beaker.session.secret=$(python3 -c 'import secrets; print(secrets.token_urlsafe())')"])
 sql = subprocess.check_output(["ckan",
                                "-c", "/srv/app/production.ini",
                                "datastore",
