@@ -1,0 +1,18 @@
+{{- if index .Values "istio" "enabled" }}
+apiVersion: networking.istio.io/v1beta1
+kind: VirtualService
+metadata:
+  name: {{ index .Values "istio" "vs" }}
+spec:
+  hosts:
+  - {{ index .Values "istio" "host" }}
+  gateways:
+  - {{ index .Values "istio" "gw" }}
+  http:
+  - match:
+    - uri:
+        prefix: /
+    route:
+    - destination:
+        host: ckan
+{{- end }}

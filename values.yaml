@@ -199,6 +199,17 @@ service:
   type: ClusterIP
   port: 80
 
+istio:
+  enabled: true
+  app-selector: istio-ingressgateway
+  host: test.ckan.plus
+  gw: ckan-gw-test
+  vs: ckan-vs-test
+  issuer: test-issuer
+  secret: test-secret
+  cert: test-certificate
+
+
 ingress:
   enabled: false
   annotations: {}
