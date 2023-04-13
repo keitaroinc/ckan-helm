@@ -1,10 +1,11 @@
+{{- if .Values.istio.certificate.enabled }}
 apiVersion: cert-manager.io/v1
 kind: Certificate
 metadata:
-  name: {{ index .Values "istio" "cert" }}
+  name: {{ .Values.istio.certificate.name }}
   namespace: istio-system
 spec:
-  secretName: {{ index .Values "istio" "secret" }}
+  secretName: {{ .Values.istio.secret.name }} 
   duration: 2160h # 90d
   renewBefore: 360h # 15d
   isCA: false
@@ -16,10 +17,12 @@ spec:
     - server auth
     - client auth
   dnsNames:
-  - "{{ index .Values "istio" "host" }}"
+  - "{{ .Values.istio.host }}"
   issuerRef:
-    name: {{ index .Values "istio" "issuer" }}
+    name: {{ .Values.istio.issuer.name }}
     # We can reference ClusterIssuers by changing the kind here.
     # The default value is Issuer (i.e. a locally namespaced Issuer)
     kind: Issuer
     group: cert-manager.io
+{{- end }}
+

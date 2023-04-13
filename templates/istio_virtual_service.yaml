@@ -1,13 +1,13 @@
-{{- if index .Values "istio" "enabled" }}
+{{- if index .Values.istio.enabled }}
 apiVersion: networking.istio.io/v1beta1
 kind: VirtualService
 metadata:
-  name: {{ index .Values "istio" "vs" }}
+  name: ckan-virtual-service
 spec:
   hosts:
-  - {{ index .Values "istio" "host" }}
+  - {{ index .Values.istio.host }}
   gateways:
-  - {{ index .Values "istio" "gw" }}
+  - {{ index .Values.istio "gateway-name" }}
   http:
   - match:
     - uri:
@@ -15,4 +15,5 @@ spec:
     route:
     - destination:
         host: ckan
+    timeout: 300000s
 {{- end }}

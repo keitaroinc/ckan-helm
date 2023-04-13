@@ -200,14 +200,19 @@ service:
   port: 80
 
 istio:
-  enabled: true
-  app-selector: istio-ingressgateway
-  host: test.ckan.plus
-  gw: ckan-gw-test
-  vs: ckan-vs-test
-  issuer: test-issuer
-  secret: test-secret
-  cert: test-certificate
+    enabled: true
+    gateway-name: ckan-gw-test
+    app-selector: istio-ingress
+    host: test.ckan.plus
+    certificate:
+      enabled: true
+      name: certificate-test
+    issuer:
+      name: issuer-test
+    secret:
+      name: secret-test
+    # When installing chart for the first time leave false so cermanager can get its certificate then put it to true
+    redirect: false
 
 
 ingress:

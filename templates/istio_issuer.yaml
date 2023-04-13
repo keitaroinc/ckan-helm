@@ -1,15 +1,18 @@
+{{- if .Values.istio.certificate.enabled }}
 apiVersion: cert-manager.io/v1
 kind: Issuer
 metadata:
-  name: {{ index .Values "istio" "issuer" }}
+  name: {{ .Values.istio.issuer.name }}
   namespace: istio-system
 spec:
   acme:
     email: ops@keitaro.com
     server: https://acme-v02.api.letsencrypt.org/directory
     privateKeySecretRef:
-      name: {{ index .Values "istio" "secret" }}
+      name: {{ .Values.istio.secret.name }}
     solvers:
     - http01:
         ingress:
           class: istio
+{{- end }}
+

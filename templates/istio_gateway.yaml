@@ -1,27 +1,27 @@
-{{- if index .Values "istio" "enabled" }}
+{{- if .Values.istio.enabled }}
 apiVersion: networking.istio.io/v1beta1
 kind: Gateway
 metadata:
-  name: {{ index .Values "istio" "gw" }}
+  name: {{ index .Values.istio "gateway-name" }}
 spec:
   selector:
-    app: {{ index .Values "istio" "app-selector" }}
+    app: {{ index .Values.istio "app-selector" }}
   servers:
   - port:
       number: 80
       name: http
       protocol: HTTP
     tls:
-      httpsRedirect: true
+      httpsRedirect: {{ .Values.istio.redirect }}
     hosts:
-    - {{ index .Values "istio" "host" }}
+    - {{ .Values.istio.host }}
   - port:
       number: 443
       name: https
       protocol: HTTPS
     tls:
       mode: SIMPLE
-      credentialName: {{ index .Values "istio" "secret" }}
+      credentialName: {{ .Values.istio.secret.name }}
     hosts:
-    - {{ index .Values "istio" "host" }}
+    - {{ .Values.istio.host }}
 {{- end }}

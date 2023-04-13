@@ -37,10 +37,10 @@ spec:
             secretKeyRef:
               name: ckancredentials
               key: ckanSqlAlchemyUrl
-        # command: ["python"]
-        # args: ["/srv/solr-init/solr-init.py"]
-        command: ["sleep"]
-        args: ["infinity"]
+        command: ["python"]
+        args: ["/srv/solr-init/solr-init.py"]
+        #command: ["sleep"]
+        #args: ["infinity"]
         volumeMounts:
         - name: solr-init-configmap
           mountPath: /srv/solr-init
