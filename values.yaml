@@ -391,6 +391,13 @@ redis:
 
 
 solr: 
+  resources:
+    limits:
+      cpu: "1200m"
+      memory: "4Gi"
+    requests:
+      cpu: "1000m"
+      memory: "4Gi"
   # Please see all available overrides at https://github.com/bitnami/charts/tree/master/bitnami/solr/#installing-the-chart
   # solr.enabled -- Flag to control whether to deploy SOLR
   enabled: true
