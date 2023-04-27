@@ -3,7 +3,7 @@ apiVersion: cert-manager.io/v1
 kind: Certificate
 metadata:
   name: {{ .Values.istio.certificate.name }}
-  namespace: istio-system
+  namespace: istio-ingress
 spec:
   secretName: {{ .Values.istio.secret.name }} 
   duration: 2160h # 90d
@@ -17,9 +17,9 @@ spec:
     - server auth
     - client auth
   dnsNames:
-  - "{{ .Values.istio.host }}"
+  - {{ .Values.istio.host | quote }}
   issuerRef:
-    name: {{ .Values.istio.issuer.name }}
+    name: {{ .Values.istio.secret.ref }}
     # We can reference ClusterIssuers by changing the kind here.
     # The default value is Issuer (i.e. a locally namespaced Issuer)
     kind: Issuer

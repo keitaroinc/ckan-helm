@@ -3,13 +3,13 @@ apiVersion: cert-manager.io/v1
 kind: Issuer
 metadata:
   name: {{ .Values.istio.issuer.name }}
-  namespace: istio-system
+  namespace: istio-ingress
 spec:
   acme:
     email: ops@keitaro.com
     server: https://acme-v02.api.letsencrypt.org/directory
     privateKeySecretRef:
-      name: {{ .Values.istio.secret.name }}
+      name: {{ .Values.istio.secret.ref }}
     solvers:
     - http01:
         ingress:
