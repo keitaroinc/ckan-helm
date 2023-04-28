@@ -210,8 +210,8 @@ istio:
     issuer:
       name: ckan-issuer
     secret:
-      name: test1
-      ref: ckan-secret-ref
+      name: ckan-certificate
+      ref: ckan-certificate-ref
     # When installing chart for the first time leave false so cermanager can get its certificate then put it to true
     redirect: false
 
