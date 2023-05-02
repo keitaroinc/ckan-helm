@@ -71,7 +71,7 @@ ckan:
   # ckan.siteId -- Site id
   siteId: "site-id-here"
   # ckan.siteUrl -- Url for the CKAN instance
-  siteUrl: "http://test.ckan.plus/"
+  siteUrl: "http://ckan-new.ckan.plus/"
   # ckan.ckanPlugins -- List of plugins to be used by the instance
   ckanPlugins: "envvars stats text_view image_view recline_view datastore resource_proxy recline_grid_view recline_graph_view recline_map_view webpage_view datapusher"
   # ckan.storagePath -- Storage path to be used by the instance
@@ -203,7 +203,7 @@ istio:
     enabled: true
     gateway-name: ckan-gw-test
     app-selector: istio-gateway
-    host: test.ckan.plus
+    host: ckan-new.ckan.plus
     certificate:
       enabled: true
       name: ckan-certificate
@@ -211,7 +211,8 @@ istio:
       enabled: true
       name: ckan-issuer
     secret:
-      name: test1
+      name: ckan-certificate
+      ref: ckan-certificate-ref
     # When installing chart for the first time leave false so cermanager can get its certificate then put it to true
     redirect: false
 
