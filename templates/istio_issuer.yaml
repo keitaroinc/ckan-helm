@@ -9,7 +9,7 @@ spec:
     email: ops@keitaro.com
     server: https://acme-v02.api.letsencrypt.org/directory
     privateKeySecretRef:
-      name: {{ .Values.istio.secret.name }}
+      name: {{ .Values.istio.secret.ref }}
     solvers:
     - http01:
         ingress:
