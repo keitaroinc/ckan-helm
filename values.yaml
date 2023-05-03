@@ -208,6 +208,7 @@ istio:
       enabled: true
       name: ckan-certificate
     issuer:
+      enabled: true
       name: ckan-issuer
     secret:
       name: ckan-certificate
@@ -397,8 +398,8 @@ solr:
       cpu: "1200m"
       memory: "4Gi"
     requests:
-      cpu: "1000m"
-      memory: "4Gi"
+      cpu: "600m"
+      memory: "2Gi"
   # Please see all available overrides at https://github.com/bitnami/charts/tree/master/bitnami/solr/#installing-the-chart
   # solr.enabled -- Flag to control whether to deploy SOLR
   enabled: true
