@@ -16,7 +16,7 @@ fullnameOverride: "ckan"
 pvc:
   enabled: true
   size: "11Gi"
-  storageClassName: "regional-disk-storage-class"
+  storageClassName: "ceph-filesystem"
 
 # DBDeploymentName -- Variable for name override for postgres deployment
 DBDeploymentName: &DBDeploymentName postgres
@@ -71,9 +71,9 @@ ckan:
   # ckan.siteId -- Site id
   siteId: "site-id-here"
   # ckan.siteUrl -- Url for the CKAN instance
-  siteUrl: "http://ckan-new.ckan.plus/"
+  siteUrl: "https://ckan-new.ckan.plus/"
   # ckan.ckanPlugins -- List of plugins to be used by the instance
-  ckanPlugins: "envvars stats text_view image_view recline_view datastore resource_proxy recline_grid_view recline_graph_view recline_map_view webpage_view datapusher"
+  ckanPlugins: "envvars stats text_view image_view recline_view datastore resource_proxy recline_grid_view recline_graph_view recline_map_view webpage_view datapusher cloudstorage"
   # ckan.storagePath -- Storage path to be used by the instance
   storagePath: "/var/lib/ckan/default"
   activityStreamsEmailNotifications: "true"
@@ -120,7 +120,7 @@ ckan:
     # ckan.datastore.RoDbPassword -- Password for the datastore read permissions user
     RoDbPassword: *DatastoreRODBPass
   # ckan.solr -- Location of SOLR collection used by the instance
-  solr: "http://solr-headless:8983/solr/ckancollection"
+  solr: "http://solr-dev-headless.solr-dev.svc.cluster.local:8983/solr/cloudstorage"
   # ckan.redis -- Location of the Redis service to be used by the CKAN instance
   redis: "redis://redis-headless:6379/0"
   spatialBackend: "solr"
@@ -147,7 +147,15 @@ ckan:
   #   - name: FOO
   #     value: "bar"
   #
-  extraEnv: []
+  extraEnv:
+    - name: CKANEXT__CLOUDSTORAGE__DRIVER
+      value: "GOOGLE_STORAGE"
+    - name: CKANEXT__CLOUDSTORAGE__CONTAINER_NAME
+      value: "datapusher-plus"
+    - name: CKANEXT__CLOUDSTORAGE__DRIVER_OPTIONS
+      value: '{"key": "GOOG1EAHSYCEBDNJDFE3HICG2RVE2T5IX2FVVB6L44SJPEU6UY3OZD6ZQDWPA", "secret": "QI9IAVYklHSxM6SjpMcrQ4kiF9LQgDg/sWaVNCWH"}'
+    - name: CKANEXT__CLOUDSTORAGE__GOOGLE_SERVICE_ACCOUNT_JSON
+      value: "/srv/app/amplus-data-453d6f3dce42.json"
 
 
   readiness:
@@ -393,16 +401,16 @@ redis:
 
 
 solr: 
-  resources:
-    limits:
-      cpu: "1200m"
-      memory: "4Gi"
-    requests:
-      cpu: "600m"
-      memory: "2Gi"
+  # resources:
+  #   limits:
+  #     cpu: "1200m"
+  #     memory: "4Gi"
+  #   requests:
+  #     cpu: "100m"
+  #     memory: "1Gi"
   # Please see all available overrides at https://github.com/bitnami/charts/tree/master/bitnami/solr/#installing-the-chart
   # solr.enabled -- Flag to control whether to deploy SOLR
-  enabled: true
+  enabled: false
   auth:
   # solr.auth.enabled -- Enable or disable auth (if auth is disabled solr-init cant upload the configset/schema.xml for ckan)
     enabled: true
