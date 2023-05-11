@@ -17,6 +17,7 @@ pvc:
   enabled: true
   size: "1Gi"
   storageClassName: "standard"
+  accessmode: "ReadWriteOnce"
 
 # DBDeploymentName -- Variable for name override for postgres deployment
 DBDeploymentName: &DBDeploymentName postgres
