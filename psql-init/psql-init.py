@@ -242,6 +242,7 @@ except(Exception, psycopg2.DatabaseError) as error:
 sed_string = "s/ckan.plugins =.*/ckan.plugins = envvars image_view text_view recline_view datastore/g"  # noqa
 subprocess.Popen(["/bin/sed", sed_string, "-i", "/srv/app/production.ini"])
 try:
+    subprocess.Popen(["/usr/bin/ckan", "config-tool", "/srv/app/production.ini", "beaker.session.secret=$(python3 -c 'import secrets; print(secrets.token_urlsafe())')"])
     sql = subprocess.check_output(["ckan","-c", "/srv/app/production.ini","datastore","set-permissions"],stderr=subprocess.STDOUT)
 except subprocess.CalledProcessError as e:
     raise RuntimeError("command '{}' return with error (code {}): {}".format(e.cmd, e.returncode, e.output))

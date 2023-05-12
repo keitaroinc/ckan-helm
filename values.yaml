@@ -5,8 +5,8 @@
 replicaCount: 1
 
 image:
-  repository: localhost:5000/ckan
-  tag: 2.9.5
+  repository: europe-west3-docker.pkg.dev/amplus-data/common/ckan-solar
+  tag: test
   pullPolicy: Always
 
 imagePullSecrets: []
@@ -16,8 +16,8 @@ fullnameOverride: "ckan"
 pvc:
   enabled: true
   size: "1Gi"
-  storageClassName: "standard"
-  accessmode: "ReadWriteOnce"
+  storageClassName: "ceph-filesystem"
+  accessmode: "ReadWriteMany"
 
 # DBDeploymentName -- Variable for name override for postgres deployment
 DBDeploymentName: &DBDeploymentName postgres
@@ -242,7 +242,7 @@ affinity: {}
 
 datapusher-plus:
   # datapusher.enabled -- Flag to control whether to deploy the datapusher
-  enabled: true
+  enabled: false
   # datapusher.fullnameOverride -- Name override for the datapusher deployment
   fullnameOverride: *DatapusherName
   image:
