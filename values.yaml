@@ -79,6 +79,8 @@ ckan:
   storagePath: "/var/lib/ckan/default"
   activityStreamsEmailNotifications: "true"
   debug: "false"
+  # To debug inside the ckan container (this sets the entrypoint of the container to sleep infinity)
+  container_debug: false
   # uswgi.proc.num -- The number of uswgi workers ckan will start
   uwsg_num: "2"
   # ckan.maintenanceMode -- Set to true to disable CKAN from starting and serve a maintenance page

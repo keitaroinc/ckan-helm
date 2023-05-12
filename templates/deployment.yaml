@@ -47,6 +47,10 @@ spec:
             - name: http
               containerPort: 5000
               protocol: TCP
+          {{- if .Values.ckan.container_debug }}
+          command: ["sleep"]
+          args: ["infinity"]
+          {{- end }}
           env:
             - name: DEBUG
               value: {{ .Values.ckan.debug | quote }}
@@ -147,6 +151,7 @@ spec:
             - name: DATAPUSHER_DATASTORE_NAME
               value: {{ .Values.DatastoreDBName | quote }}
             {{- end }}
+          {{- if not .Values.ckan.container_debug }}
           readinessProbe:
             httpGet:
               path: /api/3/action/status_show
@@ -163,6 +168,7 @@ spec:
             periodSeconds: {{ .Values.ckan.liveness.periodSeconds }}
             failureThreshold: {{ .Values.ckan.liveness.failureThreshold }}
             timeoutSeconds: {{ .Values.ckan.liveness.timeoutSeconds }}
+          {{- end }}
           {{ if .Values.pvc.enabled }}
           volumeMounts:
           - name: "ckan"
