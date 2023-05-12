@@ -2,7 +2,7 @@
 # This is a YAML-formatted file.
 # Declare variables to be passed into your templates.
 
-replicaCount: 1
+replicaCount: 5
 
 image:
   repository: europe-west3-docker.pkg.dev/amplus-data/common/ckan-solar
@@ -274,7 +274,7 @@ affinity:
 
 datapusher-plus:
   # datapusher.enabled -- Flag to control whether to deploy the datapusher
-  enabled: true
+  enabled: false
   # datapusher.fullnameOverride -- Name override for the datapusher deployment
   fullnameOverride: *DatapusherName
  
