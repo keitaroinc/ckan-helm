@@ -1,0 +1,33 @@
+name: Upload chart to GCS bucket manually 
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        type: string
+        required: true
+        description: Version to bump to
+jobs:
+  release:
+    name:  Helm Chart to GCP bucket
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v2
+      
+    - name: Authenticate to Google Cloud
+      id: auth
+      uses: google-github-actions/auth@v1
+      with:
+        credentials_json: "${{ secrets.GCLOUD_SERVICE_ACCOUNT_KEY }}"
+    - name: Upload the file
+      run: |
+        mkdir charts
+        helm dep up
+        helm package . --version "${{ github.event.inputs.version }}" --destination charts
+        gcloud auth activate-service-account githubaction@keitaro-kubernetes-001.iam.gserviceaccount.com --key-file="${{ steps.auth.outputs.credentials_file_path }}"
+        gcloud config get-value account
+        gsutil cp charts/* gs://keitaro-charts
+        cd charts
+        gsutil cp gs://keitaro-charts/index.yaml .
+        helm repo index . --merge index.yaml
+        gsutil cp index.yaml gs://keitaro-charts
