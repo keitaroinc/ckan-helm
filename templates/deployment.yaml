@@ -33,7 +33,7 @@ spec:
       {{ if .Values.pvc.enabled }}
       initContainers:
       - name: set-volume-ownsership
-        image: busybox
+        image: "{{ .Values.image.initContainer.repository }}:{{ .Values.image.initContainer.tag }}"
         command: ["sh", "-c", "chown -R 92:92 /var/lib/ckan"] # 92 is the uid and gid of ckan user/group
         volumeMounts:
         - name: ckan

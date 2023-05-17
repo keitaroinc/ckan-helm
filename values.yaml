@@ -8,6 +8,14 @@ image:
   repository: keitaro/ckan
   tag: 2.9.4
   pullPolicy: IfNotPresent
+  testConnection:
+    repository: busybox
+    tag: latest
+    pullPolicy: IfNotPresent
+  initContainer:
+    repository: busybox
+    tag: latest
+    pullPolicy: IfNotPresent  
 
 imagePullSecrets: []
 nameOverride: ""

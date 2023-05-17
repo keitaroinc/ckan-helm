@@ -9,7 +9,7 @@ metadata:
 spec:
   containers:
     - name: wget
-      image: busybox
+      image: {{ .Values.image.testConnection.repository }}:{{ .Values.image.testConnection.tag }}
       command: ['wget']
       args: ['{{ include "ckan-chart.fullname" . }}:{{ .Values.service.port }}']
   restartPolicy: Never
