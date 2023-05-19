@@ -380,6 +380,8 @@ solr:
   auth:
   # solr.auth.enabled -- Enable or disable auth (if auth is disabled solr-init cant upload the configset/schema.xml for ckan)
     enabled: true
+  # solr.auth.init -- String value for contorling solr-init-script "true" or "false" only should be same as enabeld value
+    init: "true"
   # solr.auth.adminUser -- The name of the solr admin user
     adminUsername: admin
   # solr.auth.adminPassword -- The password of the solr admin user

@@ -24,7 +24,7 @@ import base64
 
 solr_auth_enabled = os.environ.get('CKAN_SOLR_AUTH', '')
 
-if solr_auth_enabled == True :
+if solr_auth_enabled == "true" :
     solr_admin_username = os.environ.get('SOLR_ADMIN_USERNAME', '')
     solr_admin_password = os.environ.get('SOLR_ADMIN_PASSWORD', '')
     base64string = base64.b64encode(bytes('%s:%s' % (solr_admin_username, solr_admin_password),'ascii'))

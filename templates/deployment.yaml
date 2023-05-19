@@ -109,7 +109,7 @@ spec:
             - name: CKAN_SOLR_URL
               value: {{ .Values.ckan.solr }}
             - name: CKAN_SOLR_AUTH
-              value: {{ .Values.solr.auth.enabled }}
+              value: {{ .Values.solr.auth.init }}
             - name: CKAN_SOLR_USER
               value: {{ .Values.solr.auth.adminUsername }}
             - name: CKAN_SOLR_PASSWORD
