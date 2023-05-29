@@ -151,14 +151,6 @@ spec:
               value: {{ .Values.ckan.activityStreamsEmailNotifications | quote }}
             - name: CKANEXT__ISSUES__SEND_EMAIL_NOTIFICATIONS
               value: {{ .Values.ckan.issues.sendEmailNotifications | quote }}
-            {{- if index .Values "datapusher-plus" "enabled" }}
-            - name: DATAPUSHER_ROLE_NAME
-              value: {{ index .Values "datapusher-plus" "datapusher-plus" "db" "role_name" | quote }}
-            - name: DATAPUSHER_ROLE_PASS
-              value: {{ index .Values "datapusher-plus" "datapusher-plus" "db" "role_pass"  | quote }}
-            - name: DATAPUSHER_DATASTORE_NAME
-              value: {{ .Values.DatastoreDBName | quote }}
-            {{- end }}
           {{- if not .Values.ckan.container_debug }}
           readinessProbe:
             httpGet:
