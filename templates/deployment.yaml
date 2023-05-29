@@ -53,6 +53,10 @@ spec:
             - name: http
               containerPort: 5000
               protocol: TCP
+          {{- if .Values.ckan.container_debug }}
+          command: ["sleep"]
+          args: ["infinity"]
+          {{- end }}
           env:
             - name: DEBUG
               value: {{ .Values.ckan.debug | quote }}
@@ -110,6 +114,12 @@ spec:
                   key: ckanDatastoreReadUrl
             - name: CKAN_SOLR_URL
               value: {{ .Values.ckan.solr }}
+            - name: CKAN_SOLR_AUTH
+              value: {{ .Values.solr.auth.init | quote }}
+            - name: CKAN_SOLR_USER
+              value: {{ .Values.solr.auth.adminUsername }}
+            - name: CKAN_SOLR_PASSWORD
+              value: {{ .Values.solr.auth.adminPassword }}
             - name: CKAN__REDIS__URL
               value: {{ .Values.ckan.redis }}
             - name: CKANEXT__SPATIAL__SEARCH_BACKEND
@@ -141,6 +151,15 @@ spec:
               value: {{ .Values.ckan.activityStreamsEmailNotifications | quote }}
             - name: CKANEXT__ISSUES__SEND_EMAIL_NOTIFICATIONS
               value: {{ .Values.ckan.issues.sendEmailNotifications | quote }}
+            {{- if index .Values "datapusher-plus" "enabled" }}
+            - name: DATAPUSHER_ROLE_NAME
+              value: {{ index .Values "datapusher-plus" "datapusher-plus" "db" "role_name" | quote }}
+            - name: DATAPUSHER_ROLE_PASS
+              value: {{ index .Values "datapusher-plus" "datapusher-plus" "db" "role_pass"  | quote }}
+            - name: DATAPUSHER_DATASTORE_NAME
+              value: {{ .Values.DatastoreDBName | quote }}
+            {{- end }}
+          {{- if not .Values.ckan.container_debug }}
           readinessProbe:
             httpGet:
               path: /api/3/action/status_show
@@ -157,6 +176,7 @@ spec:
             periodSeconds: {{ .Values.ckan.liveness.periodSeconds }}
             failureThreshold: {{ .Values.ckan.liveness.failureThreshold }}
             timeoutSeconds: {{ .Values.ckan.liveness.timeoutSeconds }}
+          {{- end }}
           {{ if .Values.pvc.enabled }}
           volumeMounts:
           - name: "ckan"

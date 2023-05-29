@@ -18,7 +18,7 @@ version: 2.0.1
 
 # This is the version number of the application being deployed. This version number should be
 # incremented each time you make changes to the application.
-appVersion: 2.9.2
+appVersion: 2.9.5
 
 # Dependencies
 dependencies:
@@ -34,8 +34,8 @@ dependencies:
     version: 10.16.2
     repository: "https://keitaro-charts.storage.googleapis.com"
     condition: postgresql.enabled
-  - name: datapusher
+  - name: datapusher-plus
     version: 1.0.0
     repository: "https://keitaro-charts.storage.googleapis.com"
-    condition: datapusher.enabled
+    condition: datapusher-plus.enabled
 

@@ -19,7 +19,16 @@ import os
 import sys
 import requests
 import json
+import base64
 
+
+solr_auth_enabled = os.environ.get('CKAN_SOLR_AUTH', '')
+
+if solr_auth_enabled == "true" :
+    solr_admin_username = os.environ.get('SOLR_ADMIN_USERNAME', '')
+    solr_admin_password = os.environ.get('SOLR_ADMIN_PASSWORD', '')
+    base64string = base64.b64encode(bytes('%s:%s' % (solr_admin_username, solr_admin_password),'ascii'))
+base64string = base64.b64encode(bytes("noauth"))
 
 def check_solr_connection(solr_url, retry=None):
     print('\nCheck_solr_connection...')
@@ -32,7 +41,8 @@ def check_solr_connection(solr_url, retry=None):
         sys.exit(1)
 
     try:
-        requests.get(solr_url)
+        requests.get(solr_url, 
+                    headers={'Authorization': "Basic %s" % base64string.decode('utf-8')})
     except requests.exceptions.RequestException as e:
         print((str(e)))
         print('Unable to connect to solr...retrying.')
@@ -50,7 +60,7 @@ def prepare_configset(cfset_name):
     # Copy configset files from configmap volume into rw volume
     # and include schema.xml from ckan src
     shutil.copytree("/srv/solr-configset", "/srv/app/solr-configset")
-    shutil.copyfile("/srv/app/src/ckan/ckan/config/solr/schema.xml",
+    shutil.copyfile("/srv/app/src/ckan/ckan/config/solr/schema.solr8.xml",
                     "/srv/app/solr-configset/schema.xml")
 
     # Create zip
@@ -66,7 +76,8 @@ def prepare_configset(cfset_name):
         res = requests.post(url,
                             data=data,
                             headers={'Content-Type':
-                                     'application/octet-stream'})
+                                     'application/octet-stream',
+                                     'Authorization': "Basic %s" % base64string.decode('utf-8')})
     except requests.exceptions.RequestException as e:
         print('HTTP Status: ' + str(res.status_code) +
               ' Reason: ' + res.reason)
@@ -87,7 +98,8 @@ def create_solr_collection(name, cfset_name, num_shards, repl_factor,
     url = url + '&collection.configName=' + cfset_name
     print("Trying: " + url)
     try:
-        res = requests.post(url)
+        res = requests.post(url, 
+                            headers={'Authorization': "Basic %s" % base64string.decode('utf-8')})
     except requests.exceptions.RequestException as e:
         print('HTTP Status: ' + str(res.status_code) +
               ' Reason: ' + res.reason)
@@ -104,7 +116,8 @@ def solr_collection_alreadyexists(solr_url):
     url = solr_url + '/solr/admin/collections?action=LIST&wt=json'
     print("Trying: " + url)
     try:
-        res = requests.post(url)
+        res = requests.post(url, 
+                            headers={'Authorization': "Basic %s" % base64string.decode('utf-8')})
     except requests.exceptions.RequestException as e:
         print('HTTP Status: ' + str(res.status_code) +
               ' Reason: ' + res.reason)
