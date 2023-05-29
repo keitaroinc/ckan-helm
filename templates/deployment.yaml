@@ -16,6 +16,9 @@ spec:
     metadata:
       labels:
         {{- include "ckan-chart.selectorLabels" . | nindent 8 }}
+        {{- if .Values.labels.enabled }}
+        {{- .Values.labels.ckan | toYaml | nindent 8 }}
+        {{- end }}
     spec:
     {{- with .Values.imagePullSecrets }}
       imagePullSecrets:
