@@ -5,9 +5,9 @@
 replicaCount: 1
 
 image:
-  repository: europe-west3-docker.pkg.dev/amplus-data/common/ckan-solar
-  tag: test
-  pullPolicy: Always
+  repository: keitaro/ckan
+  tag: 2.9.8
+  pullPolicy: IfNotPresent
 
 imagePullSecrets: []
 nameOverride: ""
@@ -16,7 +16,7 @@ fullnameOverride: "ckan"
 pvc:
   enabled: true
   size: "1Gi"
-  storageClassName: "ceph-filesystem"
+  storageClassName: ""
   accessmode: "ReadWriteMany"
 
 # DBDeploymentName -- Variable for name override for postgres deployment
@@ -185,6 +185,10 @@ serviceAccount:
 # example:
 # ckan:
 #   test: label1
+
+labels:
+  enabled: false
+  ckan: []
 
 podSecurityContext: {}
   # fsGroup: 2000
