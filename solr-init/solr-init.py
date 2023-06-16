@@ -21,6 +21,9 @@ import requests
 import json
 
 
+solr_admin_username = os.environ.get('SOLR_ADMIN_USERNAME', '')
+solr_admin_password = os.environ.get('SOLR_ADMIN_PASSWORD', '')
+
 def check_solr_connection(solr_url, retry=None):
     print('\nCheck_solr_connection...')
     sys.stdout.flush()
@@ -32,7 +35,8 @@ def check_solr_connection(solr_url, retry=None):
         sys.exit(1)
 
     try:
-        requests.get(solr_url)
+        requests.get(solr_url, 
+                    auth=(solr_admin_username,solr_admin_password))
     except requests.exceptions.RequestException as e:
         print((str(e)))
         print('Unable to connect to solr...retrying.')
@@ -50,7 +54,7 @@ def prepare_configset(cfset_name):
     # Copy configset files from configmap volume into rw volume
     # and include schema.xml from ckan src
     shutil.copytree("/srv/solr-configset", "/srv/app/solr-configset")
-    shutil.copyfile("/srv/app/src/ckan/ckan/config/solr/schema.xml",
+    shutil.copyfile("/srv/app/src/ckan/ckan/config/solr/schema.solr8.xml",
                     "/srv/app/solr-configset/schema.xml")
 
     # Create zip
@@ -65,6 +69,7 @@ def prepare_configset(cfset_name):
     try:
         res = requests.post(url,
                             data=data,
+                            auth=(solr_admin_username,solr_admin_password),
                             headers={'Content-Type':
                                      'application/octet-stream'})
     except requests.exceptions.RequestException as e:
@@ -87,7 +92,8 @@ def create_solr_collection(name, cfset_name, num_shards, repl_factor,
     url = url + '&collection.configName=' + cfset_name
     print("Trying: " + url)
     try:
-        res = requests.post(url)
+        res = requests.post(url, 
+                            auth=(solr_admin_username,solr_admin_password))
     except requests.exceptions.RequestException as e:
         print('HTTP Status: ' + str(res.status_code) +
               ' Reason: ' + res.reason)
@@ -95,7 +101,7 @@ def create_solr_collection(name, cfset_name, num_shards, repl_factor,
         print((str(e)))
         print("\nAborting...")
         sys.exit(3)
-
+        
     print("OK")
 
 
@@ -104,7 +110,9 @@ def solr_collection_alreadyexists(solr_url):
     url = solr_url + '/solr/admin/collections?action=LIST&wt=json'
     print("Trying: " + url)
     try:
-        res = requests.post(url)
+        res = requests.post(url,
+                            auth=(solr_admin_username,solr_admin_password))
+
     except requests.exceptions.RequestException as e:
         print('HTTP Status: ' + str(res.status_code) +
               ' Reason: ' + res.reason)
@@ -112,7 +120,7 @@ def solr_collection_alreadyexists(solr_url):
         print((str(e)))
         print("\nAborting...")
         sys.exit(4)
-
+    
     response_dict = json.loads(res.text)
     if collection_name in response_dict['collections']:
         print('Collection exists. Aborting.')

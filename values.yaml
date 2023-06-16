@@ -25,7 +25,7 @@ pvc:
   enabled: true
   size: "1Gi"
   storageClassName: ""
-  accessmode: "ReadWriteMany"
+  accessmode: "ReadWriteOnce"
 
 # DBDeploymentName -- Variable for name override for postgres deployment
 DBDeploymentName: &DBDeploymentName postgres
@@ -87,6 +87,8 @@ ckan:
   storagePath: "/var/lib/ckan/default"
   activityStreamsEmailNotifications: "true"
   debug: "false"
+  # To debug inside the ckan container (this sets the entrypoint of the container to sleep infinity)
+  container_debug: false
   # uswgi.proc.num -- The number of uswgi workers ckan will start
   uwsg_num: "2"
   # ckan.maintenanceMode -- Set to true to disable CKAN from starting and serve a maintenance page
@@ -191,6 +193,7 @@ serviceAccount:
 # example:
 # ckan:
 #   test: label1
+
 labels:
   enabled: false
   ckan: []
@@ -251,7 +254,7 @@ tolerations: []
 affinity: {}
 
 datapusher:
-  # datapusher.enabled -- Flag to control whether to deploy the datapusher
+ # datapusher.enabled -- Flag to control whether to deploy the datapusher
   enabled: true
   # datapusher.fullnameOverride -- Name override for the datapusher deployment
   fullnameOverride: *DatapusherName
@@ -294,10 +297,44 @@ redis:
   # redis.auth.password --  The password of redis if auth is enabled
     password: 
 
-solr:  
-  # Please see all available overrides at https://github.com/helm/charts/tree/master/incubator/solr
+
+solr: 
+  # Please see all available overrides at https://github.com/bitnami/charts/tree/master/bitnami/solr/#installing-the-chart
   # solr.enabled -- Flag to control whether to deploy SOLR
   enabled: true
+  auth:
+  # solr.auth.enabled -- Enable or disable auth (if auth is disabled solr-init cant upload the configset/schema.xml for ckan)
+    enabled: true
+  # solr.auth.adminUser -- The name of the solr admin user
+    adminUsername: admin
+  # solr.auth.adminPassword -- The password of the solr admin user
+    adminPassword: pass
+  # solr.collection -- the name of the collection created by solr 
+  # since we are creating one with solr-init this needs to be blank
+  collection:
+  # solr.collectionShards -- Number of shards for the SOLR collection
+  collectionShards: 
+  # solr.collectionReplicas -- Number of replicas for each SOLR shard
+  collectionReplicas: 
+  # solr.fullnameOverride -- Name override for the SOLR deployment
+  fullnameOverride: *SolrName
+  # solr.replicaCount -- Number of SOLR instances in the cluster
+  replicaCount: 1
+  volumeClaimTemplates:
+    # solr.volumeClaimTemplates.storageSize -- Size of Solr PVC
+    storageSize: 5Gi
+  image:
+    registry: docker.io
+    # solr.image.repository -- Repository for the SOLR image
+    repository: bitnami/solr
+    # solr.image.tag -- Tag for the SOLR image
+    tag: 8.11.1
+  zookeeper:
+    # solr.zookeeper.replicaCount -- Numer of Zookeeper replicas in the ZK cluster
+    replicaCount: 1
+    persistence:
+      # solr.zookeeper.persistence.size -- Size of ZK PVC
+      size: 1Gi
   initialize:
     # solr.initialize.enabled -- Flag whether to initialize the SOLR instance with the provided collection name
     enabled: true
@@ -309,24 +346,8 @@ solr:
     maxShardsPerNode: 10
     # solr.initialize.configsetName -- Name of the config set used for initializing
     configsetName: ckanConfigSet
-  # solr.fullnameOverride -- Name override for the SOLR deployment
-  fullnameOverride: *SolrName
-  # solr.replicaCount -- Number of SOLR instances in the cluster
-  replicaCount: 1
-  volumeClaimTemplates:
-    # solr.volumeClaimTemplates.storageSize -- Size of Solr PVC
-    storageSize: 5Gi
-  image:
-    # solr.image.repository -- Repository for the SOLR image
-    repository: solr
-    # solr.image.tag -- Tag for the SOLR image
-    tag: 6.6.6
-  zookeeper:
-    # solr.zookeeper.replicaCount -- Numer of Zookeeper replicas in the ZK cluster
-    replicaCount: 1
-    persistence:
-      # solr.zookeeper.persistence.size -- Size of ZK PVC
-      size: 1Gi
+
+
 
 postgresql:
   # postgresql.enabled -- Flag to control whether to deploy PostgreSQL
@@ -341,3 +362,5 @@ postgresql:
   pgPass: *MasterDBPass
   # postgresql.existingSecret -- Name of existing secret that holds passwords for PostgreSQL
   existingSecret: postgrescredentials
+  
+  

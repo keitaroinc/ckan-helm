@@ -27,6 +27,12 @@ spec:
           value: {{ .Values.ckan.psql.masterDatabase }}
         - name: CKAN_SOLR_URL
           value: {{ .Values.ckan.solr }}
+        - name: CKAN_SOLR_USER
+          value: {{ .Values.solr.auth.adminUsername }}
+        - name: CKAN_SOLR_PASSWORD
+          value: {{ .Values.solr.auth.adminPassword }}
+        - name: CKAN__DATAPUSHER__URL
+          value: {{ .Values.ckan.datapusherUrl }}
         - name: CKAN_SQLALCHEMY_URL
           valueFrom:
             secretKeyRef:

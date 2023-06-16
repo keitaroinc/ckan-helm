@@ -39,6 +39,33 @@ class DB_Params:
         self.db_host = make_url(conn_str).host
         self.db_name = make_url(conn_str).database
 
+def datapusher_plus(db_params):
+    print('Creating datapusher-plus database with users...')
+    role_name = os.environ.get('DATAPUSHER_ROLE_NAME')
+    role_pass = os.environ.get('DATAPUSHER_ROLE_PASS')
+    datastore_name = os.environ.get('DATAPUSHER_DATASTORE_NAME')
+    con = None
+    try:
+        con = psycopg2.connect(user=master_user,
+                               host=db_params.db_host,
+                               password=master_passwd,
+                               database=master_database)
+        con.set_isolation_level(ISOLATION_LEVEL_AUTOCOMMIT)
+        cur = con.cursor()
+        cur.execute('CREATE ROLE "%s" ' +
+                    'LOGIN PASSWORD %s',
+                    (role_name,
+                     role_pass,))
+        cur.execute( 'GRANT CREATE, CONNECT, TEMPORARY, SUPERUSER ON DATABASE %s TO %s'
+        (datastore_name,role_name))
+        cur.execute ( 'GRANT SELECT, INSERT, UPDATE, DELETE, TRUNCATE ON ALL TABLES IN SCHEMA public TO %s'
+        (role_name))
+    except(Exception, psycopg2.DatabaseError) as error:
+        print("ERROR DB: ", error)
+    finally:
+        cur.close()
+        con.close()
+
 
 def check_db_connection(db_params, retry=None):
 
@@ -215,6 +242,7 @@ except(Exception, psycopg2.DatabaseError) as error:
 sed_string = "s/ckan.plugins =.*/ckan.plugins = envvars image_view text_view recline_view datastore/g"  # noqa
 subprocess.Popen(["/bin/sed", sed_string, "-i", "/srv/app/production.ini"])
 try:
+    subprocess.Popen(["/usr/bin/ckan", "config-tool", "/srv/app/production.ini", "beaker.session.secret=$(python3 -c 'import secrets; print(secrets.token_urlsafe())')"])
     sql = subprocess.check_output(["ckan","-c", "/srv/app/production.ini","datastore","set-permissions"],stderr=subprocess.STDOUT)
 except subprocess.CalledProcessError as e:
     raise RuntimeError("command '{}' return with error (code {}): {}".format(e.cmd, e.returncode, e.output))

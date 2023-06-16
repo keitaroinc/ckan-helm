@@ -4,12 +4,9 @@ dependencies:
   version: 16.5.5
 - name: solr
   repository: https://keitaro-charts.storage.googleapis.com
-  version: 1.5.5
+  version: 4.1.2
 - name: postgresql
   repository: https://keitaro-charts.storage.googleapis.com
   version: 10.16.2
-- name: datapusher
-  repository: https://keitaro-charts.storage.googleapis.com
-  version: 1.0.0
-digest: sha256:7945d981ee294b95ac76d36a079b2b9f4482ff2c774e84cecf3a7b97ae051782
-generated: "2023-05-22T11:54:35.124248478+02:00"
+digest: sha256:05fe359ad86546ce27b6cfa8defbf8756abb31d730c2d957189e45863ee4a073
+generated: "2023-05-29T17:30:12.065581117+02:00"
