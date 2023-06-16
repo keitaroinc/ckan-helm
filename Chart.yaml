@@ -38,8 +38,8 @@ dependencies:
   #   version: 1.0.0
   #   repository: "https://keitaro-charts.storage.googleapis.com"
   #   condition: datapusher-plus.enabled
-  # - name: datapusher
-  #   version: 1.0.0
-  #   repository: "https://keitaro-charts.storage.googleapis.com"
-  #   condition: datapusher.enabled
+  - name: datapusher
+    version: 1.0.0
+    repository: "https://keitaro-charts.storage.googleapis.com"
+    condition: datapusher.enabled
 
