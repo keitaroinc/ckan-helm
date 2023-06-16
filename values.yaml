@@ -17,7 +17,7 @@ pvc:
   enabled: true
   size: "1Gi"
   storageClassName: ""
-  accessmode: "ReadWriteMany"
+  accessmode: "ReadWriteOnce"
 
 # DBDeploymentName -- Variable for name override for postgres deployment
 DBDeploymentName: &DBDeploymentName postgres
@@ -72,7 +72,7 @@ ckan:
   # ckan.siteId -- Site id
   siteId: "site-id-here"
   # ckan.siteUrl -- Url for the CKAN instance
-  siteUrl: "http://localhost:5003"
+  siteUrl: "http://localhost:5000"
   # ckan.ckanPlugins -- List of plugins to be used by the instance
   ckanPlugins: "envvars image_view text_view recline_view datastore datapusher"
   # ckan.storagePath -- Storage path to be used by the instance
@@ -243,6 +243,27 @@ nodeSelector: {}
 tolerations: []
 
 affinity: {}
+
+datapusher:
+ # datapusher.enabled -- Flag to control whether to deploy the datapusher
+  enabled: true
+  # datapusher.fullnameOverride -- Name override for the datapusher deployment
+  fullnameOverride: *DatapusherName
+  datapusher:
+    # datapusher.datapusher.maxContentSize -- Maximum size of content to be uploaded in bytes.
+    maxContentLength: "102400000"
+    # datapusher.datapusher.chunkSize -- Size of chunks of the data that is being downloaded in bytes
+    chunkSize: "10240000"
+    # datapusher.datapusher.insertRows -- Number of rows to take from the data and upload them as chunks to datastore
+    insertRows: "50000"
+    # datapusher.datapusher.downloadTimeout -- Timeout limit of the download request
+    downloadTimeout: "300"
+    # datapusher.datapusher.datapusherSslVerify -- Enable or disable (boolean) verification of SSL when trying to get resources. Default: True
+    datapusherSslVerify: "False"
+    # datapusher.datapusher.datapusherRewriteResources -- Enable or disable (boolean) whether datapusher should rewrite resources uploaded to CKAN's filestore, since datapusher takes the CKAN Site URL value for generating the resource URL. Default: False
+    datapusherRewriteResources: "True"
+    # datapusher.datapusher.datapusherRewriteUrl -- Sets the rewrite URL that datapushed will rewrite resources that are uploaded to CKAN's filestore. Default: http://ckan:5000
+    datapusherRewriteUrl: http://ckan
 
 redis:
   # Please see all available overrides at https://github.com/bitnami/charts/tree/master/bitnami/redis
