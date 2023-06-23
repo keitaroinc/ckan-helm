@@ -8,5 +8,8 @@ dependencies:
 - name: postgresql
   repository: https://keitaro-charts.storage.googleapis.com
   version: 10.16.2
-digest: sha256:05fe359ad86546ce27b6cfa8defbf8756abb31d730c2d957189e45863ee4a073
-generated: "2023-05-29T17:30:12.065581117+02:00"
+- name: datapusher
+  repository: https://keitaro-charts.storage.googleapis.com
+  version: 1.0.0
+digest: sha256:0d4d71c90a5292036a1c351b3e042f6130e76193edb9519ce09adc0e3a828069
+generated: "2023-06-22T14:49:19.198522804+02:00"

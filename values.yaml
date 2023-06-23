@@ -253,6 +253,13 @@ tolerations: []
 
 affinity: {}
 
+hpa:
+  enabled: true
+  minReplicas: 1
+  maxReplicas: 10
+  cpuTargetAverageUtilization: 80
+  memoryTargetAverageUtilization: 80
+
 datapusher:
  # datapusher.enabled -- Flag to control whether to deploy the datapusher
   enabled: true
