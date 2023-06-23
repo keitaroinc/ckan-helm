@@ -254,7 +254,7 @@ tolerations: []
 affinity: {}
 
 hpa:
-  enabled: true
+  enabled: false
   minReplicas: 1
   maxReplicas: 10
   cpuTargetAverageUtilization: 80
