@@ -112,6 +112,27 @@ spec:
                 secretKeyRef:
                   name: ckancredentials
                   key: ckanDatastoreReadUrl
+{{- if .Values.hpa.enabled }}
+            - name: BEAKER_SESSION_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: session-secret
+                  key: session_secret
+            - name: JWT_ENCODE_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: session-secret
+                  key: jwt_encode
+            - name: JWT_DECODE_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: session-secret
+                  key: jwt_decode
+            - name: CKANEXT___BEAKER__SESSION__URL
+              value: {{ .Values.hpa.sessions.session_url | quote }}
+            - name: CKANEXT___BEAKER__SESSION__TYPE
+              value: {{ .Values.hpa.sessions.session_type | quote }}
+{{ end }}
             - name: CKAN_SOLR_URL
               value: {{ .Values.ckan.solr }}
             - name: CKAN_SOLR_USER

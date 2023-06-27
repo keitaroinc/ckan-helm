@@ -1,0 +1,11 @@
+{{- if .Values.hpa.enabled }}
+apiVersion: v1
+kind: Secret
+metadata:
+  name: sessions-secret
+type: Opaque
+stringData:
+  session_secret: {{ randAlphaNum 43 }}
+  jwt_encode: string:{{ randAlphaNum 43 }}
+  jwt_decode: string:{{ randAlphaNum 43 }}
+{{ end }}
