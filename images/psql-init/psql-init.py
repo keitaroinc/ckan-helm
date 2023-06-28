@@ -22,6 +22,8 @@ import psycopg2
 from psycopg2.extensions import ISOLATION_LEVEL_AUTOCOMMIT
 from psycopg2.extensions import AsIs
 from sqlalchemy.engine.url import make_url
+import pg8000
+
 
 ckan_conn_str = os.environ.get('CKAN_SQLALCHEMY_URL', '')
 datastorerw_conn_str = os.environ.get('CKAN_DATASTORE_WRITE_URL', '')
@@ -211,20 +213,78 @@ try:
 except(Exception, psycopg2.DatabaseError) as error:
     print("ERROR DB: ", error)
 
-# replace ckan.plugins so that ckan cli can run and apply datastore permissions
-sed_string = "s/ckan.plugins =.*/ckan.plugins = envvars image_view text_view recline_view datastore/g"  # noqa
-subprocess.Popen(["/bin/sed", sed_string, "-i", "/srv/app/production.ini"])
-try:
-    sql = subprocess.check_output(["ckan","-c", "/srv/app/production.ini","datastore","set-permissions"],stderr=subprocess.STDOUT)
-except subprocess.CalledProcessError as e:
-    raise RuntimeError("command '{}' return with error (code {}): {}".format(e.cmd, e.returncode, e.output))
-sql = sql.decode('utf-8')
-sql = sql.replace("@"+datastorerw_db.db_host, "")
+# # replace ckan.plugins so that ckan cli can run and apply datastore permissions
+# sed_string = "s/ckan.plugins =.*/ckan.plugins = envvars image_view text_view recline_view datastore/g"  # noqa
+# subprocess.Popen(["/bin/sed", sed_string, "-i", "/srv/app/production.ini"])
+# try:
+#     sql = subprocess.check_output(["ckan","-c", "/srv/app/production.ini","datastore","set-permissions"],stderr=subprocess.STDOUT)
+# except subprocess.CalledProcessError as e:
+#     raise RuntimeError("command '{}' return with error (code {}): {}".format(e.cmd, e.returncode, e.output))
+# sql = sql.decode('utf-8')
+# sql = sql.replace("@"+datastorerw_db.db_host, "")
 
-# Remove the connect clause from the output
-sql = re.sub('\\\\connect \"(.*)\"', '', sql)
+# # Remove the connect clause from the output
+# sql = re.sub('\\\\connect \"(.*)\"', '', sql)
 
-try:
-    set_datastore_permissions(datastorerw_db, datastorero_db, sql)
-except(Exception, psycopg2.DatabaseError) as error:
-    print("ERROR DB: ", error)
+def execute_sql_script(ckan_dbp, datastorero_dbp, datastorerw_dbp, script_path):
+    # Connect to the database
+    conn = psycopg2.connect(
+        user=master_user,
+        host=datastorerw_dbp.db_host,
+        password=master_passwd,
+        database=datastorerw_dbp.db_name
+    )
+
+    try:
+        # Create a cursor
+        cur = conn.cursor()
+
+        # Execute the SQL script
+        with open(script_path, 'r') as f:
+            sql_script = f.read()
+
+        # Replace placeholders with actual values
+        
+        sql_script = sql_script.replace('{datastoredb}', datastorerw_dbp.db_name)
+        sql_script = sql_script.replace('{readuser}', datastorero_dbp.db_user)
+        sql_script = sql_script.replace('{writeuser}', datastorerw_dbp.db_user)
+        sql_script = sql_script.replace('{mainuser}', ckan_dbp.db_user)
+        sql_script = sql_script.replace('{maindb}', ckan_dbp.db_name)
+
+        print("CKAN DB User:", ckan_dbp.db_user)
+
+        # Execute the SQL script
+        cur.execute(sql_script)
+
+        # Commit the changes
+        conn.commit()
+
+        print("SQL script executed successfully.")
+
+        print("CKAN DB User:", ckan_dbp.db_user)
+        print("read/write DB User:", datastorerw_dbp.db_user)
+        print("read/write DB name:", datastorerw_dbp.db_name)
+        print("read/write host:", datastorerw_dbp.db_host)
+        print("read DB user:", datastorero_dbp.db_user)
+        print("read DB name:", datastorero_dbp.db_name)
+
+    except psycopg2.Error as e:
+        print(f"Error executing SQL script: {str(e)}")
+
+    finally:
+        # Close the cursor and the connection
+        cur.close()
+        conn.close()
+
+set_permissions = './set_permissions.sql'
+
+# Print the current working directory
+print("Current working directory:", os.getcwd())
+
+# Check if the file exists
+if os.path.isfile(set_permissions):
+    print("File exists.")
+    # Call the execute_sql_script function with the appropriate arguments
+    execute_sql_script(ckan_db, datastorero_db, datastorerw_db, set_permissions)
+else:
+    print("File not found.")

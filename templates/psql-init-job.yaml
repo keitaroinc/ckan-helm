@@ -6,17 +6,15 @@ metadata:
 spec:
   template:
     spec:
-    {{- with .Values.imagePullSecrets }}
       imagePullSecrets:
-        {{- toYaml . | nindent 8 }}
-    {{- end }}
-      volumes:
-        - name: psql-init-configmap
-          configMap:
-            name: psql-init-configmap
+      - name: pullsecret
+      #volumes:
+       # - name: psql-init-configmap
+        #  configMap:
+          #  name: psql-init-configmap
       containers:
       - name: psql-init
-        image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+        image: "europe-west3-docker.pkg.dev/amplus-data/test-repo/psqlinit-test:test"
         imagePullPolicy: {{ .Values.image.pullPolicy }}
         env:
         - name: PSQL_MASTER
@@ -43,10 +41,10 @@ spec:
               name: ckancredentials
               key: ckanDatastoreReadUrl
         command: ["python"]
-        args: ["/srv/psql-init/psql-init.py"]
-        volumeMounts:
-        - name: psql-init-configmap
-          mountPath: /srv/psql-init
+        args: ["/srv/psql-init.py"]
+        #volumeMounts:
+        #- name: psql-init-configmap
+        #  mountPath: /srv/psql-init
       restartPolicy: Never
   backoffLimit: 2
 {{- end }}
