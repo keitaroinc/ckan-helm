@@ -256,9 +256,12 @@ affinity: {}
 hpa:
   enabled: false
   minReplicas: 1
-  maxReplicas: 10
+  maxReplicas: 5
   cpuTargetAverageUtilization: 80
   memoryTargetAverageUtilization: 80
+  sessions:
+    session_url: redis://redis-headless:6379/0
+    session_type: ext:redis
 
 datapusher:
  # datapusher.enabled -- Flag to control whether to deploy the datapusher
