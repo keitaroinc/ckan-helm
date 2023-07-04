@@ -44,5 +44,5 @@ spec:
         - name: solr-configset-configmap
           mountPath: /srv/solr-configset
       restartPolicy: Never
-  backoffLimit: 3
+  backoffLimit: 1
 {{- end }}
