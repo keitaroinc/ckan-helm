@@ -16,6 +16,7 @@ limitations under the License.
 
 import shutil
 import os
+import subprocess
 import sys
 import requests
 import json
@@ -151,3 +152,14 @@ solr_collection_alreadyexists(solr_url)
 prepare_configset(cfset_name)
 create_solr_collection(collection_name, cfset_name, num_shards,
                        repl_factor, max_shards_node)
+
+
+try:
+    print("search-index rebuild start")
+    result = subprocess.run(['ckan', '-c', '/srv/app/production.ini', 'search-index', 'rebuild'], capture_output=True, text=True)
+    print('Exit code:', result.returncode)
+    print('Standard output:', result.stdout)
+    print('Standard error:', result.stderr)
+except Exception as error:
+    print("ERROR DB: ", error)
+print("search-index rebuild is done")
