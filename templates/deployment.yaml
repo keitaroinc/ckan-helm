@@ -113,17 +113,17 @@ spec:
                   name: ckancredentials
                   key: ckanDatastoreReadUrl
 {{- if .Values.hpa.enabled }}
-            - name: BEAKER_SESSION_SECRET
+            - name: CKAN___BEAKER__SESSION__SECRET
               valueFrom:
                 secretKeyRef:
                   name: session-secret
                   key: session_secret
-            - name: JWT_ENCODE_SECRET
+            - name: CKAN___JWT__ENCODE__SECRET
               valueFrom:
                 secretKeyRef:
                   name: session-secret
                   key: jwt_encode
-            - name: JWT_DECODE_SECRET
+            - name: CKAN___JWT__DECODE__SECRET
               valueFrom:
                 secretKeyRef:
                   name: session-secret
