@@ -24,9 +24,9 @@ spec:
         env:
         - name: CKAN_SOLR_URL
           value: {{ .Values.ckan.solr }}
-        - name: SOLR_ADMIN_USERNAME
+        - name: CKAN_SOLR_USER
           value: {{ .Values.solr.auth.adminUsername }}
-        - name: SOLR_ADMIN_PASSWORD
+        - name: CKAN_SOLR_PASSWORD
           value: {{ .Values.solr.auth.adminPassword }}
         - name: CKAN_SOLR_INIT_NUMSHARDS
           value: "{{ .Values.solr.initialize.numShards }}"
@@ -36,8 +36,44 @@ spec:
           value: "{{ .Values.solr.initialize.maxShardsPerNode }}"
         - name: CKAN_SOLR_INIT_CONFIGSETNAME
           value: "{{ .Values.solr.initialize.configsetName }}"
+        - name: CKAN__PLUGINS
+          value: "envvars"
+        - name: PSQL_MASTER
+          value: {{ .Values.ckan.psql.masterUser }}
+        - name: PSQL_PASSWD
+          valueFrom:
+            secretKeyRef:
+              name: ckancredentials
+              key: psqlMasterPassword
+        - name: PSQL_DB
+          value: {{ .Values.ckan.psql.masterDatabase }}
+        - name: CKAN_SQLALCHEMY_URL
+          valueFrom:
+            secretKeyRef:
+              name: ckancredentials
+              key: ckanSqlAlchemyUrl
+        - name: CKAN_DATASTORE_WRITE_URL
+          valueFrom:
+            secretKeyRef:
+              name: ckancredentials
+              key: ckanDatastoreWriteUrl
+        - name: CKAN_DATASTORE_READ_URL
+          valueFrom:
+            secretKeyRef:
+              name: ckancredentials
+              key: ckanDatastoreReadUrl
+        - name: CKAN__DATAPUSHER__URL
+          value: {{ .Values.ckan.datapusherUrl }}
+        - name: CKAN__REDIS__URL
+          value: {{ .Values.ckan.redis }}
+        - name: CKAN__STORAGE_PATH
+          value: {{ .Values.ckan.storagePath }}
+        - name: CKAN___BEAKER__SESSION__SECRET
+          value: "test"
         command: ["python"]
         args: ["/srv/solr-init/solr-init.py"]
+        command: ["sleep"]
+        args: ["infinity"]
         volumeMounts:
         - name: solr-init-configmap
           mountPath: /srv/solr-init

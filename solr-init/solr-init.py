@@ -22,8 +22,8 @@ import requests
 import json
 
 
-solr_admin_username = os.environ.get('SOLR_ADMIN_USERNAME', '')
-solr_admin_password = os.environ.get('SOLR_ADMIN_PASSWORD', '')
+solr_admin_username = os.environ.get('CKAN_SOLR_USER', '')
+solr_admin_password = os.environ.get('CKAN_SOLR_PASSWORD', '')
 
 def check_solr_connection(solr_url, retry=None):
     print('\nCheck_solr_connection...')
