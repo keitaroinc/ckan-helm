@@ -27,7 +27,7 @@ dependencies:
     repository: "https://charts.bitnami.com/bitnami"
     condition: redis.enabled
   - name: solr
-    version: 1.4.0
+    version: 1.4.1
     repository: "https://charts.helm.sh/incubator"
     condition: solr.enabled
   - name: postgresql
