@@ -23,15 +23,18 @@ appVersion: 2.9.2
 # Dependencies
 dependencies:
   - name: redis 
-    version: 16.5.5
+    version: 17.15.4
     repository: "https://charts.bitnami.com/bitnami"
     condition: redis.enabled
   - name: solr
-    version: 1.4.1
-    repository: "https://charts.helm.sh/incubator"
+    # version: 1.4.0
+    # repository: "https://charts.helm.sh/incubator"
+
+    version: 1.0.0
+    repository: "https://raseel-internal.github.io/charts"
     condition: solr.enabled
   - name: postgresql
-    version: 10.16.2
+    version: 12.8.2
     repository: "https://charts.bitnami.com/bitnami"
     condition: postgresql.enabled
   - name: datapusher
