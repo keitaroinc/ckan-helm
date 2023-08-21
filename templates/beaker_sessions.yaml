@@ -2,7 +2,7 @@
 apiVersion: v1
 kind: Secret
 metadata:
-  name: sessions-secret
+  name: session-secret
 type: Opaque
 stringData:
   session_secret: {{ randAlphaNum 43 }}
