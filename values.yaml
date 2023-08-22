@@ -5,8 +5,9 @@
 replicaCount: 1
 
 image:
-  repository: keitaro/ckan
-  tag: 2.9.4
+  #repository: keitaro/ckan
+  repository: me-jeddah-1.ocir.io/axaxwymzzkuk/raseel-ckan
+  tag: latest
   pullPolicy: IfNotPresent
 
 imagePullSecrets: []
