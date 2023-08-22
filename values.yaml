@@ -320,4 +320,5 @@ postgresql:
   # Feeds into the `postgrescredentials` secret that is provided to the PostgreSQL chart
   pgPass: *MasterDBPass
   # postgresql.existingSecret -- Name of existing secret that holds passwords for PostgreSQL
-  existingSecret: postgrescredentials
+  auth:
+    existingSecret: postgrescredentials
