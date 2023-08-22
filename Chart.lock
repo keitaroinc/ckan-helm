@@ -9,7 +9,7 @@ dependencies:
   repository: https://charts.bitnami.com/bitnami
   version: 12.8.2
 - name: datapusher
-  repository: https://keitaro-charts.storage.googleapis.com
+  repository: https://raseel-internal.github.io/charts
   version: 1.0.0
-digest: sha256:01de46e271952d75226b1c4448168b1c62b28bac69c4582a3367507de477f2b7
-generated: "2023-08-17T14:20:48.62856+03:00"
+digest: sha256:035a0e68afc98cc9ff94411531c32bb6aac9cca89ba31c9d8fb240273569ca10
+generated: "2023-08-22T13:24:48.176775+03:00"

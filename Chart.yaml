@@ -27,9 +27,6 @@ dependencies:
     repository: "https://charts.bitnami.com/bitnami"
     condition: redis.enabled
   - name: solr
-    # version: 1.4.0
-    # repository: "https://charts.helm.sh/incubator"
-
     version: 1.0.0
     repository: "https://raseel-internal.github.io/charts"
     condition: solr.enabled
@@ -39,6 +36,6 @@ dependencies:
     condition: postgresql.enabled
   - name: datapusher
     version: 1.0.0
-    repository: "https://keitaro-charts.storage.googleapis.com"
+    repository: "https://raseel-internal.github.io/charts"
     condition: datapusher.enabled
 
