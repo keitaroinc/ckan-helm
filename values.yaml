@@ -68,7 +68,7 @@ ckan:
   sysadminPassword: "13Hj.iu*&h"
   # ckan.sysadminApiToken -- CKAN system admin API token
   # Needs to be generated via the CKAN UI and replaced after initial deployment
-  sysadminApiToken: "6cfe0656-520c-4776-9cce-264ac83f2278"
+  sysadminApiToken: "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJqdGkiOiJVYXJsZ2YyQUNteUN6XzNmWFI3RUlNM3ptdG1SSGRLZm5lbWlRQjVpSkRzaVFaS1o1U29PaW5PZFdTNU1zVGZDUmVXNjFwMkNFOUpNNHpvdyIsImlhdCI6MTY5Mjc4MDAzNX0.MIQiH8ADgw3QDAvmvOEDpBajh8XLqtqOp4ZWvGPpsTE"
   # ckan.sysadminEmail -- CKAN system admin email
   sysadminEmail: "hbadri@mda.gov.sa"
   # ckan.siteTitle -- Site title for the instance
