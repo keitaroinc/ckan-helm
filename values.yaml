@@ -42,14 +42,14 @@ MasterDBName: &MasterDBName postgres
 # MasterDBUser -- Variable for master user name for PostgreSQL
 MasterDBUser: &MasterDBUser postgres
 # MasterDBPass -- Variable for password for the master user in PostgreSQL
-MasterDBPass: &MasterDBPass pass
+MasterDBPass: &MasterDBPass xytGH.09Ik
 
 # CkanDBName -- Variable for name of the database used by CKAN
-CkanDBName: &CkanDBName ckan_default
+CkanDBName: &CkanDBName opendata
 # CkanDBUser -- Variable for username for the owner of the CKAN database
-CkanDBUser: &CkanDBUser ckan_default
+CkanDBUser: &CkanDBUser raseel
 # CkanDBPass -- Variable for password for the CKAN database owner
-CkanDBPass: &CkanDBPass pass
+CkanDBPass: &CkanDBPass okokiu*99
 # DatastoreDBName -- Variable for name of the database used by Datastore
 DatastoreDBName: &DatastoreDBName datastore_default
 # DatastoreRWDBUser -- Variable for username for the user with write access to the datastore database
@@ -63,20 +63,20 @@ DatastoreRODBPass: &DatastoreRODBPass pass
 
 ckan:
   # ckan.sysadminName -- CKAN system admin username
-  sysadminName: "ckan_admin"
+  sysadminName: "raseel_admin"
   # ckan.sysadminPassword -- CKAN system admin password
-  sysadminPassword: "PasswordHere"
+  sysadminPassword: "13Hj.iu*&h"
   # ckan.sysadminApiToken -- CKAN system admin API token
   # Needs to be generated via the CKAN UI and replaced after initial deployment
-  sysadminApiToken: "replace_this_with_generated_api_token_for_sysadmin"
+  sysadminApiToken: "6cfe0656-520c-4776-9cce-264ac83f2278"
   # ckan.sysadminEmail -- CKAN system admin email
-  sysadminEmail: "admin@domain.com"
+  sysadminEmail: "hbadri@mda.gov.sa"
   # ckan.siteTitle -- Site title for the instance
-  siteTitle: "Site Title here"
+  siteTitle: "Raseel Open Data Platform"
   # ckan.siteId -- Site id
-  siteId: "site-id-here"
+  siteId: "Raseel-Opendata"
   # ckan.siteUrl -- Url for the CKAN instance
-  siteUrl: "http://localhost:5000"
+  siteUrl: "https://devopendata.raseel.city"
   # ckan.ckanPlugins -- List of plugins to be used by the instance
   ckanPlugins: "envvars image_view text_view recline_view datastore datapusher"
   # ckan.storagePath -- Storage path to be used by the instance
@@ -137,12 +137,12 @@ ckan:
   # ckan.datapusherCallbackUrlBase -- Location of the CKAN k8s service to be used by the Datapusher, overriding the default site url route.
   datapusherCallbackUrlBase: http://ckan
   smtp:
-    server: "smtpServerURLorIP:port"
-    user: "smtpUser" 
-    password: "smtpPassword"
-    mailFrom: "postmaster@domain.com"
+    server: "postal.raseel.city:2525"
+    user: "raseel-opendata" 
+    password: "O3xDmBMnWga46JhIrqF4pSI7"
+    mailFrom: "raseel-opendata@postal.raseel.city"
     tls: "enabled"
-    starttls: "true"
+    starttls: "false"
   issues:
     sendEmailNotifications: "true"
 

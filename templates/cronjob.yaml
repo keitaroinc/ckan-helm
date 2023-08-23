@@ -24,7 +24,7 @@ spec:
             - "Authorization: $(CKAN_SYSADMIN_API_TOKEN)"
             - -d
             - "{}"
-            - "http://ckan/api/action/send_email_notifications"
+            - "https://devopendata.raseel.city/api/action/send_email_notifications"
             env:
 {{- if .Values.ckan.extraEnv }}
 {{ toYaml .Values.ckan.extraEnv | indent 12 }}
