@@ -10,6 +10,12 @@ spec:
         - name: psql-init-configmap
           configMap:
             name: psql-init-configmap
+      # {{- if .Values.imagePullSecretEnabled }}
+      imagePullSecrets: 
+      {{- range .Values.imagePullSecrets }}
+        - name: {{ .name }}
+      {{- end }}
+      # {{- end }}
       containers:
       - name: psql-init
         image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
