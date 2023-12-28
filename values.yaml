@@ -6,7 +6,7 @@ replicaCount: 1
 
 image:
   repository: keitaro/ckan
-  tag: 2.9.9
+  tag: 2.9.10
   pullPolicy: IfNotPresent
   testConnection:
     repository: busybox
