@@ -1,0 +1,57 @@
+# This workflow uses actions that are not certified by GitHub.
+# They are provided by a third-party and are governed by
+# separate terms of service, privacy policy, and support
+# documentation.
+
+
+name: trivy
+
+on:
+  push:
+    branches: [ "master" ]
+  pull_request:
+    # The branches below must be a subset of the branches above
+    branches: [ "master" ]
+  schedule:
+    - cron: '28 3 * * 5'
+
+permissions:
+  contents: read
+
+jobs:
+  chart-test:
+    permissions:
+        contents: read # for actions/checkout to fetch code
+        security-events: write # for github/codeql-action/upload-sarif to upload SARIF results
+        actions: read # only required for a private repository by github/codeql-action/upload-sarif to get the Action run status
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@master
+        with:
+          fetch-depth: 0
+
+      - name: Set up Helm
+        uses: azure/setup-helm@f382f75448129b3be48f8121b9857be18d815a82 # tag=v3.4
+        with:
+          version: v3.6.3
+
+      - name: Set up python
+        uses: actions/setup-python@13ae5bb136fac2878aff31522b9efb785519f984 # tag=v4.3.0
+        with:
+          python-version: 3.7
+
+      - name: Run Trivy vulnerability scanner in IaC mode
+        uses: aquasecurity/trivy-action@0.16.1
+        with:
+          scan-type: 'config'
+          hide-progress: false
+          format: 'sarif'
+          scan-ref: '.'
+          output: 'trivy-results.sarif'
+          ignore-unfixed: true
+
+      - name: Upload Trivy scan results to GitHub Security tab
+        uses: github/codeql-action/upload-sarif@312e093a1892bd801f026f1090904ee8e460b9b6 # v2.1.34
+        with:
+          sarif_file: 'trivy-results.sarif'
