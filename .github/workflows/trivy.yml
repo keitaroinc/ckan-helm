@@ -50,6 +50,7 @@ jobs:
           scan-ref: '.'
           output: 'trivy-results.sarif'
           ignore-unfixed: true
+          skip-dirs: "./dependency-charts"
 
       - name: Upload Trivy scan results to GitHub Security tab
         uses: github/codeql-action/upload-sarif@312e093a1892bd801f026f1090904ee8e460b9b6 # v2.1.34
