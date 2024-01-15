@@ -19,7 +19,28 @@ permissions:
   contents: read
 
 jobs:
-  chart-test:
+  repo_scan:
+    name: repo_scan
+    runs-on: ubuntu-20.04
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Run Trivy vulnerability scanner in repo mode
+        uses: aquasecurity/trivy-action@master
+        with:
+          scan-type: 'fs'
+          ignore-unfixed: true
+          format: 'sarif'
+          output: 'trivy-results-repo.sarif'
+          severity: 'CRITICAL'
+
+      - name: Upload Trivy scan results to GitHub Security tab
+        uses: github/codeql-action/upload-sarif@v2
+        with:
+          sarif_file: 'trivy-results-repo.sarif'
+          
+  ckan-helm-scan:
     permissions:
         contents: read # for actions/checkout to fetch code
         security-events: write # for github/codeql-action/upload-sarif to upload SARIF results
@@ -46,12 +67,12 @@ jobs:
         with:
           scan-type: 'config'
           hide-progress: false
-          format: 'sarif'
           scan-ref: '.'
-          output: 'trivy-results.sarif'
+          format: 'sarif'
+          output: 'trivy-results-helm.sarif'
           ignore-unfixed: true
 
       - name: Upload Trivy scan results to GitHub Security tab
         uses: github/codeql-action/upload-sarif@312e093a1892bd801f026f1090904ee8e460b9b6 # v2.1.34
         with:
-          sarif_file: 'trivy-results.sarif'
+          sarif_file: 'trivy-results-helm.sarif'
