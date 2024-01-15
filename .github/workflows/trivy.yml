@@ -67,6 +67,7 @@ jobs:
         with:
           scan-type: 'config'
           hide-progress: false
+          scan-ref: './templates'
           format: 'sarif'
           output: 'trivy-results-helm.sarif'
           ignore-unfixed: true
