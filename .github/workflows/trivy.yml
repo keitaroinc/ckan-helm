@@ -40,7 +40,7 @@ jobs:
         with:
           sarif_file: 'trivy-results-repo.sarif'
           
-  chart-test:
+  ckan-helm-scan:
     permissions:
         contents: read # for actions/checkout to fetch code
         security-events: write # for github/codeql-action/upload-sarif to upload SARIF results
@@ -67,7 +67,7 @@ jobs:
         with:
           scan-type: 'config'
           hide-progress: false
-          scan-ref: './templates'
+          scan-ref: '.'
           format: 'sarif'
           output: 'trivy-results-helm.sarif'
           ignore-unfixed: true
