@@ -312,6 +312,10 @@ solr:
   # Please see all available overrides at https://github.com/bitnami/charts/tree/master/bitnami/solr/#installing-the-chart
   # solr.enabled -- Flag to control whether to deploy SOLR
   enabled: true
+  global:
+    imageRegistry: ""
+    imagePullSecrets: []
+    storageClass: ""
   auth:
   # solr.auth.enabled -- Enable or disable auth (if auth is disabled solr-init cant upload the configset/schema.xml for ckan)
     enabled: true
@@ -367,10 +371,22 @@ postgresql:
     size: 1Gi
   # postgresql.fullnameOverride -- Name override for the PostgreSQL deployment
   fullnameOverride: *DBDeploymentName
-  # postgresql.pgPass -- Password for the master PostgreSQL user.
-  # Feeds into the `postgrescredentials` secret that is provided to the PostgreSQL chart
-  pgPass: *MasterDBPass
-  # postgresql.existingSecret -- Name of existing secret that holds passwords for PostgreSQL
-  existingSecret: postgrescredentials
-  
+  # @param postgresql.auth.postgresPassword Password for the "postgres" admin user (overrides `auth.postgresPassword`)
+  # @param postgresql.auth.username Name for a custom user to create (overrides `auth.username`)
+  # @param postgresql.auth.password Password for the custom user to create (overrides `auth.password`)
+  # @param postgresql.auth.database Name for a custom database to create (overrides `auth.database`)
+  # @param postgresql.auth.existingSecret Name of existing secret to use for PostgreSQL credentials (overrides `auth.existingSecret`).
+  # @param postgresql.auth.secretKeys.adminPasswordKey Name of key in existing secret to use for PostgreSQL credentials (overrides `auth.secretKeys.adminPasswordKey`). Only used when `global.postgresql.auth.existingSecret` is set.
+  # @param postgresql.auth.secretKeys.userPasswordKey Name of key in existing secret to use for PostgreSQL credentials (overrides `auth.secretKeys.userPasswordKey`). Only used when `global.postgresql.auth.existingSecret` is set.
+  # @param postgresql.auth.secretKeys.replicationPasswordKey Name of key in existing secret to use for PostgreSQL credentials (overrides `auth.secretKeys.replicationPasswordKey`). Only used when `global.postgresql.auth.existingSecret` is set.
+  auth:
+    postgresPassword: *MasterDBPass
+    username: *CkanDBUser
+    password: *CkanDBPass
+    database: *CkanDBName
+    # existingSecret: ""
+    # secretKeys:
+    #   adminPasswordKey: ""
+    #   userPasswordKey: ""
+    #   replicationPasswordKey: ""
   
