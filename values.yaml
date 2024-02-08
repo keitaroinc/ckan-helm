@@ -103,9 +103,10 @@ ckan:
     masterPassword: *MasterDBPass
     # ckan.psql.masterDatabase -- PostgreSQL database for the master user
     masterDatabase: *MasterDBName
-
+    
+  # ckan.solr -- Location of SOLR collection used by the instance
   solr: "http://solr-headless:8983/solr/ckancollection"
-
+  # ckan.redis -- Location of the Redis service to be used by the CKAN instance
   redis: "redis://redis-headless:6379/0"
 
   spatialBackend: "solr"
@@ -113,9 +114,9 @@ ckan:
   locale:
     offered: "en"
     default: "en"
-
+  # ckan.datapusherUrl -- Location of the datapusher service to be used by the CKAN instance
   datapusherUrl: "http://datapusher-headless:8000"
-
+  # ckan.datapusherCallbackUrlBase -- Location of the CKAN k8s service to be used by the Datapusher, overriding the default site url route.
   datapusherCallbackUrlBase: http://ckan
   smtp:
     server: "smtpServerURLorIP:port"
@@ -226,7 +227,7 @@ ingress:
   #    hosts:
   #      - chart-example.local
 
-
+# ingressRoute -- Used in conjunction with a Traefik v2 deployment
 ingressRoute:
   enabled: false
   host: chart-example.local
@@ -309,26 +310,35 @@ solr:
   # solr.enabled -- Flag to control whether to deploy SOLR
   enabled: true
   auth:
+  # solr.auth.enabled -- Enable or disable auth (if auth is disabled solr-init cant upload the configset/schema.xml for ckan)
     enabled: true
+  # solr.auth.adminUser -- The name of the solr admin user
     adminUsername: admin
+  # solr.auth.adminPassword -- The password of the solr admin user
     adminPassword: pass
+  # solr.collection -- the name of the collection created by solr 
+  # since we are creating one with solr-init this needs to be blank
   collection:
+  # solr.collectionShards -- Number of shards for the SOLR collection
   collectionShards: 
+  # solr.collectionReplicas -- Number of replicas for each SOLR shard
   collectionReplicas: 
+  # solr.fullnameOverride -- Name override for the SOLR deployment
   fullnameOverride: *SolrName
+  # solr.replicaCount -- Number of SOLR instances in the cluster
   replicaCount: 1
-
   volumeClaimTemplates:
+    # solr.volumeClaimTemplates.storageSize -- Size of Solr PV
     storageSize: 5Gi
-
   image:
     registry: docker.io
     repository: bitnami/solr
     tag: 8.11.1
-
   zookeeper:
+    # solr.zookeeper.replicaCount -- Numer of Zookeeper replicas in the ZK cluster
     replicaCount: 1
     persistence:
+      # solr.zookeeper.persistence.size -- Size of ZK PVC
       size: 1Gi
 
   initialize:
