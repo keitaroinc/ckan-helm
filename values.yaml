@@ -103,7 +103,7 @@ ckan:
     masterPassword: *MasterDBPass
     # ckan.psql.masterDatabase -- PostgreSQL database for the master user
     masterDatabase: *MasterDBName
-    
+
   # ckan.solr -- Location of SOLR collection used by the instance
   solr: "http://solr-headless:8983/solr/ckancollection"
   # ckan.redis -- Location of the Redis service to be used by the CKAN instance
@@ -355,7 +355,7 @@ solr:
 
 
 postgresql:
-  enabled: false
+  enabled: true
   persistence:
     # postgresql.persistence.size -- Size of the PostgreSQL pvc
     size: 1Gi
