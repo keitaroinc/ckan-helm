@@ -95,7 +95,9 @@ ckan:
   maintenanceMode: "false"
 
   psql:
+    # ckan.psql.runOnAzure -- Set to true to run on Azure (if true wont run on anything other then azure) set to false to run on other platforms  
     runOnAzure: false
+    # ckan.psql.initialize -- Flag whether to initialize the PostgreSQL instance with the provided users and databases
     initialize: true
     # ckan.psql.masterUser -- PostgreSQL master username
     masterUser: *MasterDBUser
@@ -127,6 +129,13 @@ ckan:
     starttls: "true"
   issues:
     sendEmailNotifications: "true"
+
+  # ckan.extraEnv -- An array to add extra environment variables
+  # For example:
+  # extraEnv:
+  #   - name: FOO
+  #     value: "bar"
+  #
 
   extraEnv: []
 
@@ -208,6 +217,7 @@ securityContext: {}
   # runAsUser: 1000
 
 service:
+  # service.type -- Type of the service created for the CKAN pod
   type: ClusterIP
   port: 80
 
@@ -328,7 +338,7 @@ solr:
   # solr.replicaCount -- Number of SOLR instances in the cluster
   replicaCount: 1
   volumeClaimTemplates:
-    # solr.volumeClaimTemplates.storageSize -- Size of Solr PV
+    # solr.volumeClaimTemplates.storageSize -- Size of Solr PVC
     storageSize: 5Gi
   image:
     registry: docker.io
