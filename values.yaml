@@ -342,7 +342,9 @@ solr:
     storageSize: 5Gi
   image:
     registry: docker.io
+    # solr.image.repository -- Repository for the SOLR image
     repository: bitnami/solr
+    # solr.image.tag -- Tag for the SOLR image
     tag: 8.11.1
   zookeeper:
     # solr.zookeeper.replicaCount -- Numer of Zookeeper replicas in the ZK cluster
@@ -365,6 +367,7 @@ solr:
 
 
 postgresql:
+  # postgresql.enabled -- Flag to control whether to deploy PostgreSQL
   enabled: true
   persistence:
     # postgresql.persistence.size -- Size of the PostgreSQL pvc
