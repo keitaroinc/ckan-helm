@@ -93,8 +93,9 @@ ckan:
   uwsg_num: "2"
   # ckan.maintenanceMode -- Set to true to disable CKAN from starting and serve a maintenance page
   maintenanceMode: "false"
+
   psql:
-    # ckan.psql.runOnAzure -- Set to true to run on Azure (if true wont run on anything other then azure) set to false to run on other platforms
+    # ckan.psql.runOnAzure -- Set to true to run on Azure (if true wont run on anything other then azure) set to false to run on other platforms  
     runOnAzure: false
     # ckan.psql.initialize -- Flag whether to initialize the PostgreSQL instance with the provided users and databases
     initialize: true
@@ -104,37 +105,14 @@ ckan:
     masterPassword: *MasterDBPass
     # ckan.psql.masterDatabase -- PostgreSQL database for the master user
     masterDatabase: *MasterDBName
-  db:
-    # ckan.db.ckanDbUrl -- Url of the PostgreSQL server where the CKAN database is hosted
-    ckanDbUrl: *DBHost
-    # ckan.db.ckanDbName -- Name of the database to be used by CKAN
-    ckanDbName: *CkanDBName
-    # ckan.db.ckanDbUser -- Username of the database to be used by CKAN
-    ckanDbUser: *CkanDBUser
-    # ckan.db.ckanDbPassword -- Password of the user for the database to be used by CKAN
-    ckanDbPassword: *CkanDBPass
-  datastore:
-    # ckan.datastore.RwDbUrl -- Url of the PostgreSQL server where the datastore database is hosted
-    RwDbUrl: *DBHost
-    # ckan.datastore.RwDbName -- Name of the database to be used for Datastore
-    RwDbName: *DatastoreDBName
-    # ckan.datastore.RwDbUser -- Username for the datastore database with write permissions
-    RwDbUser: *DatastoreRWDBUser
-    # ckan.datastore.RwDbPassword -- Password for the datastore write permissions user
-    RwDbPassword: *DatastoreRWDBPass
-    # ckan.datastore.RoDbUrl -- Url of the PostgreSQL server where the datastore database is hosted
-    RoDbUrl: *DBHost
-    # ckan.datastore.RoDbName -- Name of the database to be used for Datastore
-    RoDbName: *DatastoreDBName
-    # ckan.datastore.RoDbUser -- Username for the datastore database with read permissions
-    RoDbUser: *DatastoreRODBUser
-    # ckan.datastore.RoDbPassword -- Password for the datastore read permissions user
-    RoDbPassword: *DatastoreRODBPass
+
   # ckan.solr -- Location of SOLR collection used by the instance
   solr: "http://solr-headless:8983/solr/ckancollection"
   # ckan.redis -- Location of the Redis service to be used by the CKAN instance
   redis: "redis://redis-headless:6379/0"
+
   spatialBackend: "solr"
+
   locale:
     offered: "en"
     default: "en"
@@ -158,8 +136,8 @@ ckan:
   #   - name: FOO
   #     value: "bar"
   #
-  extraEnv: []
 
+  extraEnv: []
 
   readiness:
     # ckan.readiness.initialDelaySeconds -- Inital delay seconds for the readiness probe
@@ -170,6 +148,7 @@ ckan:
     failureThreshold: 6
     # ckan.readiness.timeoutSeconds -- Timeout interval for the readiness probe
     timeoutSeconds: 10
+
   liveness:
     # ckan.liveness.initialDelaySeconds -- Initial delay for the liveness probe
     initialDelaySeconds: 10
@@ -179,6 +158,34 @@ ckan:
     failureThreshold: 6
     # ckan.liveness.timeoutSeconds -- Timeout interval for the liveness probe
     timeoutSeconds: 10
+
+  db:
+    # ckan.db.ckanDbUrl -- Url of the PostgreSQL server where the CKAN database is hosted
+    ckanDbUrl: *DBHost
+    # ckan.db.ckanDbName -- Name of the database to be used by CKAN
+    ckanDbName: *CkanDBName
+    # ckan.db.ckanDbUser -- Username of the database to be used by CKAN
+    ckanDbUser: *CkanDBUser
+    # ckan.db.ckanDbPassword -- Password of the user for the database to be used by CKAN
+    ckanDbPassword: *CkanDBPass
+
+  datastore:
+    # ckan.datastore.RwDbUrl -- Url of the PostgreSQL server where the datastore database is hosted
+    RwDbUrl: *DBHost
+    # ckan.datastore.RwDbName -- Name of the database to be used for Datastore
+    RwDbName: *DatastoreDBName
+    # ckan.datastore.RwDbUser -- Username for the datastore database with write permissions
+    RwDbUser: *DatastoreRWDBUser
+    # ckan.datastore.RwDbPassword -- Password for the datastore write permissions user
+    RwDbPassword: *DatastoreRWDBPass
+    # ckan.datastore.RoDbUrl -- Url of the PostgreSQL server where the datastore database is hosted
+    RoDbUrl: *DBHost
+    # ckan.datastore.RoDbName -- Name of the database to be used for Datastore
+    RoDbName: *DatastoreDBName
+    # ckan.datastore.RoDbUser -- Username for the datastore database with read permissions
+    RoDbUser: *DatastoreRODBUser
+    # ckan.datastore.RoDbPassword -- Password for the datastore read permissions user
+    RoDbPassword: *DatastoreRODBPass
 
 serviceAccount:
   # serviceAccount.create -- Specifies whether a service account should be created
@@ -345,6 +352,7 @@ solr:
     persistence:
       # solr.zookeeper.persistence.size -- Size of ZK PVC
       size: 1Gi
+
   initialize:
     # solr.initialize.enabled -- Flag whether to initialize the SOLR instance with the provided collection name
     enabled: true
@@ -356,7 +364,6 @@ solr:
     maxShardsPerNode: 10
     # solr.initialize.configsetName -- Name of the config set used for initializing
     configsetName: ckanConfigSet
-
 
 
 postgresql:
