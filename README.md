@@ -190,3 +190,25 @@ $ kubectl delete pvc -l release=$release
   [1]: https://opensource.org/licenses/Apache-2.0
   [Chat on Gitter]: https://badges.gitter.im/gitterHQ/gitter.svg
   [2]: https://gitter.im/keitaroinc/docker-ckan
+
+## Running on local K8S cluster
+Prerequisites:
+```
+taskfile
+kind
+kubectl
+kubectx
+kubens
+```
+For setting up the cluster and installing ckan and dependencies in helm
+``` 
+task setup-ckan 
+```
+For destroying the setup run 
+```
+task destroy
+```
+For only setting up the kubernetes cluster and the namespaces
+```
+task setup
+```
