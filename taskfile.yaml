@@ -1,0 +1,29 @@
+version: "3"
+
+dotenv: [".env"]
+
+tasks:
+  setup:
+    name: Setting up project
+    desc: "Setting up cluster and resources"
+    cmds:
+      - kind create cluster --name $CLUSTER_NAME
+      - kubectl create ns ckan-test
+      - kubens ckan-test
+    status:
+      - kind get clusters | grep amplus 
+      - kubectl get ns ckan-test
+
+  setup-ckan:
+    name: Setuo cluster and ckan
+    deps: ["setup"]
+    cmds:
+      - helm upgrade --install ckan keitaro-charts/ckan
+      - kubectl wait --for=condition=Available=True deployment/ckan --timeout=300s       
+      - kubectl port-forward svc/ckan $CKAN_PORT:80
+
+  destroy:
+    name: Delete project setup
+    desc: "Delete k8s cluster"
+    cmds:
+      - kind delete cluster --name $CLUSTER_NAME
