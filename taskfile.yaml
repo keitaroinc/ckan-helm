@@ -18,7 +18,7 @@ tasks:
     name: Setuo cluster and ckan
     deps: ["setup"]
     cmds:
-      - helm upgrade --install ckan keitaro-charts/ckan
+      - helm upgrade --install ckan .
       - kubectl wait --for=condition=Available=True deployment/ckan --timeout=300s       
       - kubectl port-forward svc/ckan $CKAN_PORT:80
 

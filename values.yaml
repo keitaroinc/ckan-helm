@@ -6,7 +6,7 @@ replicaCount: 1
 
 image:
   repository: keitaro/ckan
-  tag: 2.10.3
+  tag: 2.10.4
   pullPolicy: IfNotPresent
   testConnection:
     repository: busybox
@@ -57,7 +57,7 @@ CkanDBPass: &CkanDBPass pass
 # DatastoreDBName -- Variable for name of the database used by Datastore
 DatastoreDBName: &DatastoreDBName datastore_default
 # DatastoreRWDBUser -- Variable for username for the user with write access to the datastore database
-DatastoreRWDBUser: &DatastoreRWDBUser datastorerw
+DatawaitstoreRWDBUser: &DatastoreRWDBUser datastorerw
 # DatastoreRWDBPass -- Variable for password for the datastore database user with write access
 DatastoreRWDBPass: &DatastoreRWDBPass pass
 # DatastoreRODBUser -- Variable for username for the user with read access to the datastore database
