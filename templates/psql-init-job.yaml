@@ -27,8 +27,6 @@ spec:
           value: {{ .Values.solr.auth.adminUsername }}
         - name: CKAN_SOLR_PASSWORD
           value: {{ .Values.solr.auth.adminPassword }}
-        - name: CKAN__DATAPUSHER__URL
-          value: {{ .Values.ckan.datapusherUrl }}
         - name: CKAN_SQLALCHEMY_URL
           valueFrom:
             secretKeyRef:

@@ -6,8 +6,8 @@ replicaCount: 1
 
 image:
   repository: keitaro/ckan
-  tag: 2.10.3
-  pullPolicy: IfNotPresent
+  tag: 2.10.4
+  pullPolicy: Always
   testConnection:
     repository: busybox
     tag: latest
@@ -36,8 +36,6 @@ RedisName: &RedisName redis
 # SolrName -- Variable for name override for solr deployment
 SolrName: &SolrName solr
 
-# DatapusherName -- Variable for name override for datapusher deployment
-DatapusherName: &DatapusherName datapusher
 
 # DBHost -- Variable for name of headless svc from postgres deployment
 DBHost: &DBHost postgres
@@ -82,7 +80,7 @@ ckan:
   # ckan.siteUrl -- Url for the CKAN instance
   siteUrl: "http://localhost:5000"
   # ckan.ckanPlugins -- List of plugins to be used by the instance
-  ckanPlugins: "envvars image_view text_view recline_view datastore datapusher"
+  ckanPlugins: "envvars image_view text_view recline_view datastore xloader"
   # ckan.storagePath -- Storage path to be used by the instance
   storagePath: "/var/lib/ckan/default"
   activityStreamsEmailNotifications: "true"
@@ -116,10 +114,7 @@ ckan:
   locale:
     offered: "en"
     default: "en"
-  # ckan.datapusherUrl -- Location of the datapusher service to be used by the CKAN instance
-  datapusherUrl: "http://datapusher-headless:8000"
-  # ckan.datapusherCallbackUrlBase -- Location of the CKAN k8s service to be used by the Datapusher, overriding the default site url route.
-  datapusherCallbackUrlBase: http://ckan
+  
   smtp:
     server: "smtpServerURLorIP:port"
     user: "smtpUser" 
@@ -270,26 +265,21 @@ hpa:
     session_url: redis://redis-headless:6379/0
     session_type: ext:redis
 
-datapusher:
- # datapusher.enabled -- Flag to control whether to deploy the datapusher
+xloader:
+  # xloader.enabled -- Flag to control whether to deploy xloader 
   enabled: true
-  # datapusher.fullnameOverride -- Name override for the datapusher deployment
-  fullnameOverride: *DatapusherName
-  datapusher:
-    # datapusher.datapusher.maxContentSize -- Maximum size of content to be uploaded in bytes.
-    maxContentLength: "102400000"
-    # datapusher.datapusher.chunkSize -- Size of chunks of the data that is being downloaded in bytes
-    chunkSize: "10240000"
-    # datapusher.datapusher.insertRows -- Number of rows to take from the data and upload them as chunks to datastore
-    insertRows: "50000"
-    # datapusher.datapusher.downloadTimeout -- Timeout limit of the download request
-    downloadTimeout: "300"
-    # datapusher.datapusher.datapusherSslVerify -- Enable or disable (boolean) verification of SSL when trying to get resources. Default: True
-    datapusherSslVerify: "False"
-    # datapusher.datapusher.datapusherRewriteResources -- Enable or disable (boolean) whether datapusher should rewrite resources uploaded to CKAN's filestore, since datapusher takes the CKAN Site URL value for generating the resource URL. Default: False
-    datapusherRewriteResources: "True"
-    # datapusher.datapusher.datapusherRewriteUrl -- Sets the rewrite URL that datapushed will rewrite resources that are uploaded to CKAN's filestore. Default: http://ckan:5000
-    datapusherRewriteUrl: http://ckan
+  # Set the maximum size of the file that can be uploaded and processed by xloader
+  maxContentLength: "5000000001"
+  # Define the maximum time (in seconds) allowed for a job to complete before it is terminated
+  jobTimeout: "36000"
+  # Set the maximum number of lines to read from a file to generate an excerpt
+  maxExcerptLines: "0"
+  # Specifies whether SSL verification should be performed when accessing remote resources
+  sslVerify: "false"
+  # File formats that xloader supports for processing
+  formats: "csv application/csv xls application/vnd.ms-excel xlsx application/vnd.oasis.opendocument.spreadsheet"
+  # Starting CKAN 2.10 you will need to set an API Token to be able to execute jobs against the server
+  token: "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJqdGkiOiIxQjN2SmVsaWpOY2YxYXJRWWc1c1VZbmM0bEFyY1BEVmdCNkdFX0pSajRVIiwiaWF0IjoxNzE3NTk1NTQyfQ.B7mByiPnrilB4vvYdEkBFTE86_1RNU3AE4xRlEecHkQ"
 
 redis:
   # Please see all available overrides at https://github.com/bitnami/charts/tree/master/bitnami/redis

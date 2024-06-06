@@ -63,8 +63,6 @@ spec:
               value: {{ .Values.ckan.solr }}
             - name: CKAN__REDIS__URL
               value: {{ .Values.ckan.redis }}
-            - name: CKAN__DATAPUSHER__URL
-              value: {{ .Values.ckan.datapusherUrl }}
             - name: CKAN___SMTP__SERVER
               value: {{ .Values.ckan.smtp.server | quote }}
             - name: CKAN___SMTP__USER

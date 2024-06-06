@@ -147,10 +147,6 @@ spec:
               value: {{ .Values.ckan.locale.offered | quote }}
             - name: CKAN__LOCALE_DEFAULT
               value: {{ .Values.ckan.locale.default }}
-            - name: CKAN__DATAPUSHER__URL
-              value: {{ .Values.ckan.datapusherUrl }}
-            - name: CKAN__DATAPUSHER__CALLBACK_URL_BASE
-              value: {{ .Values.ckan.datapusherCallbackUrlBase }}
             - name: CKAN___SMTP__SERVER
               value: {{ .Values.ckan.smtp.server | quote }}
             - name: CKAN___SMTP__USER
@@ -170,6 +166,25 @@ spec:
               value: {{ .Values.ckan.activityStreamsEmailNotifications | quote }}
             - name: CKANEXT__ISSUES__SEND_EMAIL_NOTIFICATIONS
               value: {{ .Values.ckan.issues.sendEmailNotifications | quote }}
+{{- if .Values.xloader.enabled }}  
+            - name: CKANEXT__XLOADER__JOBS_DB__URI
+              valueFrom:
+                secretKeyRef:
+                  name: ckancredentials
+                  key: ckanSqlAlchemyUrl
+            - name: CKANEXT__XLOADER__MAX_CONTENT_LENGTH
+              value: {{ .Values.xloader.maxContentLength | quote }}
+            - name: CKANEXT__XLOADER__JOB_TIMEOUT
+              value: {{ .Values.xloader.jobTimeout | quote }}
+            - name: CKANEXT__XLOADER__MAX_EXCERPT_LINES
+              value: {{ .Values.xloader.maxExcerptLines | quote }}
+            - name: CKANEXT__XLOADER__SSL_VERIFY
+              value: {{ .Values.xloader.sslVerify | quote }}
+            - name: CKANEXT__XLOADER__FORMATS
+              value: {{ .Values.xloader.formats | quote }}
+            - name: CKANEXT__XLOADER__API_TOKEN
+              value: {{ .Values.xloader.token }}
+{{ end }}              
           {{- if not .Values.ckan.container_debug }}
           readinessProbe:
             httpGet:
