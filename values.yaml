@@ -7,7 +7,7 @@ replicaCount: 1
 image:
   repository: keitaro/ckan
   tag: 2.10.4
-  pullPolicy: Always
+  pullPolicy: IfNotPresent
   testConnection:
     repository: busybox
     tag: latest
@@ -279,7 +279,7 @@ xloader:
   # File formats that xloader supports for processing
   formats: "csv application/csv xls application/vnd.ms-excel xlsx application/vnd.oasis.opendocument.spreadsheet"
   # Starting CKAN 2.10 you will need to set an API Token to be able to execute jobs against the server
-  token: "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJqdGkiOiIxQjN2SmVsaWpOY2YxYXJRWWc1c1VZbmM0bEFyY1BEVmdCNkdFX0pSajRVIiwiaWF0IjoxNzE3NTk1NTQyfQ.B7mByiPnrilB4vvYdEkBFTE86_1RNU3AE4xRlEecHkQ"
+  token: "replace_this_with_generated_api_token_for_sysadmin"
 
 redis:
   # Please see all available overrides at https://github.com/bitnami/charts/tree/master/bitnami/redis
