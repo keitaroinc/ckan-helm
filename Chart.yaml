@@ -25,15 +25,15 @@ appVersion: 2.10.3
 dependencies:
   - name: redis 
     version: 18.12.1
-    repository: https://keitaro-charts.storage.googleapis.com
+    repository: "https://keitaro-charts.storage.googleapis.com"
     condition: redis.enabled
   - name: solr
     version: 8.7.1
-    repository:  https://keitaro-charts.storage.googleapis.com
+    repository:  "https://keitaro-charts.storage.googleapis.com"
     condition: solr.enabled
   - name: postgresql
     version: 14.0.1
-    repository: https://keitaro-charts.storage.googleapis.com
+    repository: "https://keitaro-charts.storage.googleapis.com"
     condition: postgresql.enabled
   # - name: datapusher-plus
   #   version: 1.0.0
