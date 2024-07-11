@@ -24,16 +24,16 @@ appVersion: 2.10.3
 # Dependencies
 dependencies:
   - name: redis 
-    version: 16.5.5
-    repository: "https://keitaro-charts.storage.googleapis.com"
+    version: 18.12.1
+    repository: oci://registry-1.docker.io/bitnamicharts
     condition: redis.enabled
   - name: solr
-    version: 4.1.2
-    repository: "https://keitaro-charts.storage.googleapis.com"
+    version: 8.7.1
+    repository:  oci://registry-1.docker.io/bitnamicharts
     condition: solr.enabled
   - name: postgresql
-    version: 10.16.2
-    repository: "https://keitaro-charts.storage.googleapis.com"
+    version: 14.0.1
+    repository: oci://registry-1.docker.io/bitnamicharts
     condition: postgresql.enabled
   # - name: datapusher-plus
   #   version: 1.0.0
