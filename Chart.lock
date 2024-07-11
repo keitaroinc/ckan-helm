@@ -1,12 +1,12 @@
 dependencies:
 - name: redis
-  repository: oci://registry-1.docker.io/bitnamicharts
+  repository: https://keitaro-charts.storage.googleapis.com
   version: 18.12.1
 - name: solr
-  repository: oci://registry-1.docker.io/bitnamicharts
+  repository: https://keitaro-charts.storage.googleapis.com
   version: 8.7.1
 - name: postgresql
-  repository: oci://registry-1.docker.io/bitnamicharts
+  repository: https://keitaro-charts.storage.googleapis.com
   version: 14.0.1
 - name: datapusher
   repository: https://keitaro-charts.storage.googleapis.com
