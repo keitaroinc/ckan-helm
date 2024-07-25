@@ -48,9 +48,9 @@ $ kubectl delete pvc -l release=$release
 
 | Repository | Name | Version |
 |------------|------|---------|
-| https://charts.bitnami.com/bitnami | postgresql | 10.2.0 |
-| https://charts.bitnami.com/bitnami | redis | 12.2.3 |
-| https://charts.helm.sh/incubator | solr | 1.4.0 |
+| https://keitaro-charts.storage.googleapis.com | postgresql | 14.0.1 |
+| https://keitaro-charts.storage.googleapis.com | redis | 18.12.1 |
+| https://keitaro-charts.storage.googleapis.com | solr | 8.7.1 |
 | https://keitaro-charts.storage.googleapis.com | datapusher | 1.0.0 |
 
 ## Chart Values
