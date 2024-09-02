@@ -6,7 +6,7 @@ replicaCount: 1
 
 image:
   repository: keitaro/ckan
-  tag: 2.10.3
+  tag: 2.11.0
   pullPolicy: IfNotPresent
   testConnection:
     repository: busybox
@@ -82,7 +82,7 @@ ckan:
   # ckan.siteUrl -- Url for the CKAN instance
   siteUrl: "http://localhost:5000"
   # ckan.ckanPlugins -- List of plugins to be used by the instance
-  ckanPlugins: "envvars image_view text_view recline_view datastore datapusher"
+  ckanPlugins: "envvars activity image_view text_view datatables_view datastore datapusher"
   # ckan.storagePath -- Storage path to be used by the instance
   storagePath: "/var/lib/ckan/default"
   activityStreamsEmailNotifications: "true"
