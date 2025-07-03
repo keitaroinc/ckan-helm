@@ -5,14 +5,14 @@ CKAN Helm Chart
 
 A Helm chart for CKAN
 
-Current chart version is `1.0.2`
+Current chart version is `3.4.0`
 
 This chart deploys a self contained CKAN instance with all of its dependencies. These can be enabled/disabled if they already exist in your infrastructure.
 
 Two jobs for initializing Postgres and SOLR can also be enabled through the values. These will use the provided CKAN environment to set the access permissions for the ckan and datastore DB users as well as create a SOLR collection for the CKAN instance.
 
 ## Prerequisites Details
-* Kubernetes 1.9
+* Kubernetes
 * Install [Helm](https://github.com/helm/helm/releases)
 * Setup correctly kubectl and kubeconfig setup before running helm.
 
@@ -48,9 +48,9 @@ $ kubectl delete pvc -l release=$release
 
 | Repository | Name | Version |
 |------------|------|---------|
-| https://keitaro-charts.storage.googleapis.com | postgresql | 14.0.1 |
-| https://keitaro-charts.storage.googleapis.com | redis | 18.12.1 |
-| https://keitaro-charts.storage.googleapis.com | solr | 8.7.1 |
+| https://charts.bitnami.com/bitnami | postgresql | 14.0.1 |
+| https://charts.bitnami.com/bitnami | redis | 18.12.1 |
+| https://charts.helm.sh/incubator | solr | 8.7.1 |
 | https://keitaro-charts.storage.googleapis.com | datapusher | 1.0.0 |
 
 ## Chart Values

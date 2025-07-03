@@ -1,46 +1,23 @@
 apiVersion: v2
-name: ckan
-description: CKAN Helm chart
-
-# A chart can be either an 'application' or a 'library' chart.
-#
-# Application charts are a collection of templates that can be packaged into versioned archives
-# to be deployed.
-#
-# Library charts provide useful utilities or functions for the chart developer. They're included as
-# a dependency of application charts to inject those utilities and functions into the rendering
-# pipeline. Library charts do not define any templates and therefore cannot be deployed.
-type: application
-
-# This is the chart version. This version number should be incremented each time you make changes
-# to the chart and its templates, including the app version.
-version: 3.3.0
-
-# This is the version number of the application being deployed. This version number should be
-# incremented each time you make changes to the application.
-
 appVersion: 2.10.3
-
-# Dependencies
 dependencies:
-  - name: redis 
-    version: 18.12.1
-    repository: "https://keitaro-charts.storage.googleapis.com"
-    condition: redis.enabled
-  - name: solr
-    version: 8.7.1
-    repository:  "https://keitaro-charts.storage.googleapis.com"
-    condition: solr.enabled
-  - name: postgresql
-    version: 14.0.1
-    repository: "https://keitaro-charts.storage.googleapis.com"
-    condition: postgresql.enabled
-  # - name: datapusher-plus
-  #   version: 1.0.0
-  #   repository: "https://keitaro-charts.storage.googleapis.com"
-  #   condition: datapusher-plus.enabled
-  - name: datapusher
-    version: 1.0.0
-    repository: "https://keitaro-charts.storage.googleapis.com"
-    condition: datapusher.enabled
-
+- condition: redis.enabled
+  name: redis
+  repository: https://keitaro-charts.storage.googleapis.com
+  version: 18.12.1
+- condition: solr.enabled
+  name: solr
+  repository: https://keitaro-charts.storage.googleapis.com
+  version: 8.7.1
+- condition: postgresql.enabled
+  name: postgresql
+  repository: https://keitaro-charts.storage.googleapis.com
+  version: 14.0.1
+- condition: datapusher.enabled
+  name: datapusher
+  repository: https://keitaro-charts.storage.googleapis.com
+  version: 1.0.0
+description: CKAN Helm chart
+name: ckan
+type: application
+version: v3.4.0

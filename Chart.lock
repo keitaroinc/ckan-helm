@@ -11,5 +11,5 @@ dependencies:
 - name: datapusher
   repository: https://keitaro-charts.storage.googleapis.com
   version: 1.0.0
-digest: sha256:818e5030fa102128181648b063bf903af4c47a8e7bae01e347e6895ee5526b0e
-generated: "2024-02-05T10:04:18.721507254+01:00"
+digest: sha256:90dbf49df1f96e18f2af4ddbb757a15bd8d630bde670e8f94283da4ae2067ecd
+generated: "2024-07-15T12:09:25.297639426Z"
