@@ -1,15 +1,12 @@
 dependencies:
 - name: redis
   repository: https://keitaro-charts.storage.googleapis.com
-  version: 18.12.1
+  version: 23.0.2
 - name: solr
   repository: https://keitaro-charts.storage.googleapis.com
-  version: 8.7.1
+  version: 9.6.11
 - name: postgresql
   repository: https://keitaro-charts.storage.googleapis.com
-  version: 14.0.1
-- name: datapusher
-  repository: https://keitaro-charts.storage.googleapis.com
-  version: 1.0.0
-digest: sha256:90dbf49df1f96e18f2af4ddbb757a15bd8d630bde670e8f94283da4ae2067ecd
-generated: "2024-07-15T12:09:25.297639426Z"
+  version: 16.7.27
+digest: sha256:0c88a23f87a097db84d9dcbe565130b9fb1df6b152f547c55f30ededd1fb9c67
+generated: "2025-10-03T12:37:17.589380533+02:00"

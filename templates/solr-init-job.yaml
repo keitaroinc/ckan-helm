@@ -21,6 +21,9 @@ spec:
       - name: solr-init
         image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
         imagePullPolicy: {{ .Values.image.pullPolicy }}
+        # securityContext:
+        #   runAsUser: 92
+        #   runAsGroup: 92
         env:
         - name: CKAN_SOLR_URL
           value: {{ .Values.ckan.solr }}
@@ -37,12 +40,14 @@ spec:
         - name: CKAN_SOLR_INIT_CONFIGSETNAME
           value: "{{ .Values.solr.initialize.configsetName }}"
         command: ["python"]
-        args: ["/srv/solr-init/solr-init.py"]
+        args: ["/app/solr-init/solr-init.py"]
+        # command: ["sleep"]
+        # args: ["infinity"]
         volumeMounts:
         - name: solr-init-configmap
-          mountPath: /srv/solr-init
+          mountPath: /app/solr-init
         - name: solr-configset-configmap
-          mountPath: /srv/solr-configset
+          mountPath: /app/solr-configset
       restartPolicy: Never
   backoffLimit: 1
 {{- end }}

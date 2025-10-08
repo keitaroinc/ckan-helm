@@ -6,7 +6,7 @@ replicaCount: 1
 
 image:
   repository: keitaro/ckan
-  tag: 2.10.3
+  tag: 2.11.3
   pullPolicy: IfNotPresent
   testConnection:
     repository: busybox
@@ -15,7 +15,7 @@ image:
   initContainer:
     repository: busybox
     tag: latest
-    pullPolicy: IfNotPresent  
+    pullPolicy: IfNotPresent
 
 imagePullSecrets: []
 nameOverride: ""
@@ -24,7 +24,7 @@ fullnameOverride: "ckan"
 pvc:
   enabled: true
   size: "1Gi"
-  storageClassName: ""
+  storageClassName: "standard"
   accessmode: "ReadWriteOnce"
 
 # DBDeploymentName -- Variable for name override for postgres deployment
@@ -36,8 +36,8 @@ RedisName: &RedisName redis
 # SolrName -- Variable for name override for solr deployment
 SolrName: &SolrName solr
 
-# DatapusherName -- Variable for name override for datapusher deployment
-DatapusherName: &DatapusherName datapusher
+# ZookeeperName -- Variable for name override for zookeeper deployment
+ZookeeperName: &ZookeeperName zookeeper
 
 # DBHost -- Variable for name of headless svc from postgres deployment
 DBHost: &DBHost postgres
@@ -82,13 +82,14 @@ ckan:
   # ckan.siteUrl -- Url for the CKAN instance
   siteUrl: "http://localhost:5000"
   # ckan.ckanPlugins -- List of plugins to be used by the instance
-  ckanPlugins: "envvars image_view text_view recline_view datastore datapusher"
+  ckanPlugins: "envvars activity image_view text_view datatables_view datastore xloader" #TBD
   # ckan.storagePath -- Storage path to be used by the instance
-  storagePath: "/var/lib/ckan/default"
+  storagePath: "/app/data"
   activityStreamsEmailNotifications: "true"
+  # ckan.debug -- Set to true to enable debug mode in CKAN
   debug: "false"
   # To debug inside the ckan container (this sets the entrypoint of the container to sleep infinity)
-  container_debug: false
+  container_debug: "true"
   # uswgi.proc.num -- The number of uswgi workers ckan will start
   uwsg_num: "2"
   # ckan.maintenanceMode -- Set to true to disable CKAN from starting and serve a maintenance page
@@ -116,10 +117,7 @@ ckan:
   locale:
     offered: "en"
     default: "en"
-  # ckan.datapusherUrl -- Location of the datapusher service to be used by the CKAN instance
-  datapusherUrl: "http://datapusher-headless:8000"
-  # ckan.datapusherCallbackUrlBase -- Location of the CKAN k8s service to be used by the Datapusher, overriding the default site url route.
-  datapusherCallbackUrlBase: http://ckan
+
   smtp:
     server: "smtpServerURLorIP:port"
     user: "smtpUser" 
@@ -136,7 +134,6 @@ ckan:
   #   - name: FOO
   #     value: "bar"
   #
-
   extraEnv: []
 
   readiness:
@@ -270,26 +267,6 @@ hpa:
     session_url: redis://redis-headless:6379/0
     session_type: ext:redis
 
-datapusher:
- # datapusher.enabled -- Flag to control whether to deploy the datapusher
-  enabled: true
-  # datapusher.fullnameOverride -- Name override for the datapusher deployment
-  fullnameOverride: *DatapusherName
-  datapusher:
-    # datapusher.datapusher.maxContentSize -- Maximum size of content to be uploaded in bytes.
-    maxContentLength: "102400000"
-    # datapusher.datapusher.chunkSize -- Size of chunks of the data that is being downloaded in bytes
-    chunkSize: "10240000"
-    # datapusher.datapusher.insertRows -- Number of rows to take from the data and upload them as chunks to datastore
-    insertRows: "50000"
-    # datapusher.datapusher.downloadTimeout -- Timeout limit of the download request
-    downloadTimeout: "300"
-    # datapusher.datapusher.datapusherSslVerify -- Enable or disable (boolean) verification of SSL when trying to get resources. Default: True
-    datapusherSslVerify: "False"
-    # datapusher.datapusher.datapusherRewriteResources -- Enable or disable (boolean) whether datapusher should rewrite resources uploaded to CKAN's filestore, since datapusher takes the CKAN Site URL value for generating the resource URL. Default: False
-    datapusherRewriteResources: "True"
-    # datapusher.datapusher.datapusherRewriteUrl -- Sets the rewrite URL that datapushed will rewrite resources that are uploaded to CKAN's filestore. Default: http://ckan:5000
-    datapusherRewriteUrl: http://ckan
 
 redis:
   # Please see all available overrides at https://github.com/bitnami/charts/tree/master/bitnami/redis
@@ -298,6 +275,9 @@ redis:
   # redis.fullnameOverride -- Name override for the redis deployment
   fullnameOverride: *RedisName
   replicaCount: 1
+  global: 
+    security: 
+      allowInsecureImages: true
   # redis.architecture -- Redis architecture for standalone or replication versions
   architecture: standalone
   master:
@@ -323,6 +303,8 @@ solr:
     imageRegistry: ""
     imagePullSecrets: []
     storageClass: ""
+    security: 
+      allowInsecureImages: true
   auth:
   # solr.auth.enabled -- Enable or disable auth (if auth is disabled solr-init cant upload the configset/schema.xml for ckan)
     enabled: true
@@ -334,9 +316,9 @@ solr:
   # since we are creating one with solr-init this needs to be blank
   collection:
   # solr.collectionShards -- Number of shards for the SOLR collection
-  collectionShards: 
+  collectionShards: 0
   # solr.collectionReplicas -- Number of replicas for each SOLR shard
-  collectionReplicas: 
+  collectionReplicas: 0
   # solr.fullnameOverride -- Name override for the SOLR deployment
   fullnameOverride: *SolrName
   # solr.replicaCount -- Number of SOLR instances in the cluster
@@ -345,17 +327,11 @@ solr:
     # solr.volumeClaimTemplates.storageSize -- Size of Solr PVC
     storageSize: 5Gi
   image:
-    registry: docker.io
+    registry: public.ecr.aws
     # solr.image.repository -- Repository for the SOLR image
     repository: bitnami/solr
     # solr.image.tag -- Tag for the SOLR image
-    tag: 8.11.1
-  zookeeper:
-    # solr.zookeeper.replicaCount -- Numer of Zookeeper replicas in the ZK cluster
-    replicaCount: 1
-    persistence:
-      # solr.zookeeper.persistence.size -- Size of ZK PVC
-      size: 1Gi
+    tag: 9.9.0-debian-12-r2
 
   initialize:
     # solr.initialize.enabled -- Flag whether to initialize the SOLR instance with the provided collection name
@@ -369,6 +345,23 @@ solr:
     # solr.initialize.configsetName -- Name of the config set used for initializing
     configsetName: ckanConfigSet
 
+  zookeeper:
+    enabled: true
+    # solr.zookeeper.replicaCount -- Numer of Zookeeper replicas in the ZK cluster
+    replicaCount: 1
+    fullnameOverride: *ZookeeperName
+    persistence:
+      # solr.zookeeper.persistence.size -- Size of ZK PVC
+      size: 1Gi
+    global:
+      security:
+        allowInsecureImages: true
+    image:
+      registry: public.ecr.aws
+      repository: bitnami/zookeeper
+      tag: 3.9.3-debian-12-r22
+      digest: ""
+
 
 postgresql:
   # postgresql.enabled -- Flag to control whether to deploy PostgreSQL
@@ -376,6 +369,9 @@ postgresql:
   persistence:
     # postgresql.persistence.size -- Size of the PostgreSQL pvc
     size: 1Gi
+  global: 
+    security: 
+      allowInsecureImages: true
   # postgresql.fullnameOverride -- Name override for the PostgreSQL deployment
   fullnameOverride: *DBDeploymentName
   # @param postgresql.auth.postgresPassword Password for the "postgres" admin user (overrides `auth.postgresPassword`)
