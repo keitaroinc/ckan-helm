@@ -53,11 +53,14 @@ spec:
             - name: http
               containerPort: 5000
               protocol: TCP
-          {{- if .Values.ckan.container_debug }}
+          {{- if eq .Values.ckan.container_debug "true" }}
           command: ["sleep"]
           args: ["infinity"]
           {{- end }}
           env:
+{{- if .Values.ckan.extraEnv }}
+{{ toYaml .Values.ckan.extraEnv | indent 12 }}
+{{- end }}
             - name: DEBUG
               value: {{ .Values.ckan.debug | quote }}
             - name: MAINTENANCE_MODE
@@ -66,9 +69,6 @@ spec:
               value: {{ .Values.ckan.debug | quote }}
             - name: UWSGI_PROC_NO
               value: {{ .Values.ckan.uwsg_num | quote }}
-{{- if .Values.ckan.extraEnv }}
-{{ toYaml .Values.ckan.extraEnv | indent 12 }}
-{{- end }}
             - name: CKAN_SYSADMIN_NAME
               value: {{ .Values.ckan.sysadminName }}
             - name: CKAN_SYSADMIN_PASSWORD
@@ -147,10 +147,6 @@ spec:
               value: {{ .Values.ckan.locale.offered | quote }}
             - name: CKAN__LOCALE_DEFAULT
               value: {{ .Values.ckan.locale.default }}
-            - name: CKAN__DATAPUSHER__URL
-              value: {{ .Values.ckan.datapusherUrl }}
-            - name: CKAN__DATAPUSHER__CALLBACK_URL_BASE
-              value: {{ .Values.ckan.datapusherCallbackUrlBase }}
             - name: CKAN___SMTP__SERVER
               value: {{ .Values.ckan.smtp.server | quote }}
             - name: CKAN___SMTP__USER
@@ -170,7 +166,7 @@ spec:
               value: {{ .Values.ckan.activityStreamsEmailNotifications | quote }}
             - name: CKANEXT__ISSUES__SEND_EMAIL_NOTIFICATIONS
               value: {{ .Values.ckan.issues.sendEmailNotifications | quote }}
-          {{- if not .Values.ckan.container_debug }}
+          {{- if eq .Values.ckan.container_debug "false" }}
           readinessProbe:
             httpGet:
               path: /api/3/action/status_show

@@ -7,7 +7,7 @@ replicaCount: 1
 image:
   repository: keitaro/ckan
   tag: 2.11.3
-  pullPolicy: IfNotPresent
+  pullPolicy: Always
   testConnection:
     repository: busybox
     tag: latest
@@ -39,7 +39,7 @@ SolrName: &SolrName solr
 # ZookeeperName -- Variable for name override for zookeeper deployment
 ZookeeperName: &ZookeeperName zookeeper
 
-# DBHost -- Variable for name of headless svc from postgres deployment
+# DBHost -- Variable for name of headless svc from postgres deployment or external host connection string
 DBHost: &DBHost postgres
 # MasterDBName -- Variable for name of the master user database in PostgreSQL
 MasterDBName: &MasterDBName postgres
@@ -89,11 +89,22 @@ ckan:
   # ckan.debug -- Set to true to enable debug mode in CKAN
   debug: "false"
   # To debug inside the ckan container (this sets the entrypoint of the container to sleep infinity)
-  container_debug: "true"
+  container_debug: "false"
   # uswgi.proc.num -- The number of uswgi workers ckan will start
   uwsg_num: "2"
   # ckan.maintenanceMode -- Set to true to disable CKAN from starting and serve a maintenance page
   maintenanceMode: "false"
+
+  workers:
+  - name: default
+    replicas: 1
+    command: ["ckan", "-c", "/app/production.ini","jobs", "worker", "default"]
+  - name: bulk
+    replicas: 1
+    command: ["ckan", "-c", "/app/production.ini","jobs", "worker", "bulk"]
+  - name: priority
+    replicas: 1
+    command: ["ckan", "-c", "/app/production.ini","jobs", "worker", "priority"]
 
   psql:
     # ckan.psql.runOnAzure -- Set to true to run on Azure (if true wont run on anything other then azure) set to false to run on other platforms  
@@ -111,7 +122,7 @@ ckan:
   solr: "http://solr-headless:8983/solr/ckancollection"
   # ckan.redis -- Location of the Redis service to be used by the CKAN instance
   redis: "redis://redis-headless:6379/0"
-
+  # ckan.spatialBackend -- Spatial backend to be used by the instance
   spatialBackend: "solr"
 
   locale:
@@ -326,12 +337,6 @@ solr:
   volumeClaimTemplates:
     # solr.volumeClaimTemplates.storageSize -- Size of Solr PVC
     storageSize: 5Gi
-  image:
-    registry: public.ecr.aws
-    # solr.image.repository -- Repository for the SOLR image
-    repository: bitnami/solr
-    # solr.image.tag -- Tag for the SOLR image
-    tag: 9.9.0-debian-12-r2
 
   initialize:
     # solr.initialize.enabled -- Flag whether to initialize the SOLR instance with the provided collection name
@@ -392,4 +397,3 @@ postgresql:
     #   adminPasswordKey: ""
     #   userPasswordKey: ""
     #   replicationPasswordKey: ""
-  
