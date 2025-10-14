@@ -2,7 +2,7 @@
 apiVersion: batch/v1
 kind: Job
 metadata:
-  name: solr-init
+  name: solr-init-{{ randAlphaNum 5 | lower }}
 spec:
   template:
     spec:
@@ -21,9 +21,6 @@ spec:
       - name: solr-init
         image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
         imagePullPolicy: {{ .Values.image.pullPolicy }}
-        # securityContext:
-        #   runAsUser: 92
-        #   runAsGroup: 92
         env:
         - name: CKAN_SOLR_URL
           value: {{ .Values.ckan.solr }}
@@ -41,8 +38,10 @@ spec:
           value: "{{ .Values.solr.initialize.configsetName }}"
         command: ["python"]
         args: ["/app/solr-init/solr-init.py"]
-        # command: ["sleep"]
-        # args: ["infinity"]
+        {{- if eq .Values.solr.initialize.container_debug "true" }}
+        command: ["sleep"]
+        args: ["infinity"]
+        {{- end }}
         volumeMounts:
         - name: solr-init-configmap
           mountPath: /app/solr-init

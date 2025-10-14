@@ -2,6 +2,7 @@
 # This is a YAML-formatted file.
 # Declare variables to be passed into your templates.
 
+# Replica count for ckan deployment
 replicaCount: 1
 
 image:
@@ -54,6 +55,7 @@ CkanDBName: &CkanDBName ckan_default
 CkanDBUser: &CkanDBUser ckan_default
 # CkanDBPass -- Variable for password for the CKAN database owner
 CkanDBPass: &CkanDBPass pass
+
 # DatastoreDBName -- Variable for name of the database used by Datastore
 DatastoreDBName: &DatastoreDBName datastore_default
 # DatastoreRWDBUser -- Variable for username for the user with write access to the datastore database
@@ -82,9 +84,11 @@ ckan:
   # ckan.siteUrl -- Url for the CKAN instance
   siteUrl: "http://localhost:5000"
   # ckan.ckanPlugins -- List of plugins to be used by the instance
-  ckanPlugins: "envvars activity image_view text_view datatables_view datastore xloader" #TBD
+  ckanPlugins: "envvars activity image_view text_view datatables_view datastore xloader"
   # ckan.storagePath -- Storage path to be used by the instance
   storagePath: "/app/data"
+  # ckan.activityStreamsEmailNotifications -- Set to true to enable email notifications for activity streams
+  # for this to work smtp must be configured
   activityStreamsEmailNotifications: "true"
   # ckan.debug -- Set to true to enable debug mode in CKAN
   debug: "false"
@@ -94,7 +98,11 @@ ckan:
   uwsg_num: "2"
   # ckan.maintenanceMode -- Set to true to disable CKAN from starting and serve a maintenance page
   maintenanceMode: "false"
+  # ckan.ckanext_xloader_site_url -- URL for the xloader extension to use for file uploads
+  ckanext_xloader_site_url: "http://ckan:80"
 
+  # ckan.workers -- Configuration for CKAN worker deployments
+  # for custom workers add additional entries to the array
   workers:
   - name: default
     replicas: 1
@@ -275,12 +283,11 @@ hpa:
   cpuTargetAverageUtilization: 80
   memoryTargetAverageUtilization: 80
   sessions:
-    session_url: redis://redis-headless:6379/0
-    session_type: ext:redis
+    session_type: redis
 
 
 redis:
-  # Please see all available overrides at https://github.com/bitnami/charts/tree/master/bitnami/redis
+  # Please see all available overrides at https://github.com/bitnami/charts/tree/main/bitnami/redis
   # redis.enabled -- Flag to control whether to deploy Redis
   enabled: true
   # redis.fullnameOverride -- Name override for the redis deployment
@@ -307,7 +314,7 @@ redis:
 
 
 solr: 
-  # Please see all available overrides at https://github.com/bitnami/charts/tree/master/bitnami/solr/#installing-the-chart
+  # Please see all available overrides at https://github.com/bitnami/charts/tree/main/bitnami/solr/#installing-the-chart
   # solr.enabled -- Flag to control whether to deploy SOLR
   enabled: true
   global:
@@ -341,6 +348,8 @@ solr:
   initialize:
     # solr.initialize.enabled -- Flag whether to initialize the SOLR instance with the provided collection name
     enabled: true
+    # To debug inside the solr-init container (this sets the entrypoint of the container to sleep infinity)
+    container_debug: "false"
     # solr.initialize.numShards -- Number of shards for the SOLR collection
     numShards: 2
     # solr.initialize.replicationFactor -- Number of replicas for each SOLR shard
@@ -369,13 +378,14 @@ solr:
 
 
 postgresql:
+  # Please see all available overrides at https://github.com/bitnami/charts/tree/main/bitnami/postgresql/#installing-the-chart
   # postgresql.enabled -- Flag to control whether to deploy PostgreSQL
   enabled: true
   persistence:
     # postgresql.persistence.size -- Size of the PostgreSQL pvc
     size: 1Gi
-  global: 
-    security: 
+  global:
+    security:
       allowInsecureImages: true
   # postgresql.fullnameOverride -- Name override for the PostgreSQL deployment
   fullnameOverride: *DBDeploymentName

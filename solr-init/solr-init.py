@@ -19,6 +19,7 @@ import os
 import sys
 import requests
 import json
+import time
 
 
 solr_admin_username = os.environ.get('SOLR_ADMIN_USERNAME', '')
@@ -29,7 +30,7 @@ def check_solr_connection(solr_url, retry=None):
     sys.stdout.flush()
 
     if retry is None:
-        retry = 40
+        retry = 60
     elif retry == 0:
         print('Giving up ...')
         sys.exit(1)
@@ -131,10 +132,8 @@ def prepare_configset(cfset_name):
         # If configset already exists, exit successfully
         if res.status_code == 400 and 'already exists' in res.text:
             print("Configset already exists. Will be used for creating the collection.")
-            sys.exit(0)
         elif res.status_code == 409:
             print("Configset already exists. Will be used for creating the collection.")
-            sys.exit(0)
         else:
             print("Failed to upload configset due to HTTP error.")
             sys.exit(3)
@@ -154,6 +153,7 @@ def prepare_configset(cfset_name):
 
 def create_solr_collection(name, cfset_name, num_shards, repl_factor,
                            max_shards_node):
+    time.sleep(5)
     print("\nCreating Solr collection based on uploaded configset...")
     url = solr_url + '/solr/admin/collections?action=CREATE&name=' + name
     url = url + '&numShards=' + num_shards

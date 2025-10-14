@@ -61,6 +61,8 @@ spec:
 {{- if .Values.ckan.extraEnv }}
 {{ toYaml .Values.ckan.extraEnv | indent 12 }}
 {{- end }}
+            - name: CKANEXT__XLOADER__SITE_URL
+              value: {{ $.Values.ckan.ckanext_xloader_site_url }}
             - name: DEBUG
               value: {{ .Values.ckan.debug | quote }}
             - name: MAINTENANCE_MODE
@@ -112,27 +114,30 @@ spec:
                 secretKeyRef:
                   name: ckancredentials
                   key: ckanDatastoreReadUrl
-{{- if .Values.hpa.enabled }}
+            - name: CKAN___API_TOKEN__JWT__ENCODE__SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: session-secret
+                  key: jwt_encode
+            - name: CKAN___API_TOKEN__JWT__DECODE__SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: session-secret
+                  key: jwt_decode
+            - name: WTF_CSRF_SECRET_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: session-secret
+                  key: wtf_csrf_secret
+            {{- if .Values.hpa.enabled }}
             - name: BEAKER_SESSION_SECRET
               valueFrom:
                 secretKeyRef:
                   name: session-secret
                   key: session_secret
-            - name: JWT_ENCODE_SECRET
-              valueFrom:
-                secretKeyRef:
-                  name: session-secret
-                  key: jwt_encode
-            - name: JWT_DECODE_SECRET
-              valueFrom:
-                secretKeyRef:
-                  name: session-secret
-                  key: jwt_decode
-            - name: CKANEXT___BEAKER__SESSION__URL
-              value: {{ .Values.hpa.sessions.session_url | quote }}
-            - name: CKANEXT___BEAKER__SESSION__TYPE
+            - name: SESSION_TYPE
               value: {{ .Values.hpa.sessions.session_type | quote }}
-{{ end }}
+            {{ end }}
             - name: CKAN_SOLR_URL
               value: {{ .Values.ckan.solr }}
             - name: CKAN_SOLR_USER
