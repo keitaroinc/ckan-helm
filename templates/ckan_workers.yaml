@@ -165,7 +165,7 @@ spec:
                   name: session-secret
                   key: wtf_csrf_secret
             {{- if $.Values.hpa.enabled }}
-            - name: BEAKER_SESSION_SECRET
+            - name: CKAN___BEAKER_SESSION_SECRET
               valueFrom:
                 secretKeyRef:
                   name: session-secret

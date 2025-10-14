@@ -8,7 +8,7 @@ replicaCount: 1
 image:
   repository: keitaro/ckan
   tag: 2.11.3
-  pullPolicy: Always
+  pullPolicy: IfNotPresent
   testConnection:
     repository: busybox
     tag: latest
@@ -282,6 +282,7 @@ hpa:
   maxReplicas: 5
   cpuTargetAverageUtilization: 80
   memoryTargetAverageUtilization: 80
+  # Please check: https://docs.ckan.org/en/2.11/maintaining/configuration.html#session-settings
   sessions:
     session_type: redis
 
