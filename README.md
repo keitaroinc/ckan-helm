@@ -5,7 +5,7 @@ CKAN Helm Chart
 
 A Helm chart for CKAN
 
-Current chart version is `3.4.0`
+Current chart version is `4.0.0`
 
 This chart deploys a self contained CKAN instance with all of its dependencies. These can be enabled/disabled if they already exist in your infrastructure.
 
@@ -17,7 +17,7 @@ Two jobs for initializing Postgres and SOLR can also be enabled through the valu
 * Setup correctly kubectl and kubeconfig setup before running helm.
 
 ## Helm repo
-The datapusher and ckan charts can be found on Keitaro's helm repo:
+The CKAN and dependency charts can be found on Keitaro's helm repo:
 ```console
 $ helm repo add keitaro-charts https://keitaro-charts.storage.googleapis.com
 ```
@@ -48,143 +48,170 @@ $ kubectl delete pvc -l release=$release
 
 | Repository | Name | Version |
 |------------|------|---------|
-| https://charts.bitnami.com/bitnami | postgresql | 14.0.1 |
-| https://charts.bitnami.com/bitnami | redis | 18.12.1 |
-| https://charts.helm.sh/incubator | solr | 8.7.1 |
-| https://keitaro-charts.storage.googleapis.com | datapusher | 1.0.0 |
+| https://charts.bitnami.com/bitnami | postgresql | 16.7.27 |
+| https://charts.bitnami.com/bitnami | redis | 23.0.2 |
+| https://charts.bitnami.com/bitnami | solr | 9.6.10 |
 
 ## Chart Values
 
 | Key | Type | Default | Description |
 |-----|------|---------|-------------|
-| CkanDBName | string | `"ckan_default"` | Variable for name of the database used by CKAN |
-| CkanDBPass | string | `"pass"` | Variable for password for the CKAN database owner |
-| CkanDBUser | string | `"ckan_default"` | Variable for username for the owner of the CKAN database |
-| DBDeploymentName | string | `"postgres"` | Variable for name override for postgres deployment |
-| DBHost | string | `"postgres"` | Variable for name of headless svc from postgres deployment |
-| DatapusherName | string | `"datapusher"` | Variable for name override for datapusher deployment |
-| DatastoreDBName | string | `"datastore_default"` | Variable for name of the database used by Datastore |
-| DatastoreRODBPass | string | `"pass"` | Variable for password for the datastore database user with read access |
-| DatastoreRODBUser | string | `"datastorero"` | Variable for username for the user with read access to the datastore database |
-| DatastoreRWDBPass | string | `"pass"` | Variable for password for the datastore database user with write access |
-| DatastoreRWDBUser | string | `"datastorerw"` | Variable for username for the user with write access to the datastore database |
-| MasterDBName | string | `"postgres"` | Variable for name of the master user database in PostgreSQL |
-| MasterDBPass | string | `"pass"` | Variable for password for the master user in PostgreSQL |
-| MasterDBUser | string | `"postgres"` | Variable for master user name for PostgreSQL |
-| RedisName | string | `"redis"` | Variable for name override for redis deployment |
-| SolrName | string | `"solr"` | Variable for name override for solr deployment |
-| affinity | object | `{}` |  |
-| ckan.activityStreamsEmailNotifications | string | `"true"` |  |
-| ckan.ckanPlugins | string | `"envvars image_view text_view recline_view datastore datapusher"` | List of plugins to be used by the instance |
-| ckan.datapusherCallbackUrlBase | string | `"http://ckan"` | Location of the CKAN k8s service to be used by the Datapusher, overriding the default site url route. |
-| ckan.datapusherUrl | string | `"http://datapusher-headless:8000"` | Location of the datapusher service to be used by the CKAN instance |
-| ckan.datastore.RoDbName | string | `"datastore_default"` | Name of the database to be used for Datastore |
-| ckan.datastore.RoDbPassword | string | `"pass"` | Password for the datastore read permissions user |
-| ckan.datastore.RoDbUrl | string | `"postgres"` | Url of the PostgreSQL server where the datastore database is hosted |
-| ckan.datastore.RoDbUser | string | `"datastorero"` | Username for the datastore database with read permissions |
-| ckan.datastore.RwDbName | string | `"datastore_default"` | Name of the database to be used for Datastore |
-| ckan.datastore.RwDbPassword | string | `"pass"` | Password for the datastore write permissions user |
-| ckan.datastore.RwDbUrl | string | `"postgres"` | Url of the PostgreSQL server where the datastore database is hosted |
-| ckan.datastore.RwDbUser | string | `"datastorerw"` | Username for the datastore database with write permissions |
-| ckan.db.ckanDbName | string | `"ckan_default"` | Name of the database to be used by CKAN |
-| ckan.db.ckanDbPassword | string | `"pass"` | Password of the user for the database to be used by CKAN |
-| ckan.db.ckanDbUrl | string | `"postgres"` | Url of the PostgreSQL server where the CKAN database is hosted |
-| ckan.db.ckanDbUser | string | `"ckan_default"` | Username of the database to be used by CKAN |
-| ckan.debug | string | `"false"` |  |
-| ckan.extraEnv | list | `[]` | An array to add extra environment variables For example: extraEnv:   - name: FOO     value: "bar" |
-| ckan.issues.sendEmailNotifications | string | `"true"` |  |
-| ckan.liveness.failureThreshold | int | `6` | Failure threshold for the liveness probe |
-| ckan.liveness.initialDelaySeconds | int | `10` | Initial delay for the liveness probe |
-| ckan.liveness.periodSeconds | int | `10` | Check interval for the liveness probe |
-| ckan.liveness.timeoutSeconds | int | `10` | Timeout interval for the liveness probe |
-| ckan.locale.default | string | `"en"` |  |
-| ckan.locale.offered | string | `"en"` |  |
-| ckan.maintenanceMode | string | `"false"` | Set to true to disable CKAN from starting and serve a maintenance page |
-| ckan.psql.initialize | bool | `true` | Flag whether to initialize the PostgreSQL instance with the provided users and databases |
-| ckan.psql.masterDatabase | string | `"postgres"` | PostgreSQL database for the master user |
-| ckan.psql.masterPassword | string | `"pass"` | PostgreSQL master user password |
-| ckan.psql.masterUser | string | `"postgres"` | PostgreSQL master username |
-| ckan.readiness.failureThreshold | int | `6` | Failure threshold for the readiness probe |
-| ckan.readiness.initialDelaySeconds | int | `10` | Inital delay seconds for the readiness probe |
-| ckan.readiness.periodSeconds | int | `10` |  |
-| ckan.readiness.timeoutSeconds | int | `10` | Timeout interval for the readiness probe |
-| ckan.redis | string | `"redis://redis-headless:6379/0"` | Location of the Redis service to be used by the CKAN instance |
-| ckan.siteId | string | `"site-id-here"` | Site id |
-| ckan.siteTitle | string | `"Site Title here"` | Site title for the instance |
-| ckan.siteUrl | string | `"http://localhost:5000"` | Url for the CKAN instance |
-| ckan.smtp.mailFrom | string | `"postmaster@domain.com"` |  |
-| ckan.smtp.password | string | `"smtpPassword"` |  |
-| ckan.smtp.server | string | `"smtpServerURLorIP:port"` |  |
-| ckan.smtp.starttls | string | `"true"` |  |
-| ckan.smtp.tls | string | `"enabled"` |  |
-| ckan.smtp.user | string | `"smtpUser"` |  |
-| ckan.solr | string | `"http://solr-headless:8983/solr/ckancollection"` | Location of SOLR collection used by the instance |
-| ckan.spatialBackend | string | `"solr"` |  |
-| ckan.storagePath | string | `"/var/lib/ckan/default"` | Storage path to be used by the instance |
-| ckan.sysadminApiToken | string | `"replace_this_with_generated_api_token_for_sysadmin"` | CKAN system admin API token Needs to be generated via the CKAN UI and replaced after initial deployment |
-| ckan.sysadminEmail | string | `"admin@domain.com"` | CKAN system admin email |
+| replicaCount | int | `1` | Number of CKAN pods to deploy |
+| image.repository | string | `"keitaro/ckan"` | CKAN Docker image repository |
+| image.tag | string | `"2.11.3"` | CKAN Docker image tag |
+| image.pullPolicy | string | `"IfNotPresent"` | Image pull policy |
+| image.testConnection.repository | string | `"busybox"` | Image for test connection jobs |
+| image.initContainer.repository | string | `"busybox"` | Image for init containers |
+| imagePullSecrets | list | `[]` | List of image pull secrets |
+| nameOverride | string | `""` | Override for chart name |
+| fullnameOverride | string | `"ckan"` | Override for full chart name |
+| pvc.enabled | bool | `true` | Enable persistent volume claim |
+| pvc.size | string | `"1Gi"` | Size of the PVC |
+| pvc.storageClassName | string | `"standard"` | Storage class for PVC |
+| pvc.accessmode | string | `"ReadWriteOnce"` | Access mode for PVC |
+| DBDeploymentName | string | `"postgres"` | Name override for postgres deployment |
+| RedisName | string | `"redis"` | Name override for redis deployment |
+| SolrName | string | `"solr"` | Name override for solr deployment |
+| ZookeeperName | string | `"zookeeper"` | Name override for zookeeper deployment |
+| DBHost | string | `"postgres"` | Name of headless svc from postgres deployment or external host connection string |
+| MasterDBName | string | `"postgres"` | Name of the master user database in PostgreSQL |
+| MasterDBUser | string | `"postgres"` | Master user name for PostgreSQL |
+| MasterDBPass | string | `"pass"` | Password for the master user in PostgreSQL |
+| CkanDBName | string | `"ckan_default"` | Name of the database used by CKAN |
+| CkanDBUser | string | `"ckan_default"` | Username for the owner of the CKAN database |
+| CkanDBPass | string | `"pass"` | Password for the CKAN database owner |
+| DatastoreDBName | string | `"datastore_default"` | Name of the database used by Datastore |
+| DatastoreRWDBUser | string | `"datastorerw"` | Username for the user with write access to the datastore database |
+| DatastoreRWDBPass | string | `"pass"` | Password for the datastore database user with write access |
+| DatastoreRODBUser | string | `"datastorero"` | Username for the user with read access to the datastore database |
+| DatastoreRODBPass | string | `"pass"` | Password for the datastore database user with read access |
 | ckan.sysadminName | string | `"ckan_admin"` | CKAN system admin username |
 | ckan.sysadminPassword | string | `"PasswordHere"` | CKAN system admin password |
-| datapusher.datapusher.chunkSize | string | `"10240000"` | Size of chunks of the data that is being downloaded in bytes |
-| datapusher.datapusher.datapusherRewriteResources | string | `"True"` | Enable or disable (boolean) whether datapusher should rewrite resources uploaded to CKAN's filestore, since datapusher takes the CKAN Site URL value for generating the resource URL. Default: False |
-| datapusher.datapusher.datapusherRewriteUrl | string | `"http://ckan"` | Sets the rewrite URL that datapushed will rewrite resources that are uploaded to CKAN's filestore. Default: http://ckan:5000 |
-| datapusher.datapusher.datapusherSslVerify | string | `"False"` | Enable or disable (boolean) verification of SSL when trying to get resources. Default: True |
-| datapusher.datapusher.downloadTimeout | string | `"300"` | Timeout limit of the download request |
-| datapusher.datapusher.insertRows | string | `"50000"` | Number of rows to take from the data and upload them as chunks to datastore |
-| datapusher.datapusher.maxContentLength | string | `"102400000"` |  |
-| datapusher.enabled | bool | `true` | Flag to control whether to deploy the datapusher |
-| datapusher.fullnameOverride | string | `"datapusher"` | Name override for the datapusher deployment |
-| fullnameOverride | string | `"ckan"` |  |
-| image.pullPolicy | string | `"IfNotPresent"` |  |
-| image.repository | string | `"keitaro/ckan"` |  |
-| image.tag | string | `"2.9.2"` |  |
-| imagePullSecrets | list | `[]` |  |
-| ingress.annotations | object | `{}` |  |
-| ingress.enabled | bool | `false` |  |
-| ingress.hosts[0].host | string | `"chart-example.local"` |  |
-| ingress.hosts[0].paths | list | `[]` |  |
-| ingress.tls | list | `[]` |  |
-| ingressRoute.enabled | bool | `false` |  |
-| ingressRoute.host | string | `"chart-example.local"` | Used in conjunction with a Traefik v2 deployment |
-| nameOverride | string | `""` |  |
-| nodeSelector | object | `{}` |  |
-| podSecurityContext | object | `{}` |  |
-| postgresql.enabled | bool | `true` | Flag to control whether to deploy PostgreSQL |
-| postgresql.existingSecret | string | `"postgrescredentials"` | Name of existing secret that holds passwords for PostgreSQL |
-| postgresql.fullnameOverride | string | `"postgres"` | Name override for the PostgreSQL deployment |
-| postgresql.persistence.size | string | `"1Gi"` | Size of the PostgreSQL pvc |
-| postgresql.pgPass | string | `"pass"` | Password for the master PostgreSQL user. Feeds into the `postgrescredentials` secret that is provided to the PostgreSQL chart |
-| pvc.enabled | bool | `true` |  |
-| pvc.size | string | `"1Gi"` |  |
-| pvc.storageClassName | string | `""` |  |
-| redis.cluster.enabled | bool | `false` | Cluster mode for Redis |
-| redis.enabled | bool | `true` | Flag to control whether to deploy Redis |
-| redis.fullnameOverride | string | `"redis"` | Name override for the redis deployment |
-| redis.master.persistence.enabled | bool | `false` | Enable redis volume claim |
-| redis.master.persistence.size | string | `"1Gi"` | Size of the volume claim |
-| redis.usePassword | bool | `false` | Use password for accessing redis |
-| replicaCount | int | `1` |  |
-| resources | object | `{}` |  |
-| securityContext | object | `{}` |  |
-| service.port | int | `80` |  |
-| service.type | string | `"ClusterIP"` | Type of the service created for the CKAN pod |
-| serviceAccount.annotations | object | `{}` | Annotations to add to the service account |
+| ckan.sysadminApiToken | string | `"replace_this_with_generated_api_token_for_sysadmin"` | CKAN system admin API token |
+| ckan.sysadminEmail | string | `"admin@domain.com"` | CKAN system admin email |
+| ckan.siteTitle | string | `"Site Title here"` | Site title for the instance |
+| ckan.siteId | string | `"site-id-here"` | Site id |
+| ckan.siteUrl | string | `"http://localhost:5000"` | Url for the CKAN instance |
+| ckan.ckanPlugins | string | `"envvars activity image_view text_view datatables_view datastore xloader"` | List of plugins to be used by the instance |
+| ckan.storagePath | string | `"/app/data"` | Storage path to be used by the instance |
+| ckan.activityStreamsEmailNotifications | string | `"true"` | Enable email notifications for activity streams |
+| ckan.debug | string | `"false"` | Set to true to enable debug mode in CKAN |
+| ckan.container_debug | string | `"false"` | Set entrypoint to sleep infinity for debugging |
+| ckan.uwsg_num | string | `"2"` | Number of uswgi workers CKAN will start |
+| ckan.maintenanceMode | string | `"false"` | Set to true to serve a maintenance page |
+| ckan.ckanext_xloader_site_url | string | `"http://ckan:80"` | URL for the xloader extension to use for file uploads |
+| ckan.workers | list | See values.yaml | Configuration for CKAN worker deployments |
+| ckan.psql.runOnAzure | bool | `false` | Set to true to run on Azure |
+| ckan.psql.initialize | bool | `true` | Flag to initialize PostgreSQL instance |
+| ckan.psql.masterUser | string | `"postgres"` | PostgreSQL master username |
+| ckan.psql.masterPassword | string | `"pass"` | PostgreSQL master user password |
+| ckan.psql.masterDatabase | string | `"postgres"` | PostgreSQL database for the master user |
+| ckan.solr | string | `"http://solr-headless:8983/solr/ckancollection"` | Location of SOLR collection |
+| ckan.redis | string | `"redis://redis-headless:6379/0"` | Location of the Redis service |
+| ckan.spatialBackend | string | `"solr"` | Spatial backend to be used |
+| ckan.locale.offered | string | `"en"` | Offered locale |
+| ckan.locale.default | string | `"en"` | Default locale |
+| ckan.smtp.server | string | `"smtpServerURLorIP:port"` | SMTP server address |
+| ckan.smtp.user | string | `"smtpUser"` | SMTP user |
+| ckan.smtp.password | string | `"smtpPassword"` | SMTP password |
+| ckan.smtp.mailFrom | string | `"postmaster@domain.com"` | SMTP mail from address |
+| ckan.smtp.tls | string | `"enabled"` | Enable SMTP TLS |
+| ckan.smtp.starttls | string | `"true"` | Enable SMTP STARTTLS |
+| ckan.issues.sendEmailNotifications | string | `"true"` | Enable issue email notifications |
+| ckan.extraEnv | list | `[]` | Extra environment variables |
+| ckan.readiness.initialDelaySeconds | int | `10` | Initial delay for readiness probe |
+| ckan.readiness.periodSeconds | int | `10` | Period for readiness probe |
+| ckan.readiness.failureThreshold | int | `6` | Failure threshold for readiness probe |
+| ckan.readiness.timeoutSeconds | int | `10` | Timeout for readiness probe |
+| ckan.liveness.initialDelaySeconds | int | `10` | Initial delay for liveness probe |
+| ckan.liveness.periodSeconds | int | `10` | Period for liveness probe |
+| ckan.liveness.failureThreshold | int | `6` | Failure threshold for liveness probe |
+| ckan.liveness.timeoutSeconds | int | `10` | Timeout for liveness probe |
+| ckan.db.ckanDbUrl | string | `"postgres"` | PostgreSQL server for CKAN DB |
+| ckan.db.ckanDbName | string | `"ckan_default"` | CKAN database name |
+| ckan.db.ckanDbUser | string | `"ckan_default"` | CKAN database user |
+| ckan.db.ckanDbPassword | string | `"pass"` | CKAN database password |
+| ckan.datastore.RwDbUrl | string | `"postgres"` | PostgreSQL server for Datastore RW DB |
+| ckan.datastore.RwDbName | string | `"datastore_default"` | Datastore RW database name |
+| ckan.datastore.RwDbUser | string | `"datastorerw"` | Datastore RW database user |
+| ckan.datastore.RwDbPassword | string | `"pass"` | Datastore RW database password |
+| ckan.datastore.RoDbUrl | string | `"postgres"` | PostgreSQL server for Datastore RO DB |
+| ckan.datastore.RoDbName | string | `"datastore_default"` | Datastore RO database name |
+| ckan.datastore.RoDbUser | string | `"datastorero"` | Datastore RO database user |
+| ckan.datastore.RoDbPassword | string | `"pass"` | Datastore RO database password |
 | serviceAccount.create | bool | `false` | Specifies whether a service account should be created |
-| serviceAccount.name | string | `nil` | The name of the service account to use. If not set and create is true, a name is generated using the fullname template |
-| solr.enabled | bool | `true` | Flag to control whether to deploy SOLR |
-| solr.fullnameOverride | string | `"solr"` | Name override for the SOLR deployment |
-| solr.image.repository | string | `"solr"` | Repository for the SOLR image |
-| solr.image.tag | string | `"6.6.6"` | Tag for the SOLR image |
-| solr.initialize.configsetName | string | `"ckanConfigSet"` | Name of the config set used for initializing |
-| solr.initialize.enabled | bool | `true` | Flag whether to initialize the SOLR instance with the provided collection name |
-| solr.initialize.maxShardsPerNode | int | `10` | Maximum shards per node |
-| solr.initialize.numShards | int | `2` | Number of shards for the SOLR collection |
-| solr.initialize.replicationFactor | int | `1` | Number of replicas for each SOLR shard |
-| solr.replicaCount | int | `1` | Number of SOLR instances in the cluster |
-| solr.volumeClaimTemplates.storageSize | string | `"5Gi"` | Size of Solr PVC |
-| solr.zookeeper.persistence.size | string | `"1Gi"` | Size of ZK PVC |
-| solr.zookeeper.replicaCount | int | `1` | Numer of Zookeeper replicas in the ZK cluster |
-| tolerations | list | `[]` |  |
+| serviceAccount.annotations | object | `{}` | Annotations to add to the service account |
+| serviceAccount.name | string | `nil` | Name of the service account to use |
+| labels.enabled | bool | `false` | Enable custom labels |
+| labels.ckan | object | `{}` | Custom labels for CKAN deployment |
+| podSecurityContext | object | `{}` | Pod security context |
+| securityContext | object | `{}` | Container security context |
+| service.type | string | `"ClusterIP"` | Type of the service created for CKAN pod |
+| service.port | int | `80` | Service port |
+| ingress.enabled | bool | `false` | Enable ingress |
+| ingress.annotations | object | `{}` | Ingress annotations |
+| ingress.className | string | `""` | Ingress class name |
+| ingress.hosts | list | `[chart-example.local]` | Ingress hosts |
+| ingress.tls | list | `[]` | Ingress TLS configuration |
+| ingressRoute.enabled | bool | `false` | Enable Traefik ingress route |
+| ingressRoute.host | string | `"chart-example.local"` | Traefik ingress route host |
+| resources | object | `{}` | Resource requests/limits |
+| nodeSelector | object | `{}` | Node selector |
+| tolerations | list | `[]` | Pod tolerations |
+| affinity | object | `{}` | Pod affinity |
+| hpa.enabled | bool | `false` | Enable horizontal pod autoscaler |
+| hpa.minReplicas | int | `1` | Minimum HPA replicas |
+| hpa.maxReplicas | int | `5` | Maximum HPA replicas |
+| hpa.cpuTargetAverageUtilization | int | `80` | HPA CPU target utilization |
+| hpa.memoryTargetAverageUtilization | int | `80` | HPA memory target utilization |
+| hpa.sessions.session_type | string | `redis` | HPA session type |
+| redis.enabled | bool | `true` | Enable Redis deployment |
+| redis.fullnameOverride | string | `"redis"` | Redis deployment name override |
+| redis.replicaCount | int | `1` | Redis replica count |
+| redis.global.security.allowInsecureImages | bool | `true` | Allow insecure images for Redis |
+| redis.architecture | string | `"standalone"` | Redis architecture |
+| redis.master.persistence.enabled | bool | `false` | Enable Redis master persistence |
+| redis.master.persistence.size | string | `"1Gi"` | Redis master persistence size |
+| redis.auth.enabled | bool | `false` | Enable Redis password authentication |
+| redis.auth.sentinel | bool | `false` | Enable Redis sentinel authentication |
+| redis.auth.password | string | `""` | Redis password |
+| solr.enabled | bool | `true` | Enable Solr deployment |
+| solr.global.imageRegistry | string | `""` | Solr image registry |
+| solr.global.imagePullSecrets | list | `[]` | Solr image pull secrets |
+| solr.global.storageClass | string | `""` | Solr storage class |
+| solr.global.security.allowInsecureImages | bool | `true` | Allow insecure images for Solr |
+| solr.auth.enabled | bool | `true` | Enable Solr authentication |
+| solr.auth.adminUsername | string | `"admin"` | Solr admin username |
+| solr.auth.adminPassword | string | `"pass"` | Solr admin password |
+| solr.collection | string | `""` | Solr collection name |
+| solr.collectionShards | int | `0` | Number of Solr collection shards |
+| solr.collectionReplicas | int | `0` | Number of Solr collection replicas |
+| solr.fullnameOverride | string | `"solr"` | Solr deployment name override |
+| solr.replicaCount | int | `1` | Solr replica count |
+| solr.volumeClaimTemplates.storageSize | string | `"5Gi"` | Solr PVC size |
+| solr.initialize.enabled | bool | `true` | Enable Solr initialization |
+| solr.initialize.container_debug | string | `"false"` | Set entrypoint to sleep infinity for debugging solr-init |
+| solr.initialize.numShards | int | `2` | Number of Solr shards |
+| solr.initialize.replicationFactor | int | `1` | Number of Solr replicas per shard |
+| solr.initialize.maxShardsPerNode | int | `10` | Max shards per Solr node |
+| solr.initialize.configsetName | string | `"ckanConfigSet"` | Solr configset name |
+| solr.zookeeper.enabled | bool | `true` | Enable Zookeeper deployment |
+| solr.zookeeper.replicaCount | int | `1` | Zookeeper replica count |
+| solr.zookeeper.fullnameOverride | string | `"zookeeper"` | Zookeeper deployment name override |
+| solr.zookeeper.persistence.size | string | `"1Gi"` | Zookeeper PVC size |
+| solr.zookeeper.global.security.allowInsecureImages | bool | `true` | Allow insecure images for Zookeeper |
+| solr.zookeeper.image.registry | string | `"public.ecr.aws"` | Zookeeper image registry |
+| solr.zookeeper.image.repository | string | `"bitnami/zookeeper"` | Zookeeper image repository |
+| solr.zookeeper.image.tag | string | `"3.9.3-debian-12-r22"` | Zookeeper image tag |
+| solr.zookeeper.image.digest | string | `""` | Zookeeper image digest |
+| postgresql.enabled | bool | `true` | Enable PostgreSQL deployment |
+| postgresql.persistence.size | string | `"1Gi"` | PostgreSQL PVC size |
+| postgresql.global.security.allowInsecureImages | bool | `true` | Allow insecure images for PostgreSQL |
+| postgresql.fullnameOverride | string | `"postgres"` | PostgreSQL deployment name override |
+| postgresql.auth.postgresPassword | string | `"pass"` | PostgreSQL admin password |
+| postgresql.auth.username | string | `"ckan_default"` | PostgreSQL custom user |
+| postgresql.auth.password | string | `"pass"` | PostgreSQL custom user password |
+| postgresql.auth.database | string | `"ckan_default"` | PostgreSQL custom database |
 
   [License]: https://img.shields.io/badge/license-Apache--2.0-blue.svg?style=flat
   [1]: https://opensource.org/licenses/Apache-2.0
