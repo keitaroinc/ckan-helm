@@ -2,7 +2,7 @@
 apiVersion: batch/v1
 kind: Job
 metadata:
-  name: solr-init
+  name: solr-init-{{ randAlphaNum 5 | lower }}
 spec:
   template:
     spec:
@@ -37,12 +37,16 @@ spec:
         - name: CKAN_SOLR_INIT_CONFIGSETNAME
           value: "{{ .Values.solr.initialize.configsetName }}"
         command: ["python"]
-        args: ["/srv/solr-init/solr-init.py"]
+        args: ["/app/solr-init/solr-init.py"]
+        {{- if eq .Values.solr.initialize.container_debug "true" }}
+        command: ["sleep"]
+        args: ["infinity"]
+        {{- end }}
         volumeMounts:
         - name: solr-init-configmap
-          mountPath: /srv/solr-init
+          mountPath: /app/solr-init
         - name: solr-configset-configmap
-          mountPath: /srv/solr-configset
+          mountPath: /app/solr-configset
       restartPolicy: Never
   backoffLimit: 1
 {{- end }}

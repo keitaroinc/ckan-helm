@@ -19,6 +19,7 @@ import os
 import sys
 import requests
 import json
+import time
 
 
 solr_admin_username = os.environ.get('SOLR_ADMIN_USERNAME', '')
@@ -29,16 +30,37 @@ def check_solr_connection(solr_url, retry=None):
     sys.stdout.flush()
 
     if retry is None:
-        retry = 40
+        retry = 60
     elif retry == 0:
         print('Giving up ...')
         sys.exit(1)
 
     try:
-        requests.get(solr_url, 
-                    auth=(solr_admin_username,solr_admin_password))
+        response = requests.get(solr_url, auth=(solr_admin_username, solr_admin_password), timeout=10)
+        response.raise_for_status()
+    except requests.exceptions.HTTPError as e:
+        print(f"HTTP Error: {e.response.status_code} - {e.response.text}")
+        print('Unable to connect to solr...retrying.')
+        sys.stdout.flush()
+        import time
+        time.sleep(30)
+        check_solr_connection(solr_url, retry=retry - 1)
+    except requests.exceptions.ConnectionError as e:
+        print(f"Connection Error: {e}")
+        print('Unable to connect to solr...retrying.')
+        sys.stdout.flush()
+        import time
+        time.sleep(30)
+        check_solr_connection(solr_url, retry=retry - 1)
+    except requests.exceptions.Timeout as e:
+        print(f"Timeout Error: {e}")
+        print('Unable to connect to solr...retrying.')
+        sys.stdout.flush()
+        import time
+        time.sleep(30)
+        check_solr_connection(solr_url, retry=retry - 1)
     except requests.exceptions.RequestException as e:
-        print((str(e)))
+        print(f"Request Exception: {e}")
         print('Unable to connect to solr...retrying.')
         sys.stdout.flush()
         import time
@@ -53,37 +75,85 @@ def prepare_configset(cfset_name):
 
     # Copy configset files from configmap volume into rw volume
     # and include schema.xml from ckan src
-    shutil.copytree("/srv/solr-configset", "/srv/app/solr-configset")
-    shutil.copyfile("/srv/app/src/ckan/ckan/config/solr/schema.xml",
-                    "/srv/app/solr-configset/schema.xml")
+    base_dir = "/app/data/solr-configset"
+    shutil.copytree("/app/solr-configset",base_dir)
+    shutil.copyfile("/app/src/ckan/ckan/config/solr/schema.xml",
+                    os.path.join(base_dir, "schema.xml"))
+    
+    # Create lang folder so we have same structure as helm chart folder
+    target_folder = os.path.join(base_dir, "lang")
+
+    # Create target folder if it doesn't exist
+    os.makedirs(target_folder, exist_ok=True)
+
+    # list of filenames to exclude
+    exclude_files = {"protwords.txt", "stopwords.txt", "synonyms.txt"}
+
+    # Move all .txt files in base_dir to target_folder
+    for filename in os.listdir(base_dir):
+        if filename.endswith(".txt") and filename not in exclude_files:
+            src = os.path.join(base_dir, filename)
+            dst = os.path.join(target_folder, filename)
+            shutil.move(src, dst)
+
+    # Ensure the configset directory exists
+    if not os.path.exists("/app/data/solr-configset"):
+        print("Error: 'solr-configset' directory does not exist")
+        sys.exit(2)
 
     # Create zip
-    print("Creating Configset ZIP file")
-    shutil.make_archive('/srv/app/temp_configset', 'zip', 'solr-configset')
+    zip_path = '/app/data/temp_configset.zip'
+    try:
+        print("Creating Configset ZIP file...")
+        shutil.make_archive('/app/data/temp_configset', 'zip', '/app/data/solr-configset')
+    except Exception as e:
+        print(f"Failed to create ZIP: {e}")
+        sys.exit(2)
 
     # Upload configSet
-    print("Uploading ZIP file to Zookeeper via Solr")
-    data = open('/srv/app/temp_configset.zip', 'rb').read()
-    url = solr_url + '/solr/admin/configs?action=UPLOAD&name=' + cfset_name
-    print("Trying: " + url)
-    try:
-        res = requests.post(url,
-                            data=data,
-                            auth=(solr_admin_username,solr_admin_password),
-                            headers={'Content-Type':
-                                     'application/octet-stream'})
-    except requests.exceptions.RequestException as e:
-        print('HTTP Status: ' + str(res.status_code) +
-              ' Reason: ' + res.reason)
-        print('HTTP Response: \n' + res.text)
-        print((str(e)))
-        print("\nConfigset exists - will be used for creating the collection.")
+    url = f"{solr_url}/solr/admin/configs?action=UPLOAD&name={cfset_name}"
+    print(f"Uploading ZIP file to Zookeeper via Solr: {url}")
 
-    print("OK")
+    try:
+        with open(zip_path, 'rb') as f:
+            data = f.read()
+        res = requests.post(
+            url,
+            data=data,
+            auth=(solr_admin_username, solr_admin_password),
+            headers={'Content-Type': 'application/octet-stream'},
+            timeout=10  # avoid hanging indefinitely
+        )
+        # Raise for HTTP errors (4xx/5xx)
+        res.raise_for_status()
+        print("Configset uploaded successfully.")
+    except requests.exceptions.HTTPError as e:
+        print(f"HTTP Error: {res.status_code} - {res.text}")
+        # If configset already exists, exit successfully
+        if res.status_code == 400 and 'already exists' in res.text:
+            print("Configset already exists. Will be used for creating the collection.")
+        elif res.status_code == 409:
+            print("Configset already exists. Will be used for creating the collection.")
+        else:
+            print("Failed to upload configset due to HTTP error.")
+            sys.exit(3)
+    except requests.exceptions.ConnectionError as e:
+        print(f"Connection error: {e}")
+        sys.exit(3)
+    except requests.exceptions.Timeout as e:
+        print(f"Request timed out: {e}")
+        sys.exit(3)
+    except requests.exceptions.RequestException as e:
+        print(f"Request failed: {e}")
+        sys.exit(3)
+    except Exception as e:
+        print(f"Unexpected error: {e}")
+        sys.exit(3)
 
 
 def create_solr_collection(name, cfset_name, num_shards, repl_factor,
                            max_shards_node):
+    time.sleep(5)
     print("\nCreating Solr collection based on uploaded configset...")
     url = solr_url + '/solr/admin/collections?action=CREATE&name=' + name
     url = url + '&numShards=' + num_shards
@@ -93,15 +163,28 @@ def create_solr_collection(name, cfset_name, num_shards, repl_factor,
     print("Trying: " + url)
     try:
         res = requests.post(url, 
-                            auth=(solr_admin_username,solr_admin_password))
+                            auth=(solr_admin_username,solr_admin_password), timeout=10)
+        res.raise_for_status()
+    except requests.exceptions.HTTPError as e:
+        print(f"HTTP Error: {res.status_code} - {res.text}")
+        # If collection already exists, exit successfully
+        if res.status_code == 400 and 'already exists' in res.text:
+            print("Collection already exists. Exiting successfully.")
+            sys.exit(0)
+        print("Failed to create collection due to HTTP error.")
+        sys.exit(4)
+    except requests.exceptions.ConnectionError as e:
+        print(f"Connection error: {e}")
+        sys.exit(4)
+    except requests.exceptions.Timeout as e:
+        print(f"Request timed out: {e}")
+        sys.exit(4)
     except requests.exceptions.RequestException as e:
-        print('HTTP Status: ' + str(res.status_code) +
-              ' Reason: ' + res.reason)
-        print('HTTP Response: \n' + res.text)
-        print((str(e)))
-        print("\nAborting...")
-        sys.exit(3)
-        
+        print(f"Request failed: {e}")
+        sys.exit(4)
+    except Exception as e:
+        print(f"Unexpected error: {e}")
+        sys.exit(4)
     print("OK")
 
 
@@ -111,16 +194,24 @@ def solr_collection_alreadyexists(solr_url):
     print("Trying: " + url)
     try:
         res = requests.post(url,
-                            auth=(solr_admin_username,solr_admin_password))
-
+                            auth=(solr_admin_username,solr_admin_password), timeout=10)
+        res.raise_for_status()
+    except requests.exceptions.HTTPError as e:
+        print(f"HTTP Error: {res.status_code} - {res.text}")
+        print("Failed to list collections due to HTTP error.")
+        sys.exit(5)
+    except requests.exceptions.ConnectionError as e:
+        print(f"Connection error: {e}")
+        sys.exit(5)
+    except requests.exceptions.Timeout as e:
+        print(f"Request timed out: {e}")
+        sys.exit(5)
     except requests.exceptions.RequestException as e:
-        print('HTTP Status: ' + str(res.status_code) +
-              ' Reason: ' + res.reason)
-        print('HTTP Response: \n' + res.text)
-        print((str(e)))
-        print("\nAborting...")
-        sys.exit(4)
-    
+        print(f"Request failed: {e}")
+        sys.exit(5)
+    except Exception as e:
+        print(f"Unexpected error: {e}")
+        sys.exit(5)
     response_dict = json.loads(res.text)
     if collection_name in response_dict['collections']:
         print('Collection exists. Aborting.')

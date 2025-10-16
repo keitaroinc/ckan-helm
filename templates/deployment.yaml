@@ -37,7 +37,7 @@ spec:
       initContainers:
       - name: set-volume-ownsership
         image: "{{ .Values.image.initContainer.repository }}:{{ .Values.image.initContainer.tag }}"
-        command: ["sh", "-c", "chown -R 92:92 /var/lib/ckan"] # 92 is the uid and gid of ckan user/group
+        command: ["sh", "-c", "chown -R 92:92 {{ .Values.ckan.storagePath }}"] # 92 is the uid and gid of ckan user/group
         volumeMounts:
         - name: ckan
           mountPath: {{ .Values.ckan.storagePath }}
@@ -53,11 +53,21 @@ spec:
             - name: http
               containerPort: 5000
               protocol: TCP
-          {{- if .Values.ckan.container_debug }}
+          {{- if eq .Values.ckan.container_debug "true" }}
           command: ["sleep"]
           args: ["infinity"]
           {{- end }}
           env:
+{{- if .Values.ckan.extraEnv }}
+{{ toYaml .Values.ckan.extraEnv | indent 12 }}
+{{- end }}
+            - name: CKANEXT__XLOADER__SITE_URL
+              value: {{ $.Values.ckan.ckanext_xloader_site_url }}
+            - name: CKANEXT__XLOADER__JOBS_DB__URI
+              valueFrom:
+                secretKeyRef:
+                  name: ckancredentials
+                  key: ckanSqlAlchemyUrl
             - name: DEBUG
               value: {{ .Values.ckan.debug | quote }}
             - name: MAINTENANCE_MODE
@@ -66,9 +76,6 @@ spec:
               value: {{ .Values.ckan.debug | quote }}
             - name: UWSGI_PROC_NO
               value: {{ .Values.ckan.uwsg_num | quote }}
-{{- if .Values.ckan.extraEnv }}
-{{ toYaml .Values.ckan.extraEnv | indent 12 }}
-{{- end }}
             - name: CKAN_SYSADMIN_NAME
               value: {{ .Values.ckan.sysadminName }}
             - name: CKAN_SYSADMIN_PASSWORD
@@ -112,27 +119,30 @@ spec:
                 secretKeyRef:
                   name: ckancredentials
                   key: ckanDatastoreReadUrl
-{{- if .Values.hpa.enabled }}
-            - name: BEAKER_SESSION_SECRET
-              valueFrom:
-                secretKeyRef:
-                  name: session-secret
-                  key: session_secret
-            - name: JWT_ENCODE_SECRET
+            - name: CKAN___API_TOKEN__JWT__ENCODE__SECRET
               valueFrom:
                 secretKeyRef:
                   name: session-secret
                   key: jwt_encode
-            - name: JWT_DECODE_SECRET
+            - name: CKAN___API_TOKEN__JWT__DECODE__SECRET
               valueFrom:
                 secretKeyRef:
                   name: session-secret
                   key: jwt_decode
-            - name: CKANEXT___BEAKER__SESSION__URL
-              value: {{ .Values.hpa.sessions.session_url | quote }}
-            - name: CKANEXT___BEAKER__SESSION__TYPE
+            - name: WTF_CSRF_SECRET_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: session-secret
+                  key: wtf_csrf_secret
+            {{- if .Values.hpa.enabled }}
+            - name: CKAN___BEAKER_SESSION_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: session-secret
+                  key: session_secret
+            - name: SESSION_TYPE
               value: {{ .Values.hpa.sessions.session_type | quote }}
-{{ end }}
+            {{ end }}
             - name: CKAN_SOLR_URL
               value: {{ .Values.ckan.solr }}
             - name: CKAN_SOLR_USER
@@ -147,10 +157,6 @@ spec:
               value: {{ .Values.ckan.locale.offered | quote }}
             - name: CKAN__LOCALE_DEFAULT
               value: {{ .Values.ckan.locale.default }}
-            - name: CKAN__DATAPUSHER__URL
-              value: {{ .Values.ckan.datapusherUrl }}
-            - name: CKAN__DATAPUSHER__CALLBACK_URL_BASE
-              value: {{ .Values.ckan.datapusherCallbackUrlBase }}
             - name: CKAN___SMTP__SERVER
               value: {{ .Values.ckan.smtp.server | quote }}
             - name: CKAN___SMTP__USER
@@ -170,7 +176,7 @@ spec:
               value: {{ .Values.ckan.activityStreamsEmailNotifications | quote }}
             - name: CKANEXT__ISSUES__SEND_EMAIL_NOTIFICATIONS
               value: {{ .Values.ckan.issues.sendEmailNotifications | quote }}
-          {{- if not .Values.ckan.container_debug }}
+          {{- if eq .Values.ckan.container_debug "false" }}
           readinessProbe:
             httpGet:
               path: /api/3/action/status_show

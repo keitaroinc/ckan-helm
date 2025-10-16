@@ -1,11 +1,11 @@
-{{- if .Values.hpa.enabled }}
 apiVersion: v1
 kind: Secret
 metadata:
   name: session-secret
 type: Opaque
 stringData:
+  {{- $jwt := randAlphaNum 43 }}
+  jwt_encode: string:{{ $jwt }}
+  jwt_decode: string:{{ $jwt }}
   session_secret: {{ randAlphaNum 43 }}
-  jwt_encode: string:{{ randAlphaNum 43 }}
-  jwt_decode: string:{{ randAlphaNum 43 }}
-{{ end }}
+  wtf_csrf_secret: {{ randAlphaNum 32 }}

@@ -1,0 +1,230 @@
+{{- if .Values.ckan.workers }}
+{{- range .Values.ckan.workers }}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ printf "%s-worker-%s" (include "ckan-chart.fullname" $) .name }}
+  labels:
+    {{- include "ckan-chart.labels" $ | nindent 4 }}
+    {{- if $.Values.labels.enabled }}
+    {{- $.Values.labels.ckan | toYaml | nindent 4 }}
+    {{- end }}
+spec:
+  replicas: {{ default 1 .replicas }}
+  selector:
+    matchLabels:
+      {{- include "ckan-chart.selectorLabels" $ | nindent 6 }}
+  template:
+    metadata:
+      labels:
+        {{- include "ckan-chart.selectorLabels" $ | nindent 8 }}
+        {{- if $.Values.labels.enabled }}
+        {{- $.Values.labels.ckan | toYaml | nindent 8 }}
+        {{- end }}
+    spec:
+      {{- with $.Values.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      serviceAccountName: {{ include "ckan-chart.serviceAccountName" $ }}
+      securityContext:
+        {{- toYaml $.Values.podSecurityContext | nindent 8 }}
+      initContainers:
+      - name: wait-for-db
+        image: postgres:17-alpine
+        command:
+          - sh
+          - -c
+          - |
+            for i in {1..5}; do
+              if PGPASSWORD=$PSQL_PASSWD psql -h $DB_HOST -U $PSQL_MASTER -d $PSQL_DB -c '\q'; then
+                echo "[prerun] Successfully connected to the database"
+                exit 0
+              else
+                echo "[prerun] Database not ready, retrying in 10s..."
+                sleep 10
+              fi
+            done
+            echo "[prerun] Giving up after 5 tries"
+            exit 1
+        env:
+          - name: PSQL_MASTER
+            value: {{ $.Values.ckan.psql.masterUser }}
+          - name: PSQL_DB
+            value: {{ $.Values.ckan.psql.masterDatabase }}
+          - name: DB_HOST
+            value: {{ $.Values.ckan.db.ckanDbUrl }}
+          - name: PSQL_PASSWD
+            valueFrom:
+              secretKeyRef:
+                name: ckancredentials
+                key: psqlMasterPassword
+      - name: wait-for-solr
+        image: curlimages/curl:latest
+        command:
+          - sh
+          - -c
+          - |
+            for i in {1..10}; do
+              resp=$(curl -sS -u "$CKAN_SOLR_USER:$CKAN_SOLR_PASSWORD" "$CKAN_SOLR_URL/schema/name?wt=json")
+              echo $resp | grep -q "ckan" && exit 0
+              echo "[prerun] Solr not ready, retrying in 20s..."
+              sleep 20
+            done
+            echo "[prerun] Giving up after 10 tries"
+            exit 1
+        env:
+          - name: CKAN_SOLR_URL
+            value: {{ $.Values.ckan.solr }}
+          - name: CKAN_SOLR_USER
+            value: {{ $.Values.solr.auth.adminUsername }}
+          - name: CKAN_SOLR_PASSWORD
+            value: {{ $.Values.solr.auth.adminPassword }}
+      containers:
+        - name: {{ .name }}
+          image: "{{ $.Values.image.repository }}:{{ $.Values.image.tag }}"
+          {{- if eq $.Values.ckan.container_debug "true" }}
+          command: ["sleep"]
+          args: ["infinity"]
+          {{- else }}
+          command: {{ toJson .command }}
+          {{- end }}
+          imagePullPolicy: {{ $.Values.image.pullPolicy }}
+          securityContext:
+            {{- toYaml $.Values.securityContext | nindent 12 }}
+          env:
+            {{- if $.Values.ckan.extraEnv }}
+            {{ toYaml $.Values.ckan.extraEnv | indent 12 }}
+            {{- end }}
+            - name: CKANEXT__XLOADER__SITE_URL
+              value: {{ $.Values.ckan.ckanext_xloader_site_url }}
+            - name: CKANEXT__XLOADER__JOBS_DB__URI
+              valueFrom:
+                secretKeyRef:
+                  name: ckancredentials
+                  key: ckanSqlAlchemyUrl
+            - name: DEBUG
+              value: {{ $.Values.ckan.debug | quote }}
+            - name: MAINTENANCE_MODE
+              value: {{ $.Values.ckan.maintenanceMode | quote }}
+            - name: CKAN___DEBUG
+              value: {{ $.Values.ckan.debug | quote }}
+            - name: UWSGI_PROC_NO
+              value: {{ $.Values.ckan.uwsg_num | quote }}
+            - name: CKAN_SYSADMIN_NAME
+              value: {{ $.Values.ckan.sysadminName }}
+            - name: CKAN_SYSADMIN_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: ckancredentials
+                  key: sysadminPassword
+            - name: CKAN_SYSADMIN_EMAIL
+              value: {{ $.Values.ckan.sysadminEmail }}
+            - name: CKAN__SITE_TITLE
+              value: {{ $.Values.ckan.siteTitle }}
+            - name: CKAN_SITE_ID
+              value: {{ $.Values.ckan.siteId }}
+            - name: CKAN_SITE_URL
+              value: {{ $.Values.ckan.siteUrl }}
+            - name: CKAN__PLUGINS
+              value: {{ $.Values.ckan.ckanPlugins }}
+            - name: CKAN__STORAGE_PATH
+              value: {{ $.Values.ckan.storagePath }}
+            - name: PSQL_MASTER
+              value: {{ $.Values.ckan.psql.masterUser }}
+            - name: PSQL_PASSWD
+              valueFrom:
+                secretKeyRef:
+                  name: ckancredentials
+                  key: psqlMasterPassword
+            - name: PSQL_DB
+              value: {{ $.Values.ckan.psql.masterDatabase }}
+            - name: CKAN_SQLALCHEMY_URL
+              valueFrom:
+                secretKeyRef:
+                  name: ckancredentials
+                  key: ckanSqlAlchemyUrl
+            - name: CKAN_DATASTORE_WRITE_URL
+              valueFrom:
+                secretKeyRef:
+                  name: ckancredentials
+                  key: ckanDatastoreWriteUrl
+            - name: CKAN_DATASTORE_READ_URL
+              valueFrom:
+                secretKeyRef:
+                  name: ckancredentials
+                  key: ckanDatastoreReadUrl
+            - name: CKAN___API_TOKEN__JWT__ENCODE__SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: session-secret
+                  key: jwt_encode
+            - name: CKAN___API_TOKEN__JWT__DECODE__SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: session-secret
+                  key: jwt_decode
+            - name: WTF_CSRF_SECRET_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: session-secret
+                  key: wtf_csrf_secret
+            {{- if $.Values.hpa.enabled }}
+            - name: CKAN___BEAKER_SESSION_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: session-secret
+                  key: session_secret
+            - name: SESSION_TYPE
+              value: {{ $.Values.hpa.sessions.session_type | quote }}
+            {{ end }}
+            - name: CKAN_SOLR_URL
+              value: {{ $.Values.ckan.solr }}
+            - name: CKAN_SOLR_USER
+              value: {{ $.Values.solr.auth.adminUsername }}
+            - name: CKAN_SOLR_PASSWORD
+              value: {{ $.Values.solr.auth.adminPassword }}
+            - name: CKAN__REDIS__URL
+              value: {{ $.Values.ckan.redis }}
+            - name: CKANEXT__SPATIAL__SEARCH_BACKEND
+              value: {{ $.Values.ckan.spatialBackend }}
+            - name: CKAN__LOCALES_OFFERED
+              value: {{ $.Values.ckan.locale.offered | quote }}
+            - name: CKAN__LOCALE_DEFAULT
+              value: {{ $.Values.ckan.locale.default }}
+            - name: CKAN___SMTP__SERVER
+              value: {{ $.Values.ckan.smtp.server | quote }}
+            - name: CKAN___SMTP__USER
+              value: {{ $.Values.ckan.smtp.user }}
+            - name: CKAN___SMTP__PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: ckancredentials
+                  key: smtpPassword
+            - name: CKAN___SMTP__MAIL_FROM
+              value: {{ $.Values.ckan.smtp.mailFrom }}
+            - name: CKAN___SMTP__TLS
+              value: {{ $.Values.ckan.smtp.tls }}
+            - name: CKAN___SMTP__STARTTLS
+              value: {{ $.Values.ckan.smtp.starttls | quote }}
+            - name: CKAN__ACTIVITY_STREAMS_EMAIL_NOTIFICATIONS
+              value: {{ $.Values.ckan.activityStreamsEmailNotifications | quote }}
+            - name: CKANEXT__ISSUES__SEND_EMAIL_NOTIFICATIONS
+              value: {{ $.Values.ckan.issues.sendEmailNotifications | quote }}
+          resources:
+            {{- toYaml $.Values.resources | nindent 12 }}
+      {{- with $.Values.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with $.Values.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with $.Values.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+---
+{{- end }}
+{{- end }}
