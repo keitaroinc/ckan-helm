@@ -25,13 +25,13 @@ jobs:
       security-events: write # for github/codeql-action/upload-sarif to upload SARIF results
       actions: read # only required for a private repository by github/codeql-action/upload-sarif to get the Action run status
     name: repo_scan
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-latest
     steps:
       - name: Checkout code
         uses: actions/checkout@master
 
       - name: Run Trivy vulnerability scanner in repo mode
-        uses: aquasecurity/trivy-action@master
+        uses: aquasecurity/trivy-action@0.33.1
         with:
           scan-type: 'fs'
           ignore-unfixed: true
@@ -57,17 +57,17 @@ jobs:
           fetch-depth: 0
 
       - name: Set up Helm
-        uses: azure/setup-helm@f382f75448129b3be48f8121b9857be18d815a82 # tag=v3.4
+        uses: azure/setup-helm@v4.3.0
         with:
-          version: v3.6.3
+          version: v3.18.1
 
       - name: Set up python
-        uses: actions/setup-python@13ae5bb136fac2878aff31522b9efb785519f984 # tag=v4.3.0
+        uses: actions/setup-python@v6
         with:
-          python-version: 3.7
+          python-version: 3.8
 
       - name: Run Trivy vulnerability scanner in IaC mode
-        uses: aquasecurity/trivy-action@0.16.1
+        uses: aquasecurity/trivy-action@0.33.1
         with:
           scan-type: 'config'
           hide-progress: false
