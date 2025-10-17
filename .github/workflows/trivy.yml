@@ -66,6 +66,9 @@ jobs:
         with:
           python-version: 3.8
 
+      - name: Pull Helm dependencies
+        run: helm dependency update
+
       - name: Run Trivy vulnerability scanner in IaC mode
         uses: aquasecurity/trivy-action@0.33.1
         with:
