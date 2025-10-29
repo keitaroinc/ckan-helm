@@ -16,4 +16,4 @@ dependencies:
 description: CKAN Helm chart
 name: ckan
 type: application
-version: v4.0.0
+version: v4.0.1

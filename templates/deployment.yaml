@@ -58,9 +58,9 @@ spec:
           args: ["infinity"]
           {{- end }}
           env:
-{{- if .Values.ckan.extraEnv }}
-{{ toYaml .Values.ckan.extraEnv | indent 12 }}
-{{- end }}
+            {{- if .Values.ckan.extraEnv }}
+            {{ toYaml .Values.ckan.extraEnv | nindent 12 }}
+            {{- end }}
             - name: CKANEXT__XLOADER__SITE_URL
               value: {{ $.Values.ckan.ckanext_xloader_site_url }}
             - name: CKANEXT__XLOADER__JOBS_DB__URI
