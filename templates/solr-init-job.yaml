@@ -6,10 +6,12 @@ metadata:
 spec:
   template:
     spec:
-    {{- with .Values.imagePullSecrets }}
+      securityContext:
+        {{- toYaml $.Values.podSecurityContext | nindent 8 }}
+      {{- with .Values.imagePullSecrets }}
       imagePullSecrets:
         {{- toYaml . | nindent 8 }}
-    {{- end }}
+      {{- end }}
       volumes:
         - name: solr-init-configmap
           configMap:
@@ -18,35 +20,37 @@ spec:
           configMap:
             name: solr-configset-configmap
       containers:
-      - name: solr-init
-        image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
-        imagePullPolicy: {{ .Values.image.pullPolicy }}
-        env:
-        - name: CKAN_SOLR_URL
-          value: {{ .Values.ckan.solr }}
-        - name: SOLR_ADMIN_USERNAME
-          value: {{ .Values.solr.auth.adminUsername }}
-        - name: SOLR_ADMIN_PASSWORD
-          value: {{ .Values.solr.auth.adminPassword }}
-        - name: CKAN_SOLR_INIT_NUMSHARDS
-          value: "{{ .Values.solr.initialize.numShards }}"
-        - name: CKAN_SOLR_INIT_REPLICATIONFACTOR
-          value: "{{ .Values.solr.initialize.replicationFactor }}"
-        - name: CKAN_SOLR_INIT_MAXSHARDSPERNODE
-          value: "{{ .Values.solr.initialize.maxShardsPerNode }}"
-        - name: CKAN_SOLR_INIT_CONFIGSETNAME
-          value: "{{ .Values.solr.initialize.configsetName }}"
-        command: ["python"]
-        args: ["/app/solr-init/solr-init.py"]
-        {{- if eq .Values.solr.initialize.container_debug "true" }}
-        command: ["sleep"]
-        args: ["infinity"]
-        {{- end }}
-        volumeMounts:
-        - name: solr-init-configmap
-          mountPath: /app/solr-init
-        - name: solr-configset-configmap
-          mountPath: /app/solr-configset
+        - name: solr-init
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          securityContext:
+            {{- toYaml $.Values.securityContext | nindent 12 }}
+          env:
+            - name: CKAN_SOLR_URL
+              value: {{ .Values.ckan.solr }}
+            - name: SOLR_ADMIN_USERNAME
+              value: {{ .Values.solr.auth.adminUsername }}
+            - name: SOLR_ADMIN_PASSWORD
+              value: {{ .Values.solr.auth.adminPassword }}
+            - name: CKAN_SOLR_INIT_NUMSHARDS
+              value: "{{ .Values.solr.initialize.numShards }}"
+            - name: CKAN_SOLR_INIT_REPLICATIONFACTOR
+              value: "{{ .Values.solr.initialize.replicationFactor }}"
+            - name: CKAN_SOLR_INIT_MAXSHARDSPERNODE
+              value: "{{ .Values.solr.initialize.maxShardsPerNode }}"
+            - name: CKAN_SOLR_INIT_CONFIGSETNAME
+              value: "{{ .Values.solr.initialize.configsetName }}"
+          command: ["python"]
+          args: ["/app/solr-init/solr-init.py"]
+          {{- if eq .Values.solr.initialize.container_debug "true" }}
+          command: ["sleep"]
+          args: ["infinity"]
+          {{- end }}
+          volumeMounts:
+            - name: solr-init-configmap
+              mountPath: /app/solr-init
+            - name: solr-configset-configmap
+              mountPath: /app/solr-configset
       restartPolicy: Never
   backoffLimit: 1
 {{- end }}

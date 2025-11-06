@@ -20,29 +20,29 @@ spec:
         {{- .Values.labels.ckan | toYaml | nindent 8 }}
         {{- end }}
     spec:
-    {{- with .Values.imagePullSecrets }}
+      {{- with .Values.imagePullSecrets }}
       imagePullSecrets:
         {{- toYaml . | nindent 8 }}
-    {{- end }}
+      {{- end }}
       serviceAccountName: {{ include "ckan-chart.serviceAccountName" . }}
       securityContext:
         {{- toYaml .Values.podSecurityContext | nindent 8 }}
-      {{ if .Values.pvc.enabled }}
+      {{- if .Values.pvc.enabled }}
       volumes:
-        - name: "ckan"
-          persistentVolumeClaim:
-            claimName: "ckan"
-      {{ end }}
-      {{ if .Values.pvc.enabled }}
-      initContainers:
-      - name: set-volume-ownsership
-        image: "{{ .Values.image.initContainer.repository }}:{{ .Values.image.initContainer.tag }}"
-        command: ["sh", "-c", "chown -R 92:92 {{ .Values.ckan.storagePath }}"] # 92 is the uid and gid of ckan user/group
-        volumeMounts:
         - name: ckan
-          mountPath: {{ .Values.ckan.storagePath }}
-          readOnly: false
-      {{ end }}
+          persistentVolumeClaim:
+            claimName: ckan
+      initContainers:
+        - name: set-volume-ownsership
+          image: "{{ .Values.image.initContainer.repository }}:{{ .Values.image.initContainer.tag }}"
+          securityContext:
+            {{- toYaml .Values.securityContext | nindent 12 }}
+          command: ["sh", "-c", "chown -R 92:92 {{ .Values.ckan.storagePath }}"]
+          volumeMounts:
+            - name: ckan
+              mountPath: {{ .Values.ckan.storagePath }}
+              readOnly: false
+      {{- end }}
       containers:
         - name: {{ .Chart.Name }}
           securityContext:
@@ -142,7 +142,7 @@ spec:
                   key: session_secret
             - name: SESSION_TYPE
               value: {{ .Values.hpa.sessions.session_type | quote }}
-            {{ end }}
+            {{- end }}
             - name: CKAN_SOLR_URL
               value: {{ .Values.ckan.solr }}
             - name: CKAN_SOLR_USER
@@ -194,23 +194,23 @@ spec:
             failureThreshold: {{ .Values.ckan.liveness.failureThreshold }}
             timeoutSeconds: {{ .Values.ckan.liveness.timeoutSeconds }}
           {{- end }}
-          {{ if .Values.pvc.enabled }}
+          {{- if .Values.pvc.enabled }}
           volumeMounts:
-          - name: "ckan"
-            mountPath: {{ .Values.ckan.storagePath }}
-            readOnly: false
-          {{ end }}
+            - name: ckan
+              mountPath: {{ .Values.ckan.storagePath }}
+              readOnly: false
+          {{- end }}
           resources:
             {{- toYaml .Values.resources | nindent 12 }}
       {{- with .Values.nodeSelector }}
       nodeSelector:
         {{- toYaml . | nindent 8 }}
       {{- end }}
-    {{- with .Values.affinity }}
+      {{- with .Values.affinity }}
       affinity:
         {{- toYaml . | nindent 8 }}
-    {{- end }}
-    {{- with .Values.tolerations }}
+      {{- end }}
+      {{- with .Values.tolerations }}
       tolerations:
         {{- toYaml . | nindent 8 }}
-    {{- end }}
+      {{- end }}

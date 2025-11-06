@@ -30,56 +30,60 @@ spec:
       securityContext:
         {{- toYaml $.Values.podSecurityContext | nindent 8 }}
       initContainers:
-      - name: wait-for-db
-        image: postgres:17-alpine
-        command:
-          - sh
-          - -c
-          - |
-            for i in {1..5}; do
-              if PGPASSWORD=$PSQL_PASSWD psql -h $DB_HOST -U $PSQL_MASTER -d $PSQL_DB -c '\q'; then
-                echo "[prerun] Successfully connected to the database"
-                exit 0
-              else
-                echo "[prerun] Database not ready, retrying in 10s..."
-                sleep 10
-              fi
-            done
-            echo "[prerun] Giving up after 5 tries"
-            exit 1
-        env:
-          - name: PSQL_MASTER
-            value: {{ $.Values.ckan.psql.masterUser }}
-          - name: PSQL_DB
-            value: {{ $.Values.ckan.psql.masterDatabase }}
-          - name: DB_HOST
-            value: {{ $.Values.ckan.db.ckanDbUrl }}
-          - name: PSQL_PASSWD
-            valueFrom:
-              secretKeyRef:
-                name: ckancredentials
-                key: psqlMasterPassword
-      - name: wait-for-solr
-        image: curlimages/curl:latest
-        command:
-          - sh
-          - -c
-          - |
-            for i in {1..10}; do
-              resp=$(curl -sS -u "$CKAN_SOLR_USER:$CKAN_SOLR_PASSWORD" "$CKAN_SOLR_URL/schema/name?wt=json")
-              echo $resp | grep -q "ckan" && exit 0
-              echo "[prerun] Solr not ready, retrying in 20s..."
-              sleep 20
-            done
-            echo "[prerun] Giving up after 10 tries"
-            exit 1
-        env:
-          - name: CKAN_SOLR_URL
-            value: {{ $.Values.ckan.solr }}
-          - name: CKAN_SOLR_USER
-            value: {{ $.Values.solr.auth.adminUsername }}
-          - name: CKAN_SOLR_PASSWORD
-            value: {{ $.Values.solr.auth.adminPassword }}
+        - name: wait-for-db
+          image: postgres:17-alpine
+          securityContext:
+            {{- toYaml $.Values.securityContext | nindent 12 }}
+          command:
+            - sh
+            - -c
+            - |
+              for i in {1..5}; do
+                if PGPASSWORD=$PSQL_PASSWD psql -h $DB_HOST -U $PSQL_MASTER -d $PSQL_DB -c '\q'; then
+                  echo "[prerun] Successfully connected to the database"
+                  exit 0
+                else
+                  echo "[prerun] Database not ready, retrying in 10s..."
+                  sleep 10
+                fi
+              done
+              echo "[prerun] Giving up after 5 tries"
+              exit 1
+          env:
+            - name: PSQL_MASTER
+              value: {{ $.Values.ckan.psql.masterUser }}
+            - name: PSQL_DB
+              value: {{ $.Values.ckan.psql.masterDatabase }}
+            - name: DB_HOST
+              value: {{ $.Values.ckan.db.ckanDbUrl }}
+            - name: PSQL_PASSWD
+              valueFrom:
+                secretKeyRef:
+                  name: ckancredentials
+                  key: psqlMasterPassword
+        - name: wait-for-solr
+          image: curlimages/curl:latest
+          securityContext:
+            {{- toYaml $.Values.securityContext | nindent 12 }}
+          command:
+            - sh
+            - -c
+            - |
+              for i in {1..10}; do
+                resp=$(curl -sS -u "$CKAN_SOLR_USER:$CKAN_SOLR_PASSWORD" "$CKAN_SOLR_URL/schema/name?wt=json")
+                echo $resp | grep -q "ckan" && exit 0
+                echo "[prerun] Solr not ready, retrying in 20s..."
+                sleep 20
+              done
+              echo "[prerun] Giving up after 10 tries"
+              exit 1
+          env:
+            - name: CKAN_SOLR_URL
+              value: {{ $.Values.ckan.solr }}
+            - name: CKAN_SOLR_USER
+              value: {{ $.Values.solr.auth.adminUsername }}
+            - name: CKAN_SOLR_PASSWORD
+              value: {{ $.Values.solr.auth.adminPassword }}
       containers:
         - name: {{ .name }}
           image: "{{ $.Values.image.repository }}:{{ $.Values.image.tag }}"
