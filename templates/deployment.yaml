@@ -42,13 +42,6 @@ spec:
             readOnlyRootFilesystem: true   # writable for chown
             seccompProfile:
               type: RuntimeDefault
-          resources: 
-            limits:
-              cpu: 100m
-              memory: 256Mi
-            requests:
-              cpu: 50m
-              memory: 128Mi
           command: ["sh", "-c", "chown -R 92:92 {{ .Values.ckan.storagePath }}"]
           volumeMounts:
             - name: ckan

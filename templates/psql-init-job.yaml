@@ -21,13 +21,6 @@ spec:
             readOnlyRootFilesystem: true
             seccompProfile:
               type: RuntimeDefault
-          resources: 
-            limits:
-              cpu: 300m
-              memory: 512Mi
-            requests:
-              cpu: 150m
-              memory: 256Mi
           env:
             - name: PSQL_MASTER
               value: {{ .Values.ckan.psql.masterUser }}
