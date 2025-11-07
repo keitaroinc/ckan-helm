@@ -29,6 +29,13 @@ spec:
                 - -d
                 - "{}"
                 - "http://ckan/api/action/send_email_notifications"
+              resources: 
+                limits:
+                  cpu: 200m
+                  memory: 512Mi
+                requests:
+                  cpu: 50m
+                  memory: 128Mi
               env:
 {{- if .Values.ckan.extraEnv }}
 {{ toYaml .Values.ckan.extraEnv | indent 14 }}
