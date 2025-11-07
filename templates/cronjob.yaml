@@ -19,6 +19,7 @@ spec:
             - name: ckan-email-notifications
               securityContext:
                 {{- toYaml .Values.securityContext | nindent 16 }}
+                readOnlyRootFilesystem: true
               image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
               imagePullPolicy: {{ .Values.image.pullPolicy }}
               command: ["curl"]

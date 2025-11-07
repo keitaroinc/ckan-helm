@@ -221,17 +221,11 @@ labels:
   enabled: false
   ckan: []
 
-podSecurityContext:
+podSecurityContext: 
   runAsUser: 92
   runAsGroup: 92
 
 securityContext:
-  capabilities:
-    drop:
-      - ALL
-  readOnlyRootFilesystem: true
-  runAsNonRoot: true
-  runAsUser: 92
   allowPrivilegeEscalation: false
 
 

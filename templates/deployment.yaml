@@ -35,8 +35,11 @@ spec:
       initContainers:
         - name: set-volume-ownsership
           image: "{{ .Values.image.initContainer.repository }}:{{ .Values.image.initContainer.tag }}"
-          securityContext:
-            {{- toYaml .Values.securityContext | nindent 12 }}
+          securityContext: 
+            runAsUser: 0
+            runAsGroup: 0
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true   # writable for chown
             seccompProfile:
               type: RuntimeDefault
           resources: 
@@ -54,12 +57,15 @@ spec:
       {{- end }}
       containers:
         - name: {{ .Chart.Name }}
-          securityContext:
-            {{- toYaml .Values.securityContext | nindent 12 }}
-            seccompProfile:
-              type: RuntimeDefault
           image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
           imagePullPolicy: {{ .Values.image.pullPolicy }}
+          securityContext:
+            runAsNonRoot: true
+            runAsUser: 92
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true    # ✅ Hardened app container
+            seccompProfile:
+              type: RuntimeDefault
           ports:
             - name: http
               containerPort: 5000
