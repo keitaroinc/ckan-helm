@@ -34,6 +34,8 @@ spec:
           image: postgres:17-alpine
           securityContext:
             {{- toYaml $.Values.securityContext | nindent 12 }}
+            seccompProfile:
+              type: RuntimeDefault
           command:
             - sh
             - -c
@@ -62,9 +64,11 @@ spec:
                   name: ckancredentials
                   key: psqlMasterPassword
         - name: wait-for-solr
-          image: curlimages/curl:latest
+          image: curlimages/curl:8.17.0
           securityContext:
             {{- toYaml $.Values.securityContext | nindent 12 }}
+            seccompProfile:
+              type: RuntimeDefault
           command:
             - sh
             - -c
@@ -96,6 +100,8 @@ spec:
           imagePullPolicy: {{ $.Values.image.pullPolicy }}
           securityContext:
             {{- toYaml $.Values.securityContext | nindent 12 }}
+            seccompProfile:
+              type: RuntimeDefault
           env:
             {{- if $.Values.ckan.extraEnv }}
             {{ toYaml $.Values.ckan.extraEnv | nindent 12 }}

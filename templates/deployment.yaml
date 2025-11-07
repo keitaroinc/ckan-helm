@@ -37,6 +37,8 @@ spec:
           image: "{{ .Values.image.initContainer.repository }}:{{ .Values.image.initContainer.tag }}"
           securityContext:
             {{- toYaml .Values.securityContext | nindent 12 }}
+            seccompProfile:
+              type: RuntimeDefault
           command: ["sh", "-c", "chown -R 92:92 {{ .Values.ckan.storagePath }}"]
           volumeMounts:
             - name: ckan
@@ -47,6 +49,8 @@ spec:
         - name: {{ .Chart.Name }}
           securityContext:
             {{- toYaml .Values.securityContext | nindent 12 }}
+            seccompProfile:
+              type: RuntimeDefault
           image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           ports:

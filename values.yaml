@@ -11,11 +11,11 @@ image:
   pullPolicy: IfNotPresent
   testConnection:
     repository: busybox
-    tag: latest
+    tag: stable
     pullPolicy: IfNotPresent
   initContainer:
     repository: busybox
-    tag: latest
+    tag: stable
     pullPolicy: IfNotPresent
 
 imagePullSecrets: []

@@ -18,6 +18,8 @@ spec:
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           securityContext:
             {{- toYaml .Values.securityContext | nindent 12 }}
+            seccompProfile:
+              type: RuntimeDefault
           env:
             - name: PSQL_MASTER
               value: {{ .Values.ckan.psql.masterUser }}

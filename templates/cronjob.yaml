@@ -13,6 +13,8 @@ spec:
         spec:
           securityContext:
             {{- toYaml .Values.podSecurityContext | nindent 12 }}
+            seccompProfile:
+              type: RuntimeDefault
           containers:
             - name: ckan-email-notifications
               securityContext:
