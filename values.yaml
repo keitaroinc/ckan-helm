@@ -6,9 +6,9 @@
 replicaCount: 1
 
 image:
-  repository: keitaro/ckan
-  tag: 2.11.3
-  pullPolicy: IfNotPresent
+  repository: localhost:5050/gunicorn
+  tag: latest
+  pullPolicy: Always
   testConnection:
     repository: busybox
     tag: latest
@@ -87,6 +87,8 @@ ckan:
   ckanPlugins: "envvars activity image_view text_view datatables_view datastore xloader"
   # ckan.storagePath -- Storage path to be used by the instance
   storagePath: "/app/data"
+  # ckan.upload.enabled -- Set to true to enable file uploads in CKAN
+  uploads: "true"
   # ckan.activityStreamsEmailNotifications -- Set to true to enable email notifications for activity streams
   # for this to work smtp must be configured
   activityStreamsEmailNotifications: "true"

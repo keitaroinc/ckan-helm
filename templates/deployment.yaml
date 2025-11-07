@@ -95,6 +95,8 @@ spec:
               value: {{ .Values.ckan.ckanPlugins }}
             - name: CKAN__STORAGE_PATH
               value: {{ .Values.ckan.storagePath }}
+            - name: CKAN__UPLOADS_ENABLED
+              value: {{ .Values.ckan.uploads | quote }}
             - name: PSQL_MASTER
               value: {{ .Values.ckan.psql.masterUser }}
             - name: PSQL_PASSWD
