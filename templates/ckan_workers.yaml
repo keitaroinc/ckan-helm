@@ -102,7 +102,6 @@ spec:
           imagePullPolicy: {{ $.Values.image.pullPolicy }}
           securityContext:
             {{- toYaml $.Values.securityContext | nindent 12 }}
-            readOnlyRootFilesystem: true
             seccompProfile:
               type: RuntimeDefault
           env:
