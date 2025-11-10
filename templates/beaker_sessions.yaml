@@ -1,11 +1,31 @@
+{{- /*
+This template persists JWT and other secrets between upgrades.
+It reuses the existing secret if found; otherwise it generates new random values.
+*/ -}}
+
+{{- $existing := (lookup "v1" "Secret" .Release.Namespace "session-secret") }}
+
+{{- $jwt := "" }}
+{{- $session := "" }}
+{{- $csrf := "" }}
+
+{{- if $existing }}
+  {{- $jwt = index $existing.data "jwt_encode" | b64dec }}
+  {{- $session = index $existing.data "session_secret" | b64dec }}
+  {{- $csrf = index $existing.data "wtf_csrf_secret" | b64dec }}
+{{- else }}
+  {{- $jwt = randAlphaNum 43 }}
+  {{- $session = randAlphaNum 43 }}
+  {{- $csrf = randAlphaNum 32 }}
+{{- end }}
+
 apiVersion: v1
 kind: Secret
 metadata:
   name: session-secret
 type: Opaque
 stringData:
-  {{- $jwt := randAlphaNum 43 }}
-  jwt_encode: string:{{ $jwt }}
-  jwt_decode: string:{{ $jwt }}
-  session_secret: {{ randAlphaNum 43 }}
-  wtf_csrf_secret: {{ randAlphaNum 32 }}
+  jwt_encode: {{ $jwt | quote }}
+  jwt_decode: {{ $jwt | quote }}
+  session_secret: {{ $session | quote }}
+  wtf_csrf_secret: {{ $csrf | quote }}
