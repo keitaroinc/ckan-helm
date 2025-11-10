@@ -39,7 +39,7 @@ spec:
             runAsUser: 0
             runAsGroup: 0
             allowPrivilegeEscalation: false
-            readOnlyRootFilesystem: true   # writable for chown
+            readOnlyRootFilesystem: true
             seccompProfile:
               type: RuntimeDefault
           command: ["sh", "-c", "chown -R 92:92 {{ .Values.ckan.storagePath }}"]
@@ -53,10 +53,7 @@ spec:
           image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           securityContext:
-            runAsNonRoot: true
-            runAsUser: 92
-            allowPrivilegeEscalation: false
-            readOnlyRootFilesystem: true    # ✅ Hardened app container
+            {{- toYaml $.Values.securityContext | nindent 12 }}
             seccompProfile:
               type: RuntimeDefault
           ports:
@@ -103,6 +100,8 @@ spec:
               value: {{ .Values.ckan.siteUrl }}
             - name: CKAN__PLUGINS
               value: {{ .Values.ckan.ckanPlugins }}
+            - name: CKAN__UPLOADS_ENABLED
+              value: {{ .Values.ckan.upload_enabled | quote }}
             - name: CKAN__STORAGE_PATH
               value: {{ .Values.ckan.storagePath }}
             - name: PSQL_MASTER
