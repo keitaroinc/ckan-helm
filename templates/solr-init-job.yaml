@@ -25,7 +25,6 @@ spec:
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           securityContext:
             {{- toYaml $.Values.securityContext | nindent 12 }}
-            readOnlyRootFilesystem: true
             seccompProfile:
               type: RuntimeDefault
           env:
@@ -55,5 +54,6 @@ spec:
             - name: solr-configset-configmap
               mountPath: /app/solr-configset
       restartPolicy: Never
-  backoffLimit: 1
+      activeDeadlineSeconds: 200
+  backoffLimit: 2
 {{- end }}
