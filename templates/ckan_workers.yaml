@@ -29,6 +29,16 @@ spec:
       serviceAccountName: {{ include "ckan-chart.serviceAccountName" $ }}
       securityContext:
         {{- toYaml $.Values.podSecurityContext | nindent 8 }}
+      
+      volumes:
+        - name: tmp-storage
+          emptyDir: {}
+        {{- if $.Values.pvc.enabled }}
+        - name: ckan
+          persistentVolumeClaim:
+            claimName: ckan
+        {{- end }}
+
       initContainers:
         - name: wait-for-db
           image: postgres:17-alpine
@@ -102,6 +112,7 @@ spec:
           imagePullPolicy: {{ $.Values.image.pullPolicy }}
           securityContext:
             {{- toYaml $.Values.securityContext | nindent 12 }}
+            readOnlyRootFilesystem: true
             seccompProfile:
               type: RuntimeDefault
           env:
@@ -223,6 +234,16 @@ spec:
               value: {{ $.Values.ckan.activityStreamsEmailNotifications | quote }}
             - name: CKANEXT__ISSUES__SEND_EMAIL_NOTIFICATIONS
               value: {{ $.Values.ckan.issues.sendEmailNotifications | quote }}
+
+          volumeMounts:
+            - name: tmp-storage
+              mountPath: /tmp
+            {{- if $.Values.pvc.enabled }}
+            - name: ckan
+              mountPath: {{ $.Values.ckan.storagePath }}
+              readOnly: false
+            {{- end }}
+          
           resources:
             {{- toYaml $.Values.resources | nindent 12 }}
       {{- with $.Values.nodeSelector }}

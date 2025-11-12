@@ -27,12 +27,20 @@ spec:
       serviceAccountName: {{ include "ckan-chart.serviceAccountName" . }}
       securityContext:
         {{- toYaml .Values.podSecurityContext | nindent 8 }}
-      {{- if .Values.pvc.enabled }}
+      
       volumes:
+        {{- if .Values.pvc.enabled }}
         - name: ckan
           persistentVolumeClaim:
             claimName: ckan
+        {{- end }}
+        - name: tmp-storage
+          emptyDir: {}
+        - name: ckan-config-storage
+          emptyDir: {}
+      
       initContainers:
+        {{- if .Values.pvc.enabled }}
         - name: set-volume-ownsership
           image: "{{ .Values.image.initContainer.repository }}:{{ .Values.image.initContainer.tag }}"
           securityContext: 
@@ -47,13 +55,24 @@ spec:
             - name: ckan
               mountPath: {{ .Values.ckan.storagePath }}
               readOnly: false
-      {{- end }}
+        {{- end }}
+        - name: copy-writable-config
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+          securityContext:
+            {{- toYaml $.Values.securityContext | nindent 12 }}
+            readOnlyRootFilesystem: true
+          command: ["sh", "-c", "cp /app/production.ini /writable-config/production.ini"]
+          volumeMounts:
+            - name: ckan-config-storage
+              mountPath: /writable-config
+      
       containers:
         - name: {{ .Chart.Name }}
           image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           securityContext:
             {{- toYaml $.Values.securityContext | nindent 12 }}
+            readOnlyRootFilesystem: true
             seccompProfile:
               type: RuntimeDefault
           ports:
@@ -203,12 +222,19 @@ spec:
             failureThreshold: {{ .Values.ckan.liveness.failureThreshold }}
             timeoutSeconds: {{ .Values.ckan.liveness.timeoutSeconds }}
           {{- end }}
-          {{- if .Values.pvc.enabled }}
+          
           volumeMounts:
+            {{- if .Values.pvc.enabled }}
             - name: ckan
               mountPath: {{ .Values.ckan.storagePath }}
               readOnly: false
-          {{- end }}
+            {{- end }}
+            - name: tmp-storage
+              mountPath: /tmp
+            - name: ckan-config-storage
+              mountPath: /app/production.ini
+              subPath: production.ini
+          
           resources:
             {{- toYaml .Values.resources | nindent 12 }}
       {{- with .Values.nodeSelector }}
