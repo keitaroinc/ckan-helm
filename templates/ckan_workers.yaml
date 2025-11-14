@@ -29,7 +29,6 @@ spec:
       serviceAccountName: {{ include "ckan-chart.serviceAccountName" $ }}
       securityContext:
         {{- toYaml $.Values.podSecurityContext | nindent 8 }}
-      
       volumes:
         - name: tmp-storage
           emptyDir: {}
@@ -38,7 +37,6 @@ spec:
           persistentVolumeClaim:
             claimName: ckan
         {{- end }}
-
       initContainers:
         - name: wait-for-db
           image: postgres:17-alpine

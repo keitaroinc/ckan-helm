@@ -19,10 +19,9 @@ spec:
         - name: solr-configset-configmap
           configMap:
             name: solr-configset-configmap
-        # --- ADD THESE TWO VOLUMES ---
-        - name: solr-init-data # Writable path for your script
+        - name: solr-init-data
           emptyDir: {}
-        - name: tmp-storage # Writable /tmp
+        - name: tmp-storage
           emptyDir: {}
       containers:
         - name: solr-init
@@ -30,7 +29,7 @@ spec:
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           securityContext:
             {{- toYaml $.Values.securityContext | nindent 12 }}
-            readOnlyRootFilesystem: true  # <--- ADD THIS LINE TO FIX SCAN
+            readOnlyRootFilesystem: true
             seccompProfile:
               type: RuntimeDefault
           env:
@@ -59,9 +58,8 @@ spec:
               mountPath: /app/solr-init
             - name: solr-configset-configmap
               mountPath: /app/solr-configset
-            # --- ADD THESE TWO VOLUME MOUNTS ---
             - name: solr-init-data
-              mountPath: /app/data # The path your script writes to
+              mountPath: /app/data
             - name: tmp-storage
               mountPath: /tmp
       restartPolicy: Never

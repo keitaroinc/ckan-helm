@@ -27,7 +27,6 @@ spec:
       serviceAccountName: {{ include "ckan-chart.serviceAccountName" . }}
       securityContext:
         {{- toYaml .Values.podSecurityContext | nindent 8 }}
-      
       volumes:
         {{- if .Values.pvc.enabled }}
         - name: ckan
@@ -38,7 +37,6 @@ spec:
           emptyDir: {}
         - name: ckan-config-storage
           emptyDir: {}
-      
       initContainers:
         {{- if .Values.pvc.enabled }}
         - name: set-volume-ownsership
@@ -65,7 +63,6 @@ spec:
           volumeMounts:
             - name: ckan-config-storage
               mountPath: /writable-config
-      
       containers:
         - name: {{ .Chart.Name }}
           image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
