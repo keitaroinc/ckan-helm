@@ -6,44 +6,51 @@ metadata:
 spec:
   template:
     spec:
-    {{- with .Values.imagePullSecrets }}
+      securityContext:
+        {{- toYaml .Values.podSecurityContext | nindent 8 }}
+      {{- with .Values.imagePullSecrets }}
       imagePullSecrets:
         {{- toYaml . | nindent 8 }}
-    {{- end }}
+      {{- end }}
       containers:
-      - name: psql-init
-        image: "keitaro/psql-init:0.0.1"
-        imagePullPolicy: {{ .Values.image.pullPolicy }}
-        env:
-        - name: PSQL_MASTER
-          value: {{ .Values.ckan.psql.masterUser }}
-        - name: PSQL_PASSWD
-          value: {{ .Values.ckan.psql.masterPassword }}
-        - name: PSQL_DB
-          value: {{ .Values.ckan.psql.masterDatabase }}
-        - name: CKAN_SOLR_URL
-          value: {{ .Values.ckan.solr }}
-        - name: CKAN_SOLR_USER
-          value: {{ .Values.solr.auth.adminUsername }}
-        - name: CKAN_SOLR_PASSWORD
-          value: {{ .Values.solr.auth.adminPassword }}
-        - name: CKAN__DATAPUSHER__URL
-          value: {{ .Values.ckan.datapusherUrl }}
-        - name: CKAN_SQLALCHEMY_URL
-          valueFrom:
-            secretKeyRef:
-              name: ckancredentials
-              key: ckanSqlAlchemyUrl
-        - name: CKAN_DATASTORE_WRITE_URL
-          valueFrom:
-            secretKeyRef:
-              name: ckancredentials
-              key: ckanDatastoreWriteUrl
-        - name: CKAN_DATASTORE_READ_URL
-          valueFrom:
-            secretKeyRef:
-              name: ckancredentials
-              key: ckanDatastoreReadUrl
+        - name: psql-init
+          image: "keitaro/psql-init:0.0.1"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          securityContext:
+            {{- toYaml .Values.securityContext | nindent 12 }}
+            readOnlyRootFilesystem: true
+            seccompProfile:
+              type: RuntimeDefault
+          env:
+            - name: PSQL_MASTER
+              value: {{ .Values.ckan.psql.masterUser }}
+            - name: PSQL_PASSWD
+              value: {{ .Values.ckan.psql.masterPassword }}
+            - name: PSQL_DB
+              value: {{ .Values.ckan.psql.masterDatabase }}
+            - name: CKAN_SOLR_URL
+              value: {{ .Values.ckan.solr }}
+            - name: CKAN_SOLR_USER
+              value: {{ .Values.solr.auth.adminUsername }}
+            - name: CKAN_SOLR_PASSWORD
+              value: {{ .Values.solr.auth.adminPassword }}
+            - name: CKAN__DATAPUSHER__URL
+              value: {{ .Values.ckan.datapusherUrl }}
+            - name: CKAN_SQLALCHEMY_URL
+              valueFrom:
+                secretKeyRef:
+                  name: ckancredentials
+                  key: ckanSqlAlchemyUrl
+            - name: CKAN_DATASTORE_WRITE_URL
+              valueFrom:
+                secretKeyRef:
+                  name: ckancredentials
+                  key: ckanDatastoreWriteUrl
+            - name: CKAN_DATASTORE_READ_URL
+              valueFrom:
+                secretKeyRef:
+                  name: ckancredentials
+                  key: ckanDatastoreReadUrl
       restartPolicy: Never
   backoffLimit: 1
 {{- end }}

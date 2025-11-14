@@ -11,78 +11,83 @@ spec:
     spec:
       template:
         spec:
+          securityContext:
+            {{- toYaml .Values.podSecurityContext | nindent 12 }}
+            seccompProfile:
+              type: RuntimeDefault
           containers:
-          - name: ckan-email-notifications
-            securityContext:
-              {{- toYaml .Values.securityContext | nindent 14 }}
-            image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
-            imagePullPolicy: {{ .Values.image.pullPolicy }}
-            command: ["curl"]
-            args:
-            - -s
-            - -H 
-            - "Authorization: $(CKAN_SYSADMIN_API_TOKEN)"
-            - -d
-            - "{}"
-            - "http://ckan/api/action/send_email_notifications"
-            env:
+            - name: ckan-email-notifications
+              securityContext:
+                {{- toYaml .Values.securityContext | nindent 16 }}
+                readOnlyRootFilesystem: true
+              image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+              imagePullPolicy: {{ .Values.image.pullPolicy }}
+              command: ["curl"]
+              args:
+                - -s
+                - -H
+                - "Authorization: $(CKAN_SYSADMIN_API_TOKEN)"
+                - -d
+                - "{}"
+                - "http://ckan/api/action/send_email_notifications"
+              env:
 {{- if .Values.ckan.extraEnv }}
-{{ toYaml .Values.ckan.extraEnv | indent 12 }}
+{{ toYaml .Values.ckan.extraEnv | indent 14 }}
 {{- end }}
-            - name: CKAN__SITE_TITLE
-              value: {{ .Values.ckan.siteTitle }}
-            - name: CKAN_SITE_ID
-              value: {{ .Values.ckan.siteId }}
-            - name: CKAN_SITE_URL
-              value: {{ .Values.ckan.siteUrl }}
-            - name: CKAN__PLUGINS
-              value: {{ .Values.ckan.ckanPlugins }}
-            - name: CKAN__STORAGE_PATH
-              value: {{ .Values.ckan.storagePath }}
-            - name: CKAN_SYSADMIN_API_TOKEN
-              valueFrom:
-                secretKeyRef:
-                  name: ckansysadminapitoken
-                  key: sysadminApiToken
-            - name: CKAN_SQLALCHEMY_URL
-              valueFrom:
-                secretKeyRef:
-                  name: ckancredentials
-                  key: ckanSqlAlchemyUrl
-            - name: CKAN_DATASTORE_WRITE_URL
-              valueFrom:
-                secretKeyRef:
-                  name: ckancredentials
-                  key: ckanDatastoreWriteUrl
-            - name: CKAN_DATASTORE_READ_URL
-              valueFrom:
-                secretKeyRef:
-                  name: ckancredentials
-                  key: ckanDatastoreReadUrl
-            - name: CKAN_SOLR_URL
-              value: {{ .Values.ckan.solr }}
-            - name: CKAN__REDIS__URL
-              value: {{ .Values.ckan.redis }}
-            - name: CKAN__DATAPUSHER__URL
-              value: {{ .Values.ckan.datapusherUrl }}
-            - name: CKAN___SMTP__SERVER
-              value: {{ .Values.ckan.smtp.server | quote }}
-            - name: CKAN___SMTP__USER
-              value: {{ .Values.ckan.smtp.user }}
-            - name: CKAN___SMTP__PASSWORD
-              valueFrom:
-                secretKeyRef:
-                  name: ckancredentials
-                  key: smtpPassword
-            - name: CKAN___SMTP__MAIL_FROM
-              value: {{ .Values.ckan.smtp.mailFrom }}
-            - name: CKAN___SMTP__TLS
-              value: {{ .Values.ckan.smtp.tls }}
-            - name: CKAN___SMTP__STARTTLS
-              value: {{ .Values.ckan.smtp.starttls | quote }}
-            - name: CKAN__ACTIVITY_STREAMS_EMAIL_NOTIFICATIONS
-              value: {{ .Values.ckan.activityStreamsEmailNotifications | quote }}
-            - name: CKANEXT__ISSUES__SEND_EMAIL_NOTIFICATIONS
-              value: {{ .Values.ckan.issues.sendEmailNotifications | quote }}
+                - name: CKAN__SITE_TITLE
+                  value: {{ .Values.ckan.siteTitle }}
+                - name: CKAN_SITE_ID
+                  value: {{ .Values.ckan.siteId }}
+                - name: CKAN_SITE_URL
+                  value: {{ .Values.ckan.siteUrl }}
+                - name: CKAN__PLUGINS
+                  value: {{ .Values.ckan.ckanPlugins }}
+                - name: CKAN__STORAGE_PATH
+                  value: {{ .Values.ckan.storagePath }}
+                - name: CKAN_SYSADMIN_API_TOKEN
+                  valueFrom:
+                    secretKeyRef:
+                      name: ckansysadminapitoken
+                      key: sysadminApiToken
+                - name: CKAN_SQLALCHEMY_URL
+                  valueFrom:
+                    secretKeyRef:
+                      name: ckancredentials
+                      key: ckanSqlAlchemyUrl
+                - name: CKAN_DATASTORE_WRITE_URL
+                  valueFrom:
+                    secretKeyRef:
+                      name: ckancredentials
+                      key: ckanDatastoreWriteUrl
+                - name: CKAN_DATASTORE_READ_URL
+                  valueFrom:
+                    secretKeyRef:
+                      name: ckancredentials
+                      key: ckanDatastoreReadUrl
+                - name: CKAN_SOLR_URL
+                  value: {{ .Values.ckan.solr }}
+                - name: CKAN__REDIS__URL
+                  value: {{ .Values.ckan.redis }}
+                - name: CKAN__DATAPUSHER__URL
+                  value: {{ .Values.ckan.datapusherUrl }}
+                - name: CKAN___SMTP__SERVER
+                  value: {{ .Values.ckan.smtp.server | quote }}
+                - name: CKAN___SMTP__USER
+                  value: {{ .Values.ckan.smtp.user }}
+                - name: CKAN___SMTP__PASSWORD
+                  valueFrom:
+                    secretKeyRef:
+                      name: ckancredentials
+                      key: smtpPassword
+                - name: CKAN___SMTP__MAIL_FROM
+                  value: {{ .Values.ckan.smtp.mailFrom }}
+                - name: CKAN___SMTP__TLS
+                  value: {{ .Values.ckan.smtp.tls }}
+                - name: CKAN___SMTP__STARTTLS
+                  value: {{ .Values.ckan.smtp.starttls | quote }}
+                - name: CKAN__ACTIVITY_STREAMS_EMAIL_NOTIFICATIONS
+                  value: {{ .Values.ckan.activityStreamsEmailNotifications | quote }}
+                - name: CKANEXT__ISSUES__SEND_EMAIL_NOTIFICATIONS
+                  value: {{ .Values.ckan.issues.sendEmailNotifications | quote }}
           restartPolicy: OnFailure
 {{- end }}

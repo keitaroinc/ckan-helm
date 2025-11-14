@@ -7,15 +7,15 @@ replicaCount: 1
 
 image:
   repository: keitaro/ckan
-  tag: 2.11.3
+  tag: 2.11.4
   pullPolicy: IfNotPresent
   testConnection:
     repository: busybox
-    tag: latest
+    tag: stable
     pullPolicy: IfNotPresent
   initContainer:
     repository: busybox
-    tag: latest
+    tag: stable
     pullPolicy: IfNotPresent
 
 imagePullSecrets: []
@@ -87,6 +87,8 @@ ckan:
   ckanPlugins: "envvars activity image_view text_view datatables_view datastore xloader"
   # ckan.storagePath -- Storage path to be used by the instance
   storagePath: "/app/data"
+  # ckan.upload_enabled -- Set to "true" to enable file uploads in CKAN
+  upload_enabled: "true"
   # ckan.activityStreamsEmailNotifications -- Set to true to enable email notifications for activity streams
   # for this to work smtp must be configured
   activityStreamsEmailNotifications: "true"
@@ -163,7 +165,7 @@ ckan:
     # ckan.readiness.failureThreshold -- Failure threshold for the readiness probe
     failureThreshold: 6
     # ckan.readiness.timeoutSeconds -- Timeout interval for the readiness probe
-    timeoutSeconds: 10
+    timeoutSeconds: 15
 
   liveness:
     # ckan.liveness.initialDelaySeconds -- Initial delay for the liveness probe
@@ -173,7 +175,7 @@ ckan:
     # ckan.liveness.failureThreshold -- Failure threshold for the liveness probe
     failureThreshold: 6
     # ckan.liveness.timeoutSeconds -- Timeout interval for the liveness probe
-    timeoutSeconds: 10
+    timeoutSeconds: 15
 
   db:
     # ckan.db.ckanDbUrl -- Url of the PostgreSQL server where the CKAN database is hosted
@@ -221,16 +223,13 @@ labels:
   enabled: false
   ckan: []
 
-podSecurityContext: {}
-  # fsGroup: 2000
+podSecurityContext:
+  runAsUser: 92
+  runAsGroup: 92
 
-securityContext: {}
-  # capabilities:
-  #   drop:
-  #   - ALL
-  # readOnlyRootFilesystem: true
-  # runAsNonRoot: true
-  # runAsUser: 1000
+securityContext:
+  allowPrivilegeEscalation: false
+
 
 service:
   # service.type -- Type of the service created for the CKAN pod

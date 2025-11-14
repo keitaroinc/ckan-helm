@@ -29,57 +29,75 @@ spec:
       serviceAccountName: {{ include "ckan-chart.serviceAccountName" $ }}
       securityContext:
         {{- toYaml $.Values.podSecurityContext | nindent 8 }}
+      volumes:
+        - name: tmp-storage
+          emptyDir: {}
+        {{- if $.Values.pvc.enabled }}
+        - name: ckan
+          persistentVolumeClaim:
+            claimName: ckan
+        {{- end }}
       initContainers:
-      - name: wait-for-db
-        image: postgres:17-alpine
-        command:
-          - sh
-          - -c
-          - |
-            for i in {1..5}; do
-              if PGPASSWORD=$PSQL_PASSWD psql -h $DB_HOST -U $PSQL_MASTER -d $PSQL_DB -c '\q'; then
-                echo "[prerun] Successfully connected to the database"
-                exit 0
-              else
-                echo "[prerun] Database not ready, retrying in 10s..."
-                sleep 10
-              fi
-            done
-            echo "[prerun] Giving up after 5 tries"
-            exit 1
-        env:
-          - name: PSQL_MASTER
-            value: {{ $.Values.ckan.psql.masterUser }}
-          - name: PSQL_DB
-            value: {{ $.Values.ckan.psql.masterDatabase }}
-          - name: DB_HOST
-            value: {{ $.Values.ckan.db.ckanDbUrl }}
-          - name: PSQL_PASSWD
-            valueFrom:
-              secretKeyRef:
-                name: ckancredentials
-                key: psqlMasterPassword
-      - name: wait-for-solr
-        image: curlimages/curl:latest
-        command:
-          - sh
-          - -c
-          - |
-            for i in {1..10}; do
-              resp=$(curl -sS -u "$CKAN_SOLR_USER:$CKAN_SOLR_PASSWORD" "$CKAN_SOLR_URL/schema/name?wt=json")
-              echo $resp | grep -q "ckan" && exit 0
-              echo "[prerun] Solr not ready, retrying in 20s..."
-              sleep 20
-            done
-            echo "[prerun] Giving up after 10 tries"
-            exit 1
-        env:
-          - name: CKAN_SOLR_URL
-            value: {{ $.Values.ckan.solr }}
-          - name: CKAN_SOLR_USER
-            value: {{ $.Values.solr.auth.adminUsername }}
-          - name: CKAN_SOLR_PASSWORD
-            value: {{ $.Values.solr.auth.adminPassword }}
+        - name: wait-for-db
+          image: postgres:17-alpine
+          securityContext:
+            {{- toYaml $.Values.securityContext | nindent 12 }}
+            readOnlyRootFilesystem: true
+            seccompProfile:
+              type: RuntimeDefault
+          command:
+            - sh
+            - -c
+            - |
+              for i in {1..5}; do
+                if PGPASSWORD=$PSQL_PASSWD psql -h $DB_HOST -U $PSQL_MASTER -d $PSQL_DB -c '\q'; then
+                  echo "[prerun] Successfully connected to the database"
+                  exit 0
+                else
+                  echo "[prerun] Database not ready, retrying in 10s..."
+                  sleep 10
+                fi
+              done
+              echo "[prerun] Giving up after 5 tries"
+              exit 1
+          env:
+            - name: PSQL_MASTER
+              value: {{ $.Values.ckan.psql.masterUser }}
+            - name: PSQL_DB
+              value: {{ $.Values.ckan.psql.masterDatabase }}
+            - name: DB_HOST
+              value: {{ $.Values.ckan.db.ckanDbUrl }}
+            - name: PSQL_PASSWD
+              valueFrom:
+                secretKeyRef:
+                  name: ckancredentials
+                  key: psqlMasterPassword
+        - name: wait-for-solr
+          image: curlimages/curl:8.17.0
+          securityContext:
+            {{- toYaml $.Values.securityContext | nindent 12 }}
+            readOnlyRootFilesystem: true
+            seccompProfile:
+              type: RuntimeDefault
+          command:
+            - sh
+            - -c
+            - |
+              for i in {1..10}; do
+                resp=$(curl -sS -u "$CKAN_SOLR_USER:$CKAN_SOLR_PASSWORD" "$CKAN_SOLR_URL/schema/name?wt=json")
+                echo $resp | grep -q "ckan" && exit 0
+                echo "[prerun] Solr not ready, retrying in 20s..."
+                sleep 20
+              done
+              echo "[prerun] Giving up after 10 tries"
+              exit 1
+          env:
+            - name: CKAN_SOLR_URL
+              value: {{ $.Values.ckan.solr }}
+            - name: CKAN_SOLR_USER
+              value: {{ $.Values.solr.auth.adminUsername }}
+            - name: CKAN_SOLR_PASSWORD
+              value: {{ $.Values.solr.auth.adminPassword }}
       containers:
         - name: {{ .name }}
           image: "{{ $.Values.image.repository }}:{{ $.Values.image.tag }}"
@@ -92,6 +110,9 @@ spec:
           imagePullPolicy: {{ $.Values.image.pullPolicy }}
           securityContext:
             {{- toYaml $.Values.securityContext | nindent 12 }}
+            readOnlyRootFilesystem: true
+            seccompProfile:
+              type: RuntimeDefault
           env:
             {{- if $.Values.ckan.extraEnv }}
             {{ toYaml $.Values.ckan.extraEnv | nindent 12 }}
@@ -211,6 +232,16 @@ spec:
               value: {{ $.Values.ckan.activityStreamsEmailNotifications | quote }}
             - name: CKANEXT__ISSUES__SEND_EMAIL_NOTIFICATIONS
               value: {{ $.Values.ckan.issues.sendEmailNotifications | quote }}
+
+          volumeMounts:
+            - name: tmp-storage
+              mountPath: /tmp
+            {{- if $.Values.pvc.enabled }}
+            - name: ckan
+              mountPath: {{ $.Values.ckan.storagePath }}
+              readOnly: false
+            {{- end }}
+          
           resources:
             {{- toYaml $.Values.resources | nindent 12 }}
       {{- with $.Values.nodeSelector }}

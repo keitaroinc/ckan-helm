@@ -122,7 +122,7 @@ def prepare_configset(cfset_name):
             data=data,
             auth=(solr_admin_username, solr_admin_password),
             headers={'Content-Type': 'application/octet-stream'},
-            timeout=10  # avoid hanging indefinitely
+            timeout=60  # avoid hanging indefinitely
         )
         # Raise for HTTP errors (4xx/5xx)
         res.raise_for_status()
