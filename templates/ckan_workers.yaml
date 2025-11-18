@@ -43,6 +43,7 @@ spec:
           securityContext:
             {{- toYaml $.Values.securityContext | nindent 12 }}
             readOnlyRootFilesystem: true
+            runAsNonRoot: true
             seccompProfile:
               type: RuntimeDefault
           command:
@@ -77,6 +78,7 @@ spec:
           securityContext:
             {{- toYaml $.Values.securityContext | nindent 12 }}
             readOnlyRootFilesystem: true
+            runAsNonRoot: true
             seccompProfile:
               type: RuntimeDefault
           command:
@@ -110,6 +112,7 @@ spec:
           imagePullPolicy: {{ $.Values.image.pullPolicy }}
           securityContext:
             {{- toYaml $.Values.securityContext | nindent 12 }}
+            runAsNonRoot: true
             readOnlyRootFilesystem: true
             seccompProfile:
               type: RuntimeDefault

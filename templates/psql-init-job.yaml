@@ -19,8 +19,21 @@ spec:
           securityContext:
             {{- toYaml .Values.securityContext | nindent 12 }}
             readOnlyRootFilesystem: true
+            runAsNonRoot: true
             seccompProfile:
               type: RuntimeDefault
+            capabilities:
+              drop:
+                - ALL
+              add:
+                - NET_BIND_SERVICE
+          resources:
+            requests:
+              memory: "64Mi"
+              cpu: "100m"
+            limits:
+              memory: "128Mi"
+              cpu: "200m"
           env:
             - name: PSQL_MASTER
               value: {{ .Values.ckan.psql.masterUser }}
