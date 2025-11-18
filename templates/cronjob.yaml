@@ -13,6 +13,7 @@ spec:
         spec:
           securityContext:
             {{- toYaml .Values.podSecurityContext | nindent 12 }}
+            runAsNonRoot: true
             seccompProfile:
               type: RuntimeDefault
           containers:

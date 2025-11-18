@@ -152,8 +152,8 @@ def prepare_configset(cfset_name):
 
 
 def create_solr_collection(name, cfset_name, num_shards, repl_factor,
-                           max_shards_node):
-    time.sleep(5)
+                           max_shards_node, max_retries=10, retry_delay=10):
+
     print("\nCreating Solr collection based on uploaded configset...")
     url = solr_url + '/solr/admin/collections?action=CREATE&name=' + name
     url = url + '&numShards=' + num_shards
@@ -161,31 +161,38 @@ def create_solr_collection(name, cfset_name, num_shards, repl_factor,
     url = url + '&maxShardsPerNode=' + max_shards_node
     url = url + '&collection.configName=' + cfset_name
     print("Trying: " + url)
-    try:
-        res = requests.post(url, 
-                            auth=(solr_admin_username,solr_admin_password), timeout=10)
-        res.raise_for_status()
-    except requests.exceptions.HTTPError as e:
-        print(f"HTTP Error: {res.status_code} - {res.text}")
-        # If collection already exists, exit successfully
-        if res.status_code == 400 and 'already exists' in res.text:
-            print("Collection already exists. Exiting successfully.")
-            sys.exit(0)
-        print("Failed to create collection due to HTTP error.")
-        sys.exit(4)
-    except requests.exceptions.ConnectionError as e:
-        print(f"Connection error: {e}")
-        sys.exit(4)
-    except requests.exceptions.Timeout as e:
-        print(f"Request timed out: {e}")
-        sys.exit(4)
-    except requests.exceptions.RequestException as e:
-        print(f"Request failed: {e}")
-        sys.exit(4)
-    except Exception as e:
-        print(f"Unexpected error: {e}")
-        sys.exit(4)
-    print("OK")
+    attempt = 0
+    while attempt < max_retries:
+        try:
+            res = requests.post(url, 
+                                auth=(solr_admin_username,solr_admin_password), timeout=10)
+            res.raise_for_status()
+        except requests.exceptions.HTTPError as e:
+            print(f"HTTP Error: {res.status_code} - {res.text}")
+            # If collection already exists, exit successfully
+            if res.status_code == 400 and 'already exists' in res.text:
+                print("Collection already exists. Exiting successfully.")
+                sys.exit(0)
+            print("Failed to create collection due to HTTP error.")
+            sys.exit(4)
+        except (requests.exceptions.ConnectionError, requests.exceptions.Timeout) as e:
+            print(f"Connection/Timeout error: {e}")
+            attempt += 1
+            if attempt < max_retries:
+                print(f"Retrying in {retry_delay} seconds... (Attempt {attempt}/{max_retries})")
+                time.sleep(retry_delay)
+                continue
+            else:
+                print("Max retries reached. Giving up.")
+                sys.exit(4)
+        except requests.exceptions.RequestException as e:
+            print(f"Request failed: {e}")
+            sys.exit(4)
+        except Exception as e:
+            print(f"Unexpected error: {e}")
+            sys.exit(4)
+        print("OK")
+        return
 
 
 def solr_collection_alreadyexists(solr_url):

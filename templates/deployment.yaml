@@ -59,6 +59,9 @@ spec:
           securityContext:
             {{- toYaml $.Values.securityContext | nindent 12 }}
             readOnlyRootFilesystem: true
+            runAsNonRoot: true
+            seccompProfile:
+              type: RuntimeDefault
           command: ["sh", "-c", "cp /app/production.ini /writable-config/production.ini"]
           volumeMounts:
             - name: ckan-config-storage
@@ -70,6 +73,7 @@ spec:
           securityContext:
             {{- toYaml $.Values.securityContext | nindent 12 }}
             readOnlyRootFilesystem: true
+            runAsNonRoot: true
             seccompProfile:
               type: RuntimeDefault
           ports:
