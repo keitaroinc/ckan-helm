@@ -33,7 +33,7 @@ spec:
                 - "http://ckan/api/action/send_email_notifications"
               env:
 {{- if .Values.ckan.extraEnv }}
-{{ toYaml .Values.ckan.extraEnv | indent 14 }}
+{{ toYaml .Values.ckan.extraEnv | nindent 16 }}
 {{- end }}
                 - name: CKAN__SITE_TITLE
                   value: {{ .Values.ckan.siteTitle }}
