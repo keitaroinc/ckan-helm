@@ -5,7 +5,7 @@ CKAN Helm Chart
 
 A Helm chart for CKAN
 
-Current chart version is `4.0.3`
+Current chart version is `4.0.4`
 
 This chart deploys a self contained CKAN instance with all of its dependencies. These can be enabled/disabled if they already exist in your infrastructure.
 
