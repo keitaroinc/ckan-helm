@@ -42,10 +42,12 @@ spec:
           image: postgres:17-alpine
           securityContext:
             {{- toYaml $.Values.securityContext | nindent 12 }}
+            {{- if not $.Values.openshift.enabled }}
             readOnlyRootFilesystem: true
             runAsNonRoot: true
             seccompProfile:
               type: RuntimeDefault
+            {{- end }}
           command:
             - sh
             - -c
@@ -77,10 +79,12 @@ spec:
           image: curlimages/curl:8.17.0
           securityContext:
             {{- toYaml $.Values.securityContext | nindent 12 }}
+            {{- if not $.Values.openshift.enabled }}
             readOnlyRootFilesystem: true
             runAsNonRoot: true
             seccompProfile:
               type: RuntimeDefault
+            {{- end }}
           command:
             - sh
             - -c
@@ -112,10 +116,12 @@ spec:
           imagePullPolicy: {{ $.Values.image.pullPolicy }}
           securityContext:
             {{- toYaml $.Values.securityContext | nindent 12 }}
+            {{- if not $.Values.openshift.enabled }}
             runAsNonRoot: true
             readOnlyRootFilesystem: true
             seccompProfile:
               type: RuntimeDefault
+            {{- end }}
           env:
             {{- if $.Values.ckan.extraEnv }}
             {{ toYaml $.Values.ckan.extraEnv | nindent 12 }}
