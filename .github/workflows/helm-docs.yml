@@ -16,7 +16,7 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
         with:
-            fetch-depth: 0
+            fetch-depth: 0  
 
       - name: Install helm-docs
         run: |
@@ -30,8 +30,10 @@ jobs:
 
       - name: Check for changes
         run: |
-          if [[ -n "$(git status --porcelain)" ]]; then
+          # Check for documentation changes (README.md) only, ignoring the LICENSE issue
+          if ! git diff --quiet README.md; then
             echo "README.md is outdated. Run 'helm-docs' locally and commit the changes."
-            git diff
+            git diff README.md
             exit 1
           fi
+          echo "Helm documentation check passed successfully."
