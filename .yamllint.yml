@@ -2,7 +2,7 @@ extend: default
 
 rules:
   indentation:
-    indent: 2
+    spaces: 2
     indent-sequences: consistent
 
   line-length:
