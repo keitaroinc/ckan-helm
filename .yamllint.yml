@@ -1,0 +1,17 @@
+extend: default
+
+rules:
+  indentation:
+    indent: 2
+    indent-sequences: consistent
+
+  line-length:
+    max: 120
+    level: warning
+
+  trailing-spaces: enable
+  new-lines: enable
+
+ignore: |
+  charts/**
+  .github/**
