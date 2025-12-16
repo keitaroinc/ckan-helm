@@ -1,0 +1,40 @@
+# Custom CKAN image with scheming and DCAT extensions
+# Based on keitaro/ckan:2.11.4
+
+FROM keitaro/ckan:2.11.4
+
+# Extension versions
+ENV SCHEMING_VERSION="3.1.0"
+ENV DCAT_VERSION="2.4.2"
+ENV RDFLIB_VERSION="7.0.0"
+
+# Plugin configuration - keep all base plugins and add new ones
+ENV CKAN__PLUGINS="envvars activity image_view text_view datatables_view datastore xloader scheming_datasets dcat dcat_json_interface structured_data"
+
+# Switch to root user for installation
+USER root
+
+# Install extensions using uv (faster and more reliable than pip)
+RUN uv pip install --system \
+    ckanext-scheming==${SCHEMING_VERSION} \
+    ckanext-dcat==${DCAT_VERSION} \
+    rdflib==${RDFLIB_VERSION} && \
+    # Create directory for custom schemas
+    mkdir -p /app/schemas && \
+    chown -R ckan:ckan /app/schemas && \
+    # Update plugin configuration in production.ini
+    ckan config-tool ${APP_DIR}/production.ini "ckan.plugins = ${CKAN__PLUGINS}" && \
+    # Clean up uv cache to reduce image size
+    rm -rf /root/.cache/uv
+
+# Copy custom scheming schema
+COPY --chown=ckan:ckan schemas/dataset_schema.yaml /app/schemas/
+
+# Switch back to ckan user
+USER ckan
+
+# Metadata labels
+LABEL description="CKAN 2.11.4 with scheming ${SCHEMING_VERSION} and DCAT ${DCAT_VERSION}"
+LABEL extensions="ckanext-scheming==${SCHEMING_VERSION} ckanext-dcat==${DCAT_VERSION}"
+LABEL maintainer="Stad Gent"
+LABEL org.opencontainers.image.source="https://github.com/MPParsley/ckan-helm"
