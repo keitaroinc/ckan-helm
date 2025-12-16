@@ -4,22 +4,25 @@
 FROM keitaro/ckan:2.11.4
 
 # Extension versions
-ENV SCHEMING_VERSION="3.1.0"
-ENV DCAT_VERSION="2.4.2"
-ENV RDFLIB_VERSION="7.0.0"
+ENV SCHEMING_VERSION="release-3.1.0"
+ENV HARVEST_VERSION="v1.5.6"
+ENV DCAT_VERSION="v2.4.2"
 
-# Plugin configuration - keep all base plugins and add DCAT (as per docs)
+# Plugin configuration - keep all base plugins and add DCAT
+# dcat: core DCAT RDF export functionality
+# dcat_rdf_harvester: harvest DCAT datasets from other catalogs
+# structured_data: schema.org/DCAT-AP JSON-LD in dataset pages
 ENV CKAN__PLUGINS="envvars activity image_view text_view datatables_view datastore xloader dcat dcat_rdf_harvester structured_data"
 
 # Switch to root user for installation
 USER root
 
-# Install scheming (required by structured_data) and DCAT extension using uv
-RUN uv pip install --system \
-    ckanext-scheming==${SCHEMING_VERSION} \
-    ckanext-dcat==${DCAT_VERSION} \
-    rdflib==${RDFLIB_VERSION} && \
-    # Update plugin configuration in production.ini using sed
+# Install extensions using uv
+RUN uv pip install --system git+https://github.com/ckan/ckanext-scheming.git@${SCHEMING_VERSION} && \
+    uv pip install --system git+https://github.com/ckan/ckanext-harvest.git@${HARVEST_VERSION} && \
+    uv pip install --system -r https://raw.githubusercontent.com/ckan/ckanext-harvest/${HARVEST_VERSION}/requirements.txt && \
+    uv pip install --system git+https://github.com/ckan/ckanext-dcat.git@${DCAT_VERSION} && \
+    # Update plugin configuration in production.ini
     sed -i 's/^ckan.plugins =.*/ckan.plugins = '"${CKAN__PLUGINS}"'/' /app/production.ini && \
     # Add DCAT configuration directly to production.ini
     echo "" >> /app/production.ini && \
@@ -37,7 +40,7 @@ RUN uv pip install --system \
 USER ckan
 
 # Metadata labels
-LABEL description="CKAN 2.11.4 with DCAT ${DCAT_VERSION} (euro_dcat_ap_3) and scheming ${SCHEMING_VERSION}"
-LABEL extensions="ckanext-scheming==${SCHEMING_VERSION} ckanext-dcat==${DCAT_VERSION}"
+LABEL description="CKAN 2.11.4 with DCAT ${DCAT_VERSION} (euro_dcat_ap_3), scheming ${SCHEMING_VERSION}, and harvest ${HARVEST_VERSION}"
+LABEL extensions="ckanext-scheming@${SCHEMING_VERSION} ckanext-harvest@${HARVEST_VERSION} ckanext-dcat@${DCAT_VERSION}"
 LABEL maintainer="Stad Gent"
 LABEL org.opencontainers.image.source="https://github.com/MPParsley/ckan-helm"
