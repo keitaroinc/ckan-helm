@@ -1,40 +1,29 @@
-# Custom CKAN image with scheming and DCAT extensions
+# Custom CKAN image with DCAT extension
 # Based on keitaro/ckan:2.11.4
 
 FROM keitaro/ckan:2.11.4
 
 # Extension versions
-ENV SCHEMING_VERSION="3.1.0"
 ENV DCAT_VERSION="2.4.2"
 ENV RDFLIB_VERSION="7.0.0"
 
-# Plugin configuration - keep all base plugins and add new ones
-ENV CKAN__PLUGINS="envvars activity image_view text_view datatables_view datastore xloader scheming_datasets dcat dcat_json_interface structured_data"
+# Plugin configuration - keep all base plugins and add DCAT
+ENV CKAN__PLUGINS="envvars activity image_view text_view datatables_view datastore xloader dcat dcat_json_interface structured_data"
 
 # Switch to root user for installation
 USER root
 
-# Install extensions using uv (faster and more reliable than pip)
+# Install DCAT extension using uv (faster and more reliable than pip)
 RUN uv pip install --system \
-    ckanext-scheming==${SCHEMING_VERSION} \
     ckanext-dcat==${DCAT_VERSION} \
     rdflib==${RDFLIB_VERSION} && \
-    # Create directory for custom schemas
-    mkdir -p /app/schemas && \
-    chown -R ckan:ckan /app/schemas && \
     # Update plugin configuration in production.ini using sed
     sed -i 's/^ckan.plugins =.*/ckan.plugins = '"${CKAN__PLUGINS}"'/' /app/production.ini && \
-    # Add scheming and DCAT configuration directly to production.ini
-    echo "" >> /app/production.ini && \
-    echo "## Scheming Configuration" >> /app/production.ini && \
-    echo "# Use DCAT-AP recommended schema (pre-built, compatible with DCAT)" >> /app/production.ini && \
-    echo "scheming.dataset_schemas = ckanext.dcat.schemas:dcat_ap_recommended.yaml" >> /app/production.ini && \
-    echo "scheming.presets = ckanext.scheming:presets.json ckanext.dcat.schemas:presets.yaml" >> /app/production.ini && \
-    echo "scheming.organization_schemas = ckanext.scheming:organization.json" >> /app/production.ini && \
-    echo "scheming.group_schemas = ckanext.scheming:group.json" >> /app/production.ini && \
+    # Add DCAT configuration directly to production.ini
     echo "" >> /app/production.ini && \
     echo "## DCAT Configuration" >> /app/production.ini && \
-    echo "ckanext.dcat.rdf.profiles = euro_dcat_ap_2 euro_dcat_ap" >> /app/production.ini && \
+    echo "# Using euro_dcat_ap_3 profile (latest European DCAT-AP specification)" >> /app/production.ini && \
+    echo "ckanext.dcat.rdf.profiles = euro_dcat_ap_3 euro_dcat_ap_2 euro_dcat_ap" >> /app/production.ini && \
     echo "ckanext.dcat.translate_keys = true" >> /app/production.ini && \
     echo "ckanext.dcat.enable_rdf_endpoints = true" >> /app/production.ini && \
     echo "ckanext.dcat.enable_content_negotiation = true" >> /app/production.ini && \
@@ -42,14 +31,11 @@ RUN uv pip install --system \
     # Clean up uv cache to reduce image size
     rm -rf /root/.cache/uv
 
-# Copy custom scheming schema
-COPY --chown=ckan:ckan schemas/dataset_schema.yaml /app/schemas/
-
 # Switch back to ckan user
 USER ckan
 
 # Metadata labels
-LABEL description="CKAN 2.11.4 with scheming ${SCHEMING_VERSION} and DCAT ${DCAT_VERSION}"
-LABEL extensions="ckanext-scheming==${SCHEMING_VERSION} ckanext-dcat==${DCAT_VERSION}"
+LABEL description="CKAN 2.11.4 with DCAT ${DCAT_VERSION} and euro_dcat_ap_3 profile"
+LABEL extensions="ckanext-dcat==${DCAT_VERSION}"
 LABEL maintainer="Stad Gent"
 LABEL org.opencontainers.image.source="https://github.com/MPParsley/ckan-helm"
