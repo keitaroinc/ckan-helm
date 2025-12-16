@@ -4,17 +4,19 @@
 FROM keitaro/ckan:2.11.4
 
 # Extension versions
+ENV SCHEMING_VERSION="3.1.0"
 ENV DCAT_VERSION="2.4.2"
 ENV RDFLIB_VERSION="7.0.0"
 
-# Plugin configuration - keep all base plugins and add DCAT
-ENV CKAN__PLUGINS="envvars activity image_view text_view datatables_view datastore xloader dcat dcat_json_interface structured_data"
+# Plugin configuration - keep all base plugins and add DCAT (as per docs)
+ENV CKAN__PLUGINS="envvars activity image_view text_view datatables_view datastore xloader dcat dcat_rdf_harvester structured_data"
 
 # Switch to root user for installation
 USER root
 
-# Install DCAT extension using uv (faster and more reliable than pip)
+# Install scheming (required by structured_data) and DCAT extension using uv
 RUN uv pip install --system \
+    ckanext-scheming==${SCHEMING_VERSION} \
     ckanext-dcat==${DCAT_VERSION} \
     rdflib==${RDFLIB_VERSION} && \
     # Update plugin configuration in production.ini using sed
@@ -35,7 +37,7 @@ RUN uv pip install --system \
 USER ckan
 
 # Metadata labels
-LABEL description="CKAN 2.11.4 with DCAT ${DCAT_VERSION} and euro_dcat_ap_3 profile"
-LABEL extensions="ckanext-dcat==${DCAT_VERSION}"
+LABEL description="CKAN 2.11.4 with DCAT ${DCAT_VERSION} (euro_dcat_ap_3) and scheming ${SCHEMING_VERSION}"
+LABEL extensions="ckanext-scheming==${SCHEMING_VERSION} ckanext-dcat==${DCAT_VERSION}"
 LABEL maintainer="Stad Gent"
 LABEL org.opencontainers.image.source="https://github.com/MPParsley/ckan-helm"
