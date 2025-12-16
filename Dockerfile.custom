@@ -27,7 +27,8 @@ RUN uv pip install --system \
     # Add scheming and DCAT configuration directly to production.ini
     echo "" >> /app/production.ini && \
     echo "## Scheming Configuration" >> /app/production.ini && \
-    echo "scheming.dataset_schemas = /app/schemas/dataset_schema.yaml" >> /app/production.ini && \
+    echo "# Use DCAT-AP recommended schema (pre-built, compatible with DCAT)" >> /app/production.ini && \
+    echo "scheming.dataset_schemas = ckanext.dcat.schemas:dcat_ap_recommended.yaml" >> /app/production.ini && \
     echo "scheming.presets = ckanext.scheming:presets.json ckanext.dcat.schemas:presets.yaml" >> /app/production.ini && \
     echo "scheming.organization_schemas = ckanext.scheming:organization.json" >> /app/production.ini && \
     echo "scheming.group_schemas = ckanext.scheming:group.json" >> /app/production.ini && \
