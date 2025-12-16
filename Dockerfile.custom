@@ -24,6 +24,17 @@ RUN uv pip install --system \
     chown -R ckan:ckan /app/schemas && \
     # Update plugin configuration in production.ini
     ckan config-tool ${APP_DIR}/production.ini "ckan.plugins = ${CKAN__PLUGINS}" && \
+    # Add scheming configuration to production.ini
+    ckan config-tool ${APP_DIR}/production.ini "scheming.dataset_schemas = /app/schemas/dataset_schema.yaml" && \
+    ckan config-tool ${APP_DIR}/production.ini "scheming.presets = ckanext.scheming:presets.json ckanext.dcat.schemas:presets.yaml" && \
+    ckan config-tool ${APP_DIR}/production.ini "scheming.organization_schemas = ckanext.scheming:organization.json" && \
+    ckan config-tool ${APP_DIR}/production.ini "scheming.group_schemas = ckanext.scheming:group.json" && \
+    # Add DCAT configuration
+    ckan config-tool ${APP_DIR}/production.ini "ckanext.dcat.rdf.profiles = euro_dcat_ap_2 euro_dcat_ap" && \
+    ckan config-tool ${APP_DIR}/production.ini "ckanext.dcat.translate_keys = true" && \
+    ckan config-tool ${APP_DIR}/production.ini "ckanext.dcat.enable_rdf_endpoints = true" && \
+    ckan config-tool ${APP_DIR}/production.ini "ckanext.dcat.enable_content_negotiation = true" && \
+    ckan config-tool ${APP_DIR}/production.ini "ckanext.dcat.enable_dataset_rdf_endpoints = true" && \
     # Clean up uv cache to reduce image size
     rm -rf /root/.cache/uv
 
