@@ -76,6 +76,7 @@ spec:
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           securityContext:
             {{- toYaml $.Values.securityContext | nindent 12 }}
+            {{- if not .Values.openshift.enabled }}
             runAsNonRoot: true
             seccompProfile:
               type: RuntimeDefault
