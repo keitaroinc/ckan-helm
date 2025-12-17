@@ -185,7 +185,7 @@ $ kubectl delete pvc -l release=$release
 | redis.master.persistence.enabled | bool | `false` | Enable redis volume claim |
 | redis.master.persistence.size | string | `"1Gi"` | Size of the volume claim |
 | redis.replicaCount | int | `1` |  |
-| replicaCount | int | `1` |  |
+| replicaCount | int | `1` | Number of CKAN pods to deploy |
 | resources | object | `{}` |  |
 | securityContext.allowPrivilegeEscalation | bool | `false` |  |
 | service.port | int | `80` |  |
