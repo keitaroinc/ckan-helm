@@ -6,26 +6,36 @@
 replicaCount: 1
 
 image:
+  # image.repository -- CKAN Docker image repository
   repository: keitaro/ckan
+  # image.tag -- CKAN Docker image tag
   tag: 2.11.4
+  # image.pullPolicy -- Image pull policy  
   pullPolicy: IfNotPresent
   testConnection:
+    # image.testConnection.repository -- Image for test connection jobs
     repository: busybox
     tag: stable
     pullPolicy: IfNotPresent
   initContainer:
+    # image.initContainer.repository -- Image for init containers
     repository: busybox
     tag: stable
     pullPolicy: IfNotPresent
 
 imagePullSecrets: []
 nameOverride: ""
+# fullnameOverride -- Override for full chart name
 fullnameOverride: "ckan"
 
 pvc:
+  # pvc.enabled -- Enable persistent volume claim
   enabled: true
+  # pvc.size -- Size of the PVC
   size: "1Gi"
+  # pvc.storageClassName -- Storage class for PVC
   storageClassName: "standard"
+  # pvc.accessmode -- Access mode for PVC
   accessmode: "ReadWriteOnce"
 
 # DBDeploymentName -- Variable for name override for postgres deployment
@@ -219,14 +229,18 @@ serviceAccount:
 # ckan:
 #   test: label1
 
+# labels.ckan -- Custom labels for CKAN deployment
 labels:
+  # labels.enabled -- Enable custom labels
   enabled: false
   ckan: []
 
+# podSecurityContext -- Pod security context
 podSecurityContext:
   runAsUser: 92
   runAsGroup: 92
 
+# securityContext -- Container security context
 securityContext:
   allowPrivilegeEscalation: false
 
@@ -234,19 +248,25 @@ securityContext:
 service:
   # service.type -- Type of the service created for the CKAN pod
   type: ClusterIP
+  # service.port -- Service port
   port: 80
 
 ingress:
+  # ingress.enabled -- Enable ingress
   enabled: false
+  # ingress.annotations -- Ingress annotations
   annotations: {}
     # kubernetes.io/ingress.class: nginx
     # kubernetes.io/tls-acme: "true"
+  # ingress.className -- Ingress class name    
   className: ""
+  # ingress.hosts -- Ingress hosts
   hosts:
     - host: chart-example.local
       paths:
         - path: /
           pathType: ImplementationSpecific
+  # ingress.tls -- Ingress TLS configuration        
   tls: []
   #  - secretName: chart-example-tls
   #    hosts:
@@ -254,9 +274,11 @@ ingress:
 
 # ingressRoute -- Used in conjunction with a Traefik v2 deployment
 ingressRoute:
+  # ingressRoute.enabled -- Enable Traefik ingress route
   enabled: false
+  # ingressRoute.host -- Traefik ingress route host
   host: chart-example.local
-
+# resources -- Resource requests/limits
 resources: {}
   # We usually recommend not to specify default resources and to leave this as a conscious
   # choice for the user. This also increases chances charts run on environments with little
@@ -269,20 +291,29 @@ resources: {}
   #   cpu: 100m
   #   memory: 128Mi
 
+# nodeSelector -- Node selector
 nodeSelector: {}
 
+# tolerations -- Pod tolerations
 tolerations: []
 
+# affinity -- Pod affinity
 affinity: {}
 
 hpa:
+  # hpa.enabled -- Enable horizontal pod autoscaler
   enabled: false
+  # hpa.minReplicas -- Minimum HPA replicas
   minReplicas: 1
+  # hpa.maxReplicas -- Maximum HPA replicas
   maxReplicas: 5
+  # hpa.cpuTargetAverageUtilization -- HPA CPU target utilization
   cpuTargetAverageUtilization: 80
+  # hpa.memoryTargetAverageUtilization -- HPA memory target utilization
   memoryTargetAverageUtilization: 80
   # Please check: https://docs.ckan.org/en/2.11/maintaining/configuration.html#session-settings
   sessions:
+    # hpa.sessions.session_type -- HPA session type
     session_type: redis
 
 

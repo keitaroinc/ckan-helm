@@ -76,7 +76,7 @@ $ kubectl delete pvc -l release=$release
 | RedisName | string | `"redis"` | Variable for name override for redis deployment |
 | SolrName | string | `"solr"` | Variable for name override for solr deployment |
 | ZookeeperName | string | `"zookeeper"` | Variable for name override for zookeeper deployment |
-| affinity | object | `{}` |  |
+| affinity | object | `{}` | Pod affinity |
 | ckan.activityStreamsEmailNotifications | string | `"true"` | Set to true to enable email notifications for activity streams for this to work smtp must be configured |
 | ckan.ckanPlugins | string | `"envvars activity image_view text_view datatables_view datastore xloader"` | List of plugins to be used by the instance |
 | ckan.ckanext_xloader_site_url | string | `"http://ckan:80"` | URL for the xloader extension to use for file uploads |
@@ -132,37 +132,36 @@ $ kubectl delete pvc -l release=$release
 | ckan.upload_enabled | string | `"true"` | Set to "true" to enable file uploads in CKAN |
 | ckan.uwsg_num | string | `"2"` |  |
 | ckan.workers | list | `[{"command":["ckan","-c","/app/production.ini","jobs","worker","default"],"name":"default","replicas":1},{"command":["ckan","-c","/app/production.ini","jobs","worker","bulk"],"name":"bulk","replicas":1},{"command":["ckan","-c","/app/production.ini","jobs","worker","priority"],"name":"priority","replicas":1}]` | Configuration for CKAN worker deployments for custom workers add additional entries to the array |
-| fullnameOverride | string | `"ckan"` |  |
-| hpa.cpuTargetAverageUtilization | int | `80` |  |
-| hpa.enabled | bool | `false` |  |
-| hpa.maxReplicas | int | `5` |  |
-| hpa.memoryTargetAverageUtilization | int | `80` |  |
-| hpa.minReplicas | int | `1` |  |
-| hpa.sessions.session_type | string | `"redis"` |  |
+| fullnameOverride | string | `"ckan"` | Override for full chart name |
+| hpa.cpuTargetAverageUtilization | int | `80` | HPA CPU target utilization |
+| hpa.enabled | bool | `false` | Enable horizontal pod autoscaler |
+| hpa.maxReplicas | int | `5` | Maximum HPA replicas |
+| hpa.memoryTargetAverageUtilization | int | `80` | HPA memory target utilization |
+| hpa.minReplicas | int | `1` | Minimum HPA replicas |
+| hpa.sessions.session_type | string | `"redis"` | HPA session type |
 | image.initContainer.pullPolicy | string | `"IfNotPresent"` |  |
-| image.initContainer.repository | string | `"busybox"` |  |
+| image.initContainer.repository | string | `"busybox"` | Image for init containers |
 | image.initContainer.tag | string | `"stable"` |  |
-| image.pullPolicy | string | `"IfNotPresent"` |  |
-| image.repository | string | `"keitaro/ckan"` |  |
-| image.tag | string | `"2.11.4"` |  |
+| image.pullPolicy | string | `"IfNotPresent"` | Image pull policy   |
+| image.repository | string | `"keitaro/ckan"` | CKAN Docker image repository |
+| image.tag | string | `"2.11.4"` | CKAN Docker image tag |
 | image.testConnection.pullPolicy | string | `"IfNotPresent"` |  |
-| image.testConnection.repository | string | `"busybox"` |  |
+| image.testConnection.repository | string | `"busybox"` | Image for test connection jobs |
 | image.testConnection.tag | string | `"stable"` |  |
 | imagePullSecrets | list | `[]` |  |
-| ingress.annotations | object | `{}` |  |
-| ingress.className | string | `""` |  |
-| ingress.enabled | bool | `false` |  |
-| ingress.hosts[0].host | string | `"chart-example.local"` |  |
-| ingress.hosts[0].paths[0].path | string | `"/"` |  |
-| ingress.hosts[0].paths[0].pathType | string | `"ImplementationSpecific"` |  |
-| ingress.tls | list | `[]` |  |
+| ingress.annotations | object | `{}` | Ingress annotations |
+| ingress.className | string | `""` | Ingress class name     |
+| ingress.enabled | bool | `false` | Enable ingress |
+| ingress.hosts | list | `[{"host":"chart-example.local","paths":[{"path":"/","pathType":"ImplementationSpecific"}]}]` | Ingress hosts |
+| ingress.tls | list | `[]` | Ingress TLS configuration         |
 | ingressRoute | object | `{"enabled":false,"host":"chart-example.local"}` | Used in conjunction with a Traefik v2 deployment |
-| labels.ckan | list | `[]` | A map where you can add extra labels to the ckan deployment: example: ckan:   test: label1 |
-| labels.enabled | bool | `false` |  |
+| ingressRoute.enabled | bool | `false` | Enable Traefik ingress route |
+| ingressRoute.host | string | `"chart-example.local"` | Traefik ingress route host |
+| labels.ckan | list | `[]` | Custom labels for CKAN deployment |
+| labels.enabled | bool | `false` | Enable custom labels |
 | nameOverride | string | `""` |  |
-| nodeSelector | object | `{}` |  |
-| podSecurityContext.runAsGroup | int | `92` |  |
-| podSecurityContext.runAsUser | int | `92` |  |
+| nodeSelector | object | `{}` | Node selector |
+| podSecurityContext | object | `{"runAsGroup":92,"runAsUser":92}` | Pod security context |
 | postgresql.auth.database | string | `"ckan_default"` |  |
 | postgresql.auth.password | string | `"pass"` |  |
 | postgresql.auth.postgresPassword | string | `"pass"` |  |
@@ -171,10 +170,10 @@ $ kubectl delete pvc -l release=$release
 | postgresql.fullnameOverride | string | `"postgres"` | Name override for the PostgreSQL deployment |
 | postgresql.global.security.allowInsecureImages | bool | `true` |  |
 | postgresql.persistence.size | string | `"1Gi"` | Size of the PostgreSQL pvc |
-| pvc.accessmode | string | `"ReadWriteOnce"` |  |
-| pvc.enabled | bool | `true` |  |
-| pvc.size | string | `"1Gi"` |  |
-| pvc.storageClassName | string | `"standard"` |  |
+| pvc.accessmode | string | `"ReadWriteOnce"` | Access mode for PVC |
+| pvc.enabled | bool | `true` | Enable persistent volume claim |
+| pvc.size | string | `"1Gi"` | Size of the PVC |
+| pvc.storageClassName | string | `"standard"` | Storage class for PVC |
 | redis.architecture | string | `"standalone"` | Redis architecture for standalone or replication versions |
 | redis.auth.enabled | bool | `false` | Enable or disable redis password auth |
 | redis.auth.password | string | `nil` | The password of redis if auth is enabled |
@@ -186,9 +185,9 @@ $ kubectl delete pvc -l release=$release
 | redis.master.persistence.size | string | `"1Gi"` | Size of the volume claim |
 | redis.replicaCount | int | `1` |  |
 | replicaCount | int | `1` | Number of CKAN pods to deploy |
-| resources | object | `{}` |  |
-| securityContext.allowPrivilegeEscalation | bool | `false` |  |
-| service.port | int | `80` |  |
+| resources | object | `{}` | Resource requests/limits |
+| securityContext | object | `{"allowPrivilegeEscalation":false}` | Container security context |
+| service.port | int | `80` | Service port |
 | service.type | string | `"ClusterIP"` | Type of the service created for the CKAN pod |
 | serviceAccount.annotations | object | `{}` | Annotations to add to the service account |
 | serviceAccount.create | bool | `false` | Specifies whether a service account should be created |
@@ -222,4 +221,4 @@ $ kubectl delete pvc -l release=$release
 | solr.zookeeper.image.tag | string | `"3.9.3-debian-12-r22"` |  |
 | solr.zookeeper.persistence.size | string | `"1Gi"` | Size of ZK PVC |
 | solr.zookeeper.replicaCount | int | `1` | Numer of Zookeeper replicas in the ZK cluster |
-| tolerations | list | `[]` |  |
+| tolerations | list | `[]` | Pod tolerations |
