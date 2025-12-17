@@ -1,0 +1,39 @@
+name: Helm Docs
+
+on:
+  pull_request:
+    paths:
+      - "values.yaml"
+      - "README.md"
+      - "Chart.yaml"
+      - ".github/workflows/helm-docs.yml"
+
+jobs:
+  helm-docs:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+            fetch-depth: 0  
+
+      - name: Install helm-docs
+        run: |
+          curl -sSL https://github.com/norwoodj/helm-docs/releases/download/v1.14.2/helm-docs_1.14.2_Linux_x86_64.tar.gz -o helm-docs.tar.gz
+          tar -xzf helm-docs.tar.gz
+          chmod +x helm-docs
+          sudo mv helm-docs /usr/local/bin/
+
+      - name: Generate docs
+        run: helm-docs
+
+      - name: Check for changes
+        run: |
+          # Check for documentation changes (README.md) only, ignoring the LICENSE issue
+          if ! git diff --quiet README.md; then
+            echo "README.md is outdated. Run 'helm-docs' locally and commit the changes."
+            git diff README.md
+            exit 1
+          fi
+          echo "Helm documentation check passed successfully."
