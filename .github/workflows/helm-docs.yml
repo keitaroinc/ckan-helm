@@ -11,12 +11,15 @@ on:
 jobs:
   helm-docs:
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
 
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
         with:
-            fetch-depth: 0  
+          fetch-depth: 0
+          ref: ${{ github.head_ref }}
 
       - name: Install helm-docs
         run: |
@@ -28,12 +31,9 @@ jobs:
       - name: Generate docs
         run: helm-docs
 
-      - name: Check for changes
-        run: |
-          # Check for documentation changes (README.md) only, ignoring the LICENSE issue
-          if ! git diff --quiet README.md; then
-            echo "README.md is outdated. Run 'helm-docs' locally and commit the changes."
-            git diff README.md
-            exit 1
-          fi
-          echo "Helm documentation check passed successfully."
+      - name: Commit and Push changes
+        uses: stefanzweifel/git-auto-commit-action@v5
+        with:
+          commit_message: "docs: Auto-generate README.md via helm-docs"
+          file_pattern: README.md
+          skip_dirty_check: false
