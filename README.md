@@ -107,7 +107,7 @@ $ kubectl delete pvc -l release=$release
 | ckan.psql.masterDatabase | string | `"postgres"` | PostgreSQL database for the master user |
 | ckan.psql.masterPassword | string | `"pass"` | PostgreSQL master user password |
 | ckan.psql.masterUser | string | `"postgres"` | PostgreSQL master username |
-| ckan.psql.runOnAzure | bool | `false` | Set to true to run on Azure (if true wont run on anything other then azure) set to false to run on other platforms   |
+| ckan.psql.runOnAzure | bool | `false` | Set to true to run on Azure (if true wont run on anything other then azure) set to false to run on other platforms |
 | ckan.readiness.failureThreshold | int | `6` | Failure threshold for the readiness probe |
 | ckan.readiness.initialDelaySeconds | int | `10` | Inital delay seconds for the readiness probe |
 | ckan.readiness.periodSeconds | int | `10` | Check interval for the readiness probe |
@@ -142,7 +142,7 @@ $ kubectl delete pvc -l release=$release
 | image.initContainer.pullPolicy | string | `"IfNotPresent"` |  |
 | image.initContainer.repository | string | `"busybox"` | Image for init containers |
 | image.initContainer.tag | string | `"stable"` |  |
-| image.pullPolicy | string | `"IfNotPresent"` | Image pull policy   |
+| image.pullPolicy | string | `"IfNotPresent"` | Image pull policy |
 | image.repository | string | `"keitaro/ckan"` | CKAN Docker image repository |
 | image.tag | string | `"2.11.4"` | CKAN Docker image tag |
 | image.testConnection.pullPolicy | string | `"IfNotPresent"` |  |
@@ -150,10 +150,10 @@ $ kubectl delete pvc -l release=$release
 | image.testConnection.tag | string | `"stable"` |  |
 | imagePullSecrets | list | `[]` |  |
 | ingress.annotations | object | `{}` | Ingress annotations |
-| ingress.className | string | `""` | Ingress class name     |
+| ingress.className | string | `""` | Ingress class name |
 | ingress.enabled | bool | `false` | Enable ingress |
 | ingress.hosts | list | `[{"host":"chart-example.local","paths":[{"path":"/","pathType":"ImplementationSpecific"}]}]` | Ingress hosts |
-| ingress.tls | list | `[]` | Ingress TLS configuration         |
+| ingress.tls | list | `[]` | Ingress TLS configuration |
 | ingressRoute | object | `{"enabled":false,"host":"chart-example.local"}` | Used in conjunction with a Traefik v2 deployment |
 | ingressRoute.enabled | bool | `false` | Enable Traefik ingress route |
 | ingressRoute.host | string | `"chart-example.local"` | Traefik ingress route host |
@@ -195,7 +195,7 @@ $ kubectl delete pvc -l release=$release
 | solr.auth.adminPassword | string | `"pass"` | The password of the solr admin user |
 | solr.auth.adminUsername | string | `"admin"` |  |
 | solr.auth.enabled | bool | `true` | Enable or disable auth (if auth is disabled solr-init cant upload the configset/schema.xml for ckan) |
-| solr.collection | string | `nil` | the name of the collection created by solr  since we are creating one with solr-init this needs to be blank |
+| solr.collection | string | `nil` | the name of the collection created by solr since we are creating one with solr-init this needs to be blank |
 | solr.collectionReplicas | int | `0` | Number of replicas for each SOLR shard |
 | solr.collectionShards | int | `0` | Number of shards for the SOLR collection |
 | solr.enabled | bool | `true` | Flag to control whether to deploy SOLR |
