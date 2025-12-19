@@ -27,7 +27,7 @@ ENV DCAT_REQUIREMENTS_URL="https://raw.githubusercontent.com/ckan/ckanext-dcat/r
 #ENV PAGES_GIT_VERSION="master"
 
 # Add the custom extensions to the plugins list
-ENV CKAN__PLUGINS="envvars activity image_view text_view datatables_view datastore xloader scheming_datasets harvest dcat dcat_rdf_harvester structured_data"
+ENV CKAN__PLUGINS="envvars activity image_view text_view datatables_view datastore xloader scheming_datasets harvest dcat dcat_rdf_harvester structured_data stadgent_validators"
 
 # Switch to the root user
 USER root
@@ -56,6 +56,11 @@ RUN apk add --no-cache libffi-dev && \
 
 # Copy custom Stad Gent DCAT schema
 COPY --chown=ckan:ckan schemas/dcat_ap_stadgent.yaml ${APP_DIR}/schemas/
+
+# Copy and install custom validators extension
+COPY validators/ckanext-stadgent-validators /tmp/ckanext-stadgent-validators
+RUN uv pip install --system /tmp/ckanext-stadgent-validators && \
+    rm -rf /tmp/ckanext-stadgent-validators
 
 # Switch to the ckan user
 USER ckan
