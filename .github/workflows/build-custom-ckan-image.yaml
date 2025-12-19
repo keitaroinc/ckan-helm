@@ -6,7 +6,7 @@ on:
       - master
       - main
     paths:
-      - 'Dockerfile.custom'
+      - 'Dockerfile'
       - 'schemas/**'
       - '.github/workflows/build-custom-ckan-image.yaml'
   pull_request:
@@ -14,7 +14,7 @@ on:
       - master
       - main
     paths:
-      - 'Dockerfile.custom'
+      - 'Dockerfile'
       - 'schemas/**'
   workflow_dispatch:
     inputs:
