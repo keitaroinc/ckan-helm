@@ -13,14 +13,18 @@ spec:
         spec:
           securityContext:
             {{- toYaml .Values.podSecurityContext | nindent 12 }}
+            {{- if not .Values.openshift.enabled }}
             runAsNonRoot: true
             seccompProfile:
               type: RuntimeDefault
+            {{- end }}
           containers:
             - name: ckan-email-notifications
               securityContext:
                 {{- toYaml .Values.securityContext | nindent 16 }}
+                {{- if not .Values.openshift.enabled }}
                 readOnlyRootFilesystem: true
+                {{- end }}
               image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
               imagePullPolicy: {{ .Values.image.pullPolicy }}
               command: ["curl"]
