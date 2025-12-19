@@ -39,8 +39,8 @@ dataset_fields:
 - field_name: project_code
   label: Projectcode
   form_placeholder: Bijv. STAD-2024-001
-  validators: ignore_missing project_code_validator
-  help_text: Projectcode in formaat STAD-YYYY-NNN (verplicht formaat).
+  validators: ignore_missing unicode_safe
+  help_text: Projectcode in formaat STAD-YYYY-NNN (validatie volgt later).
 
 - field_name: data_quality
   label: Datakwaliteit
