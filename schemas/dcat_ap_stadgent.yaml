@@ -1,7 +1,7 @@
 scheming_version: 2
 dataset_type: dataset
-about: Full DCAT AP (2 and 3) schema
-about_url: http://github.com/ckan/ckanext-dcat
+about: Stad Gent DCAT AP schema (based on DCAT AP 2 and 3)
+about_url: https://github.com/MPParsley/ckan-helm
 
 dataset_fields:
 
@@ -21,6 +21,13 @@ dataset_fields:
   required: true
   form_snippet: markdown.html
   help_text: A free-text account of the dataset.
+
+- field_name: license_id
+  label: License
+  form_snippet: license.html
+  required: true
+  validators: not_empty unicode_safe
+  help_text: License definitions and additional information can be found at http://opendefinition.org/.
 
 - field_name: tag_string
   label: Keywords
@@ -117,11 +124,6 @@ dataset_fields:
   display_snippet: link.html
   help_text: A web page that acts as the homepage for the dataset.
 
-- field_name: license_id
-  label: License
-  form_snippet: license.html
-  help_text: License definitions and additional information can be found at http://opendefinition.org/.
-
 - field_name: owner_org
   label: Organization
   preset: dataset_organization
@@ -164,7 +166,8 @@ dataset_fields:
 
 - field_name: frequency
   label: Frequency
-  help_text: The frequency at which dataset is published.
+  form_snippet: null
+  help_text: The frequency at which dataset is published (hidden from form).
 
 - field_name: provenance
   label: Provenance

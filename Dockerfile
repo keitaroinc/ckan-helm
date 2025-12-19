@@ -42,14 +42,20 @@ RUN apk add --no-cache libffi-dev && \
     uv pip install --system git+${DCAT_GIT_URL}@${DCAT_GIT_VERSION} && \
     # Install any other required python packages
     uv pip install --system requests && \
+    # Create schemas directory
+    mkdir -p ${APP_DIR}/schemas && \
+    chown -R ckan:ckan ${APP_DIR}/schemas && \
     # Update plugin configuration
     ckan config-tool ${APP_DIR}/production.ini "ckan.plugins = ${CKAN__PLUGINS}" && \
-    ckan config-tool ${APP_DIR}/production.ini "scheming.dataset_schemas = ckanext.dcat.schemas:dcat_ap_full.yaml" && \
+    ckan config-tool ${APP_DIR}/production.ini "scheming.dataset_schemas = file://${APP_DIR}/schemas/dcat_ap_stadgent.yaml" && \
     ckan config-tool ${APP_DIR}/production.ini "scheming.presets = ckanext.scheming:presets.json ckanext.dcat.schemas:presets.yaml" && \
     ckan config-tool ${APP_DIR}/production.ini "ckanext.dcat.rdf.profiles = euro_dcat_ap_3" && \
     chown -R ckan:ckan /app && \
     # Remove uv cache
     rm -rf /app/cache
+
+# Copy custom Stad Gent DCAT schema
+COPY --chown=ckan:ckan schemas/dcat_ap_stadgent.yaml ${APP_DIR}/schemas/
 
 # Switch to the ckan user
 USER ckan
