@@ -15,3 +15,4 @@ rules:
 ignore: |
   charts/**
   .github/**
+  templates/**/*.yaml

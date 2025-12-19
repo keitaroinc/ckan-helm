@@ -10,7 +10,7 @@ image:
   repository: keitaro/ckan
   # image.tag -- CKAN Docker image tag
   tag: 2.11.4
-  # image.pullPolicy -- Image pull policy  
+  # image.pullPolicy -- Image pull policy
   pullPolicy: IfNotPresent
   testConnection:
     # image.testConnection.repository -- Image for test connection jobs
@@ -127,7 +127,7 @@ ckan:
     command: ["ckan", "-c", "/app/production.ini","jobs", "worker", "priority"]
 
   psql:
-    # ckan.psql.runOnAzure -- Set to true to run on Azure (if true wont run on anything other then azure) set to false to run on other platforms  
+    # ckan.psql.runOnAzure -- Set to true to run on Azure (if true wont run on anything other then azure) set to false to run on other platforms
     runOnAzure: false
     # ckan.psql.initialize -- Flag whether to initialize the PostgreSQL instance with the provided users and databases
     initialize: true
@@ -151,7 +151,7 @@ ckan:
 
   smtp:
     server: "smtpServerURLorIP:port"
-    user: "smtpUser" 
+    user: "smtpUser"
     password: "smtpPassword"
     mailFrom: "postmaster@domain.com"
     tls: "enabled"
@@ -258,15 +258,15 @@ ingress:
   annotations: {}
     # kubernetes.io/ingress.class: nginx
     # kubernetes.io/tls-acme: "true"
-  # ingress.className -- Ingress class name    
+  # ingress.className -- Ingress class name
   className: ""
   # ingress.hosts -- Ingress hosts
   hosts:
-    - host: chart-example.local
-      paths:
-        - path: /
-          pathType: ImplementationSpecific
-  # ingress.tls -- Ingress TLS configuration        
+  - host: chart-example.local
+    paths:
+    - path: /
+      pathType: ImplementationSpecific
+  # ingress.tls -- Ingress TLS configuration
   tls: []
   #  - secretName: chart-example-tls
   #    hosts:
@@ -324,8 +324,8 @@ redis:
   # redis.fullnameOverride -- Name override for the redis deployment
   fullnameOverride: *RedisName
   replicaCount: 1
-  global: 
-    security: 
+  global:
+    security:
       allowInsecureImages: true
   # redis.architecture -- Redis architecture for standalone or replication versions
   architecture: standalone
@@ -341,10 +341,10 @@ redis:
   # redis.auth.sentinel -- Enables or disables passwords for sentinels
     sentinel: false
   # redis.auth.password --  The password of redis if auth is enabled
-    password: 
+    password:
 
 
-solr: 
+solr:
   # Please see all available overrides at https://github.com/bitnami/charts/tree/main/bitnami/solr/#installing-the-chart
   # solr.enabled -- Flag to control whether to deploy SOLR
   enabled: true
@@ -352,7 +352,7 @@ solr:
     imageRegistry: ""
     imagePullSecrets: []
     storageClass: ""
-    security: 
+    security:
       allowInsecureImages: true
   auth:
   # solr.auth.enabled -- Enable or disable auth (if auth is disabled solr-init cant upload the configset/schema.xml for ckan)
@@ -361,7 +361,7 @@ solr:
     adminUsername: admin
   # solr.auth.adminPassword -- The password of the solr admin user
     adminPassword: pass
-  # solr.collection -- the name of the collection created by solr 
+  # solr.collection -- the name of the collection created by solr
   # since we are creating one with solr-init this needs to be blank
   collection:
   # solr.collectionShards -- Number of shards for the SOLR collection
