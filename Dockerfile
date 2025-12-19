@@ -1,7 +1,7 @@
 ############
 ### MAIN ###
 ############
-FROM ghcr.io/keitaroinc/ckan:2.11.2
+FROM ghcr.io/keitaroinc/ckan:2.11.4
 
 # CKAN extension source code URLs
 #ENV ACME_GIT_URL="https://github.com/myghorg/ckanext-acme.git"
