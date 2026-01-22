@@ -8,7 +8,7 @@ CKAN Helm Chart
 [Chat on Gitter]: https://badges.gitter.im/gitterHQ/gitter.svg
 [2]: https://gitter.im/keitaroinc/docker-ckan
 
-A Helm chart for CKAN
+A Helm chart for CKAN 
 
 Current chart version is `v4.0.5`
 
