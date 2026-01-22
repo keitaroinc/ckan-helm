@@ -94,6 +94,7 @@ $ kubectl delete pvc -l release=$release
 | ckan.db.ckanDbUrl | string | `"postgres"` | Url of the PostgreSQL server where the CKAN database is hosted |
 | ckan.db.ckanDbUser | string | `"ckan_default"` | Username of the database to be used by CKAN |
 | ckan.debug | string | `"false"` | Set to true to enable debug mode in CKAN |
+| ckan.extraContainers | list | `[]` | An array to add extra containers to the CKAN pod For example: |
 | ckan.extraEnv | list | `[]` | An array to add extra environment variables For example: extraEnv:   - name: FOO     value: "bar"  |
 | ckan.issues.sendEmailNotifications | string | `"true"` |  |
 | ckan.liveness.failureThreshold | int | `6` | Failure threshold for the liveness probe |
