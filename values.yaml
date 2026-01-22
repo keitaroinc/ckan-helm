@@ -126,6 +126,18 @@ ckan:
     replicas: 1
     command: ["ckan", "-c", "/app/production.ini","jobs", "worker", "priority"]
 
+  # ckan.extraContainers -- An array to add extra containers to the CKAN pod
+  # For example:
+  extraContainers: []
+  # - name: example-sidecar
+  #   image: alpine:3.19
+  #   command:
+  #     - sleep
+  #     - infinity
+  #   volumeMounts:
+  #     - name: ckan
+  #       mountPath: /app/data
+
   psql:
     # ckan.psql.runOnAzure -- Set to true to run on Azure (if true wont run on anything other then azure) set to false to run on other platforms
     runOnAzure: false

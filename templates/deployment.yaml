@@ -37,6 +37,9 @@ spec:
           emptyDir: {}
         - name: ckan-config-storage
           emptyDir: {}
+        {{- with .Values.ckan.extraVolumes }}
+        {{ toYaml . | nindent 8 }}
+        {{- end }}
       initContainers:
         {{- if .Values.pvc.enabled }}
         - name: set-volume-ownsership
@@ -66,6 +69,7 @@ spec:
           volumeMounts:
             - name: ckan-config-storage
               mountPath: /writable-config
+
       containers:
         - name: {{ .Chart.Name }}
           image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
@@ -222,7 +226,6 @@ spec:
             failureThreshold: {{ .Values.ckan.liveness.failureThreshold }}
             timeoutSeconds: {{ .Values.ckan.liveness.timeoutSeconds }}
           {{- end }}
-          
           volumeMounts:
             {{- if .Values.pvc.enabled }}
             - name: ckan
@@ -234,9 +237,14 @@ spec:
             - name: ckan-config-storage
               mountPath: /app/production.ini
               subPath: production.ini
-          
           resources:
             {{- toYaml .Values.resources | nindent 12 }}
+
+        # Sidecar containers
+        {{- with .Values.ckan.extraContainers }}
+        {{ toYaml . | nindent 8 }}
+        {{- end }}
+
       {{- with .Values.nodeSelector }}
       nodeSelector:
         {{- toYaml . | nindent 8 }}
