@@ -246,6 +246,9 @@ labels:
   # labels.enabled -- Enable custom labels
   enabled: false
   ckan: []
+  # labels.workers -- Optional labels applied only to worker pod templates.
+  # If not set, workers inherit labels.ckan.
+  workers: {}
 
 # podSecurityContext -- Pod security context
 podSecurityContext:

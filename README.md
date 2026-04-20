@@ -10,7 +10,7 @@ CKAN Helm Chart
 
 A Helm chart for CKAN
 
-Current chart version is `v4.0.5`
+Current chart version is `v4.0.7`
 
 This chart deploys a self contained CKAN instance with all of its dependencies. These can be enabled/disabled if they already exist in your infrastructure.
 
@@ -160,6 +160,7 @@ $ kubectl delete pvc -l release=$release
 | ingressRoute.host | string | `"chart-example.local"` | Traefik ingress route host |
 | labels.ckan | list | `[]` | Custom labels for CKAN deployment |
 | labels.enabled | bool | `false` | Enable custom labels |
+| labels.workers | object | `{}` | Optional labels applied only to worker pod templates. If not set, workers inherit labels.ckan. |
 | nameOverride | string | `""` |  |
 | nodeSelector | object | `{}` | Node selector |
 | podSecurityContext | object | `{"runAsGroup":92,"runAsUser":92}` | Pod security context |
