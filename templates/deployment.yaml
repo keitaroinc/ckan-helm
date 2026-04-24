@@ -172,7 +172,7 @@ spec:
                 secretKeyRef:
                   name: session-secret
                   key: session_secret
-            - name: SESSION_TYPE
+            - name: CKAN___SESSION_TYPE
               value: {{ .Values.hpa.sessions.session_type | quote }}
             {{- end }}
             - name: CKAN_SOLR_URL
