@@ -1,0 +1,103 @@
+scheming_version: 2
+dataset_type: dataset
+about: Custom dataset schema met Linked Data en GIS velden voor Stad Gent
+about_url: https://github.com/ckan/ckanext-scheming
+
+dataset_fields:
+  # Standaard CKAN velden
+  - field_name: title
+    label: Titel
+    preset: title
+    form_placeholder: Titel van de dataset
+    required: true
+
+  - field_name: name
+    label: URL
+    preset: dataset_slug
+    form_placeholder: bv-mijn-dataset
+
+  - field_name: notes
+    label: Beschrijving
+    form_snippet: markdown.html
+    form_placeholder: Beschrijving van de dataset
+    required: true
+
+  - field_name: tag_string
+    label: Tags
+    preset: tag_string_autocomplete
+    form_placeholder: bv. economie, mobiliteit, linked-data
+
+  - field_name: owner_org
+    label: Organisatie
+    preset: dataset_organization
+
+  # Custom velden voor Linked Data
+  - field_name: linked_data
+    label: Linked Data beschikbaar?
+    help_text: Is deze dataset beschikbaar als Linked Open Data?
+    preset: select
+    required: false
+    choices:
+      - value: "true"
+        label: Ja
+      - value: "false"
+        label: Nee
+    form_placeholder: Selecteer ja of nee
+
+  - field_name: data_category
+    label: Data Categorie
+    help_text: Type data dat deze dataset bevat
+    preset: select
+    required: false
+    choices:
+      - value: GIS
+        label: GIS (Geo-informatie)
+      - value: ODP
+        label: ODP (Open Data Portal)
+      - value: LOD
+        label: LOD (Linked Open Data)
+      - value: API
+        label: API
+      - value: OTHER
+        label: Anders
+    form_placeholder: Selecteer categorie
+
+  - field_name: lod_url
+    label: Linked Data URL
+    help_text: URL naar het LOD/SPARQL endpoint (indien van toepassing)
+    form_snippet: text.html
+    display_snippet: link.html
+    form_placeholder: https://example.org/sparql
+    required: false
+
+  - field_name: gis_service_url
+    label: GIS Service URL
+    help_text: URL naar WMS/WFS of andere GIS service (indien van toepassing)
+    form_snippet: text.html
+    display_snippet: link.html
+    form_placeholder: https://geo.example.org/wms
+    required: false
+
+  # Standaard velden
+  - field_name: license_id
+    label: Licentie
+    form_snippet: license.html
+    help_text: Selecteer de licentie voor deze dataset
+
+resource_fields:
+  - field_name: url
+    label: URL
+    preset: resource_url_upload
+
+  - field_name: name
+    label: Naam
+    form_placeholder: bv. Januari 2025 data
+
+  - field_name: description
+    label: Beschrijving
+    form_snippet: markdown.html
+    form_placeholder: Beschrijving van deze resource
+
+  - field_name: format
+    label: Formaat
+    preset: resource_format_autocomplete

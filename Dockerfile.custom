@@ -1,0 +1,46 @@
+# Custom CKAN image with DCAT extension
+# Based on keitaro/ckan:2.11.4
+
+FROM keitaro/ckan:2.11.4
+
+# Extension versions
+ENV SCHEMING_VERSION="release-3.1.0"
+ENV HARVEST_VERSION="v1.5.6"
+ENV DCAT_VERSION="v2.4.2"
+
+# Plugin configuration - keep all base plugins and add DCAT
+# dcat: core DCAT RDF export functionality
+# dcat_rdf_harvester: harvest DCAT datasets from other catalogs
+# structured_data: schema.org/DCAT-AP JSON-LD in dataset pages
+ENV CKAN__PLUGINS="envvars activity image_view text_view datatables_view datastore xloader dcat dcat_rdf_harvester structured_data"
+
+# Switch to root user for installation
+USER root
+
+# Install extensions using uv
+RUN uv pip install --system git+https://github.com/ckan/ckanext-scheming.git@${SCHEMING_VERSION} && \
+    uv pip install --system git+https://github.com/ckan/ckanext-harvest.git@${HARVEST_VERSION} && \
+    uv pip install --system -r https://raw.githubusercontent.com/ckan/ckanext-harvest/${HARVEST_VERSION}/requirements.txt && \
+    uv pip install --system git+https://github.com/ckan/ckanext-dcat.git@${DCAT_VERSION} && \
+    # Update plugin configuration in production.ini
+    sed -i 's/^ckan.plugins =.*/ckan.plugins = '"${CKAN__PLUGINS}"'/' /app/production.ini && \
+    # Add DCAT configuration directly to production.ini
+    echo "" >> /app/production.ini && \
+    echo "## DCAT Configuration" >> /app/production.ini && \
+    echo "# Using euro_dcat_ap_3 profile (latest European DCAT-AP specification)" >> /app/production.ini && \
+    echo "ckanext.dcat.rdf.profiles = euro_dcat_ap_3 euro_dcat_ap_2 euro_dcat_ap" >> /app/production.ini && \
+    echo "ckanext.dcat.translate_keys = true" >> /app/production.ini && \
+    echo "ckanext.dcat.enable_rdf_endpoints = true" >> /app/production.ini && \
+    echo "ckanext.dcat.enable_content_negotiation = true" >> /app/production.ini && \
+    echo "ckanext.dcat.enable_dataset_rdf_endpoints = true" >> /app/production.ini && \
+    # Clean up uv cache to reduce image size
+    rm -rf /root/.cache/uv
+
+# Switch back to ckan user
+USER ckan
+
+# Metadata labels
+LABEL description="CKAN 2.11.4 with DCAT ${DCAT_VERSION} (euro_dcat_ap_3), scheming ${SCHEMING_VERSION}, and harvest ${HARVEST_VERSION}"
+LABEL extensions="ckanext-scheming@${SCHEMING_VERSION} ckanext-harvest@${HARVEST_VERSION} ckanext-dcat@${DCAT_VERSION}"
+LABEL maintainer="Stad Gent"
+LABEL org.opencontainers.image.source="https://github.com/MPParsley/ckan-helm"
