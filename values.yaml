@@ -119,12 +119,15 @@ ckan:
   - name: default
     replicas: 1
     command: ["ckan", "-c", "/app/production.ini","jobs", "worker", "default"]
+    # resources: {}  # optional: overrides workerResources for this worker only
   - name: bulk
     replicas: 1
     command: ["ckan", "-c", "/app/production.ini","jobs", "worker", "bulk"]
+    # resources: {}  # optional: overrides workerResources for this worker only
   - name: priority
     replicas: 1
     command: ["ckan", "-c", "/app/production.ini","jobs", "worker", "priority"]
+    # resources: {}  # optional: overrides workerResources for this worker only
 
   # ckan.extraContainers -- An array to add extra containers to the CKAN pod
   # For example:
