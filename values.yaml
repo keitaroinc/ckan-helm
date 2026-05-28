@@ -113,8 +113,7 @@ ckan:
   # ckan.ckanext_xloader_site_url -- URL for the xloader extension to use for file uploads
   ckanext_xloader_site_url: "http://ckan:80"
 
-  # ckan.workers -- Configuration for CKAN worker deployments
-  # for custom workers add additional entries to the array
+  # ckan.workers -- Configuration for CKAN worker deployments. Each entry supports: name, replicas, command, and an optional resources field that overrides workerResources for that worker only.
   workers:
   - name: default
     replicas: 1
