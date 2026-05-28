@@ -113,18 +113,38 @@ ckan:
   # ckan.ckanext_xloader_site_url -- URL for the xloader extension to use for file uploads
   ckanext_xloader_site_url: "http://ckan:80"
 
-  # ckan.workers -- Configuration for CKAN worker deployments
-  # for custom workers add additional entries to the array
+  # ckan.workers -- Configuration for CKAN worker deployments. Each entry supports: name, replicas, command, and an optional resources field that overrides workerResources for that worker only.
   workers:
   - name: default
     replicas: 1
     command: ["ckan", "-c", "/app/production.ini","jobs", "worker", "default"]
+    # resources:        # optional: overrides workerResources for this worker only
+    #   requests:
+    #     cpu: 100m
+    #     memory: 128Mi
+    #   limits:
+    #     cpu: 100m
+    #     memory: 128Mi
   - name: bulk
     replicas: 1
     command: ["ckan", "-c", "/app/production.ini","jobs", "worker", "bulk"]
+    # resources:        # optional: overrides workerResources for this worker only
+    #   requests:
+    #     cpu: 100m
+    #     memory: 128Mi
+    #   limits:
+    #     cpu: 100m
+    #     memory: 128Mi
   - name: priority
     replicas: 1
     command: ["ckan", "-c", "/app/production.ini","jobs", "worker", "priority"]
+    # resources:        # optional: overrides workerResources for this worker only
+    #   requests:
+    #     cpu: 100m
+    #     memory: 128Mi
+    #   limits:
+    #     cpu: 100m
+    #     memory: 128Mi
 
   # ckan.extraContainers -- An array to add extra containers to the CKAN pod
   # For example:

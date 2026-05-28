@@ -249,7 +249,9 @@ spec:
               readOnly: false
             {{- end }}
           resources:
-            {{- if $.Values.workerResources }}
+            {{- if .resources }}
+            {{- toYaml .resources | nindent 12 }}
+            {{- else if $.Values.workerResources }}
             {{- toYaml $.Values.workerResources | nindent 12 }}
             {{- else }}
             {{- toYaml $.Values.resources | nindent 12 }}
