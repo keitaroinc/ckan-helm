@@ -249,7 +249,11 @@ spec:
               readOnly: false
             {{- end }}
           resources:
+            {{- if $.Values.workerResources }}
+            {{- toYaml $.Values.workerResources | nindent 12 }}
+            {{- else }}
             {{- toYaml $.Values.resources | nindent 12 }}
+            {{- end }}
       {{- with $.Values.nodeSelector }}
       nodeSelector:
         {{- toYaml . | nindent 8 }}
