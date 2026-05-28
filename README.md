@@ -187,7 +187,7 @@ $ kubectl delete pvc -l release=$release
 | redis.master.persistence.size | string | `"1Gi"` | Size of the volume claim |
 | redis.replicaCount | int | `1` |  |
 | replicaCount | int | `1` | Number of CKAN pods to deploy |
-| resources | object | `{}` | Resource requests/limits |
+| resources | object | `{}` | Resource requests/limits for the main CKAN pod |
 | securityContext | object | `{"allowPrivilegeEscalation":false}` | Container security context |
 | service.port | int | `80` | Service port |
 | service.type | string | `"ClusterIP"` | Type of the service created for the CKAN pod |
@@ -224,3 +224,4 @@ $ kubectl delete pvc -l release=$release
 | solr.zookeeper.persistence.size | string | `"1Gi"` | Size of ZK PVC |
 | solr.zookeeper.replicaCount | int | `1` | Numer of Zookeeper replicas in the ZK cluster |
 | tolerations | list | `[]` | Pod tolerations |
+| workerResources | object | `{}` | Resource requests/limits for worker pods. Falls back to resources if not set. |
