@@ -9,7 +9,7 @@ image:
   # image.repository -- CKAN Docker image repository
   repository: keitaro/ckan
   # image.tag -- CKAN Docker image tag
-  tag: 2.11.4
+  tag: 2.11.5
   # image.pullPolicy -- Image pull policy
   pullPolicy: IfNotPresent
   testConnection:

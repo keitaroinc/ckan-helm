@@ -10,7 +10,7 @@ CKAN Helm Chart
 
 A Helm chart for CKAN
 
-Current chart version is `v4.0.7`
+Current chart version is `v4.0.8`
 
 This chart deploys a self contained CKAN instance with all of its dependencies. These can be enabled/disabled if they already exist in your infrastructure.
 
@@ -145,7 +145,7 @@ $ kubectl delete pvc -l release=$release
 | image.initContainer.tag | string | `"stable"` |  |
 | image.pullPolicy | string | `"IfNotPresent"` | Image pull policy |
 | image.repository | string | `"keitaro/ckan"` | CKAN Docker image repository |
-| image.tag | string | `"2.11.4"` | CKAN Docker image tag |
+| image.tag | string | `"2.11.5"` | CKAN Docker image tag |
 | image.testConnection.pullPolicy | string | `"IfNotPresent"` |  |
 | image.testConnection.repository | string | `"busybox"` | Image for test connection jobs |
 | image.testConnection.tag | string | `"stable"` |  |

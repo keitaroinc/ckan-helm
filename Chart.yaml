@@ -1,5 +1,5 @@
 apiVersion: v2
-appVersion: 2.11.3
+appVersion: 2.11.5
 dependencies:
 - condition: redis.enabled
   name: redis
@@ -16,4 +16,4 @@ dependencies:
 description: CKAN Helm chart
 name: ckan
 type: application
-version: v4.0.7
+version: v4.0.8
