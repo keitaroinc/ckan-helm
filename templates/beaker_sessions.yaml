@@ -1,6 +1,12 @@
 {{- /*
 This template persists JWT and other secrets between upgrades.
-It reuses the existing secret if found; otherwise it generates new random values.
+
+Priority order:
+  1. Static values from .Values.sessionSecret (required for ArgoCD and any other
+     GitOps tool that renders with `helm template`, where `lookup` has no cluster
+     access and silently returns empty)
+  2. Existing secret via lookup (works with plain helm upgrade)
+  3. Random generation (first install only)
 */ -}}
 
 {{- $existing := (lookup "v1" "Secret" .Release.Namespace "session-secret") }}
@@ -9,7 +15,11 @@ It reuses the existing secret if found; otherwise it generates new random values
 {{- $session := "" }}
 {{- $csrf := "" }}
 
-{{- if $existing }}
+{{- if and .Values.sessionSecret .Values.sessionSecret.jwt }}
+  {{- $jwt = .Values.sessionSecret.jwt }}
+  {{- $session = .Values.sessionSecret.session }}
+  {{- $csrf = .Values.sessionSecret.csrf }}
+{{- else if $existing }}
   {{- $jwt = index $existing.data "jwt_encode" | b64dec }}
   {{- $session = index $existing.data "session_secret" | b64dec }}
   {{- $csrf = index $existing.data "wtf_csrf_secret" | b64dec }}
