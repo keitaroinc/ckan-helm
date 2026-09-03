@@ -10,7 +10,7 @@ CKAN Helm Chart
 
 A Helm chart for CKAN
 
-Current chart version is `v4.0.8`
+Current chart version is `v4.0.9`
 
 This chart deploys a self contained CKAN instance with all of its dependencies. These can be enabled/disabled if they already exist in your infrastructure.
 
@@ -194,6 +194,7 @@ $ kubectl delete pvc -l release=$release
 | serviceAccount.annotations | object | `{}` | Annotations to add to the service account |
 | serviceAccount.create | bool | `false` | Specifies whether a service account should be created |
 | serviceAccount.name | string | `nil` | The name of the service account to use. If not set and create is true, a name is generated using the fullname template |
+| sessionSecret | object | `{}` | Static JWT/session/CSRF secrets for the `session-secret` Secret. Leave empty to let the chart reuse the existing in-cluster Secret (via `lookup`) or generate random values on first install. Set these when deploying with a GitOps tool such as ArgoCD: it renders with `helm template`, where `lookup` has no cluster access and returns empty, so every sync would otherwise write freshly generated secrets and invalidate all sessions and API tokens. All three keys are required together; `jwt` must keep the `string:` prefix. |
 | solr.auth.adminPassword | string | `"pass"` | The password of the solr admin user |
 | solr.auth.adminUsername | string | `"admin"` |  |
 | solr.auth.enabled | bool | `true` | Enable or disable auth (if auth is disabled solr-init cant upload the configset/schema.xml for ckan) |

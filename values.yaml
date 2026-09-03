@@ -5,6 +5,18 @@
 # replicaCount -- Number of CKAN pods to deploy
 replicaCount: 1
 
+# sessionSecret -- Static JWT/session/CSRF secrets for the `session-secret` Secret.
+# Leave empty to let the chart reuse the existing in-cluster Secret (via `lookup`)
+# or generate random values on first install. Set these when deploying with a
+# GitOps tool such as ArgoCD: it renders with `helm template`, where `lookup` has
+# no cluster access and returns empty, so every sync would otherwise write freshly
+# generated secrets and invalidate all sessions and API tokens.
+# All three keys are required together; `jwt` must keep the `string:` prefix.
+sessionSecret: {}
+  # jwt: "string:<43 chars>"
+  # session: "<43 chars>"
+  # csrf: "<32 chars>"
+
 image:
   # image.repository -- CKAN Docker image repository
   repository: keitaro/ckan
