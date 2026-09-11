@@ -17,6 +17,16 @@ sessionSecret: {}
   # session: "<43 chars>"
   # csrf: "<32 chars>"
 
+# externalSecrets -- Set to true when credentials are managed by External Secrets
+# Operator (ESO) instead of this chart. The chart then skips rendering the
+# `ckancredentials`, `session-secret`, `postgrescredentials` and
+# `ckansysadminapitoken` Secrets, leaving ESO as their sole owner. Without this,
+# ArgoCD re-applies chart-rendered values on every sync and fights ESO for
+# ownership. The Secret names and keys are unchanged, so no workload changes are
+# needed: the ExternalSecret must produce the same names and keys.
+externalSecrets:
+  enabled: false
+
 image:
   # image.repository -- CKAN Docker image repository
   repository: keitaro/ckan
