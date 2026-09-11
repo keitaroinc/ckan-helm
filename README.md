@@ -10,7 +10,7 @@ CKAN Helm Chart
 
 A Helm chart for CKAN
 
-Current chart version is `v4.0.9`
+Current chart version is `v4.1.0`
 
 This chart deploys a self contained CKAN instance with all of its dependencies. These can be enabled/disabled if they already exist in your infrastructure.
 
@@ -133,6 +133,7 @@ $ kubectl delete pvc -l release=$release
 | ckan.upload_enabled | string | `"true"` | Set to "true" to enable file uploads in CKAN |
 | ckan.uwsg_num | string | `"2"` |  |
 | ckan.workers | list | `[{"command":["ckan","-c","/app/production.ini","jobs","worker","default"],"name":"default","replicas":1},{"command":["ckan","-c","/app/production.ini","jobs","worker","bulk"],"name":"bulk","replicas":1},{"command":["ckan","-c","/app/production.ini","jobs","worker","priority"],"name":"priority","replicas":1}]` | Configuration for CKAN worker deployments. Each entry supports: name, replicas, command, and an optional resources field that overrides workerResources for that worker only. |
+| externalSecrets | object | `{"enabled":false}` | Set to true when credentials are managed by External Secrets Operator (ESO) instead of this chart. The chart then skips rendering the `ckancredentials`, `session-secret`, `postgrescredentials` and `ckansysadminapitoken` Secrets, leaving ESO as their sole owner. Without this, ArgoCD re-applies chart-rendered values on every sync and fights ESO for ownership. The Secret names and keys are unchanged, so no workload changes are needed: the ExternalSecret must produce the same names and keys. |
 | fullnameOverride | string | `"ckan"` | Override for full chart name |
 | hpa.cpuTargetAverageUtilization | int | `80` | HPA CPU target utilization |
 | hpa.enabled | bool | `false` | Enable horizontal pod autoscaler |
