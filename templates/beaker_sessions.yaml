@@ -9,6 +9,7 @@ Priority order:
   3. Random generation (first install only)
 */ -}}
 
+{{- if not .Values.externalSecrets.enabled }}
 {{- $existing := (lookup "v1" "Secret" .Release.Namespace "session-secret") }}
 
 {{- $jwt := "" }}
@@ -39,3 +40,4 @@ stringData:
   jwt_decode: {{ $jwt | quote }}
   session_secret: {{ $session | quote }}
   wtf_csrf_secret: {{ $csrf | quote }}
+{{- end }}
