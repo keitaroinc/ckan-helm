@@ -103,7 +103,14 @@ spec:
             - name: CKAN_SOLR_USER
               value: {{ $.Values.solr.auth.adminUsername }}
             - name: CKAN_SOLR_PASSWORD
+              {{- if $.Values.externalSecrets.enabled }}
+              valueFrom:
+                secretKeyRef:
+                  name: {{ $.Values.externalSecrets.solr.secretName }}
+                  key: {{ $.Values.externalSecrets.solr.passwordKey }}
+              {{- else }}
               value: {{ $.Values.solr.auth.adminPassword }}
+              {{- end }}
       containers:
         - name: {{ .name }}
           image: "{{ $.Values.image.repository }}:{{ $.Values.image.tag }}"
@@ -211,7 +218,14 @@ spec:
             - name: CKAN_SOLR_USER
               value: {{ $.Values.solr.auth.adminUsername }}
             - name: CKAN_SOLR_PASSWORD
+              {{- if $.Values.externalSecrets.enabled }}
+              valueFrom:
+                secretKeyRef:
+                  name: {{ $.Values.externalSecrets.solr.secretName }}
+                  key: {{ $.Values.externalSecrets.solr.passwordKey }}
+              {{- else }}
               value: {{ $.Values.solr.auth.adminPassword }}
+              {{- end }}
             - name: CKAN__REDIS__URL
               value: {{ $.Values.ckan.redis }}
             - name: CKANEXT__SPATIAL__SEARCH_BACKEND

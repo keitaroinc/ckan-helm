@@ -10,7 +10,7 @@ CKAN Helm Chart
 
 A Helm chart for CKAN
 
-Current chart version is `v4.0.9`
+Current chart version is `v4.1.0`
 
 This chart deploys a self contained CKAN instance with all of its dependencies. These can be enabled/disabled if they already exist in your infrastructure.
 
@@ -133,6 +133,10 @@ $ kubectl delete pvc -l release=$release
 | ckan.upload_enabled | string | `"true"` | Set to "true" to enable file uploads in CKAN |
 | ckan.uwsg_num | string | `"2"` |  |
 | ckan.workers | list | `[{"command":["ckan","-c","/app/production.ini","jobs","worker","default"],"name":"default","replicas":1},{"command":["ckan","-c","/app/production.ini","jobs","worker","bulk"],"name":"bulk","replicas":1},{"command":["ckan","-c","/app/production.ini","jobs","worker","priority"],"name":"priority","replicas":1}]` | Configuration for CKAN worker deployments. Each entry supports: name, replicas, command, and an optional resources field that overrides workerResources for that worker only. |
+| externalSecrets | object | `{"enabled":false,"solr":{"passwordKey":"solr-password","secretName":"solr"}}` | Credentials supplied by External Secrets Operator (ESO) instead of this chart. When enabled, the chart stops rendering the `ckancredentials`, `session-secret`, `postgrescredentials` and `ckansysadminapitoken` Secrets, so no credential values need to be present in a values file at all, and injects passwords via secretKeyRef rather than as plaintext env values in the pod spec.  Secret names and keys are unchanged, so workloads need no modification: the ExternalSecret only has to produce the same names and keys. |
+| externalSecrets.enabled | bool | `false` | Set true when ESO manages the credential Secrets |
+| externalSecrets.solr.passwordKey | string | `"solr-password"` | Key within that Secret |
+| externalSecrets.solr.secretName | string | `"solr"` | Secret holding the Solr admin password |
 | fullnameOverride | string | `"ckan"` | Override for full chart name |
 | hpa.cpuTargetAverageUtilization | int | `80` | HPA CPU target utilization |
 | hpa.enabled | bool | `false` | Enable horizontal pod autoscaler |

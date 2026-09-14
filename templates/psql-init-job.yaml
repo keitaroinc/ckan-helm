@@ -38,7 +38,10 @@ spec:
             - name: PSQL_MASTER
               value: {{ .Values.ckan.psql.masterUser }}
             - name: PSQL_PASSWD
-              value: {{ .Values.ckan.psql.masterPassword }}
+              valueFrom:
+                secretKeyRef:
+                  name: ckancredentials
+                  key: psqlMasterPassword
             - name: PSQL_DB
               value: {{ .Values.ckan.psql.masterDatabase }}
             - name: CKAN_SOLR_URL
@@ -46,7 +49,14 @@ spec:
             - name: CKAN_SOLR_USER
               value: {{ .Values.solr.auth.adminUsername }}
             - name: CKAN_SOLR_PASSWORD
+              {{- if .Values.externalSecrets.enabled }}
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Values.externalSecrets.solr.secretName }}
+                  key: {{ .Values.externalSecrets.solr.passwordKey }}
+              {{- else }}
               value: {{ .Values.solr.auth.adminPassword }}
+              {{- end }}
             - name: CKAN__DATAPUSHER__URL
               value: {{ .Values.ckan.datapusherUrl }}
             - name: CKAN_SQLALCHEMY_URL

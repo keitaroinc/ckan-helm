@@ -17,6 +17,24 @@ sessionSecret: {}
   # session: "<43 chars>"
   # csrf: "<32 chars>"
 
+# externalSecrets -- Credentials supplied by External Secrets Operator (ESO)
+# instead of this chart. When enabled, the chart stops rendering the
+# `ckancredentials`, `session-secret`, `postgrescredentials` and
+# `ckansysadminapitoken` Secrets, so no credential values need to be present in
+# a values file at all, and injects passwords via secretKeyRef rather than as
+# plaintext env values in the pod spec.
+#
+# Secret names and keys are unchanged, so workloads need no modification: the
+# ExternalSecret only has to produce the same names and keys.
+externalSecrets:
+  # externalSecrets.enabled -- Set true when ESO manages the credential Secrets
+  enabled: false
+  solr:
+    # externalSecrets.solr.secretName -- Secret holding the Solr admin password
+    secretName: solr
+    # externalSecrets.solr.passwordKey -- Key within that Secret
+    passwordKey: solr-password
+
 image:
   # image.repository -- CKAN Docker image repository
   repository: keitaro/ckan

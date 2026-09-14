@@ -51,7 +51,14 @@ spec:
             - name: SOLR_ADMIN_USERNAME
               value: {{ .Values.solr.auth.adminUsername }}
             - name: SOLR_ADMIN_PASSWORD
+              {{- if .Values.externalSecrets.enabled }}
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Values.externalSecrets.solr.secretName }}
+                  key: {{ .Values.externalSecrets.solr.passwordKey }}
+              {{- else }}
               value: {{ .Values.solr.auth.adminPassword }}
+              {{- end }}
             - name: CKAN_SOLR_INIT_NUMSHARDS
               value: "{{ .Values.solr.initialize.numShards }}"
             - name: CKAN_SOLR_INIT_REPLICATIONFACTOR
